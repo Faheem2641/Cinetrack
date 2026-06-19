@@ -1,0 +1,121 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id           String        @id @default(uuid())
+  username     String        @unique
+  email        String        @unique
+  passwordHash String
+  name         String?
+  avatarUrl    String?
+  bio          String?
+  createdAt    DateTime      @default(now())
+  
+  watchEntries WatchEntry[]
+  reviews      Review[]
+  reviewLikes  ReviewLike[]
+  comments     Comment[]
+  customLists  CustomList[]
+  
+  followers    Follow[]      @relation("FollowingUsers")
+  following    Follow[]      @relation("FollowerUsers")
+}
+
+model WatchEntry {
+  id                  String   @id @default(uuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tmdbId              String
+  mediaType           String   // "movie" or "tv"
+  title               String
+  posterPath          String?
+  releaseDate         String?
+  isWatched           Boolean  @default(false)
+  isWishlist          Boolean  @default(false)
+  isCurrentlyWatching Boolean  @default(false)
+  isFavorite          Boolean  @default(false)
+  rating              Float?   // null or 0.5 to 5.0
+  updatedAt           DateTime @updatedAt
+
+  @@unique([userId, tmdbId, mediaType])
+}
+
+model Review {
+  id         String       @id @default(uuid())
+  userId     String
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tmdbId     String
+  mediaType  String       // "movie" or "tv"
+  title      String
+  posterPath String?
+  content    String
+  rating     Float?       // rating given in this review
+  createdAt  DateTime     @default(now())
+  
+  likes      ReviewLike[]
+  comments   Comment[]
+}
+
+model ReviewLike {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewId  String
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, reviewId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewId  String
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model CustomList {
+  id          String           @id @default(uuid())
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  isPublic    Boolean          @default(true)
+  createdAt   DateTime         @default(now())
+  
+  items       CustomListItem[]
+}
+
+model CustomListItem {
+  id         String     @id @default(uuid())
+  listId     String
+  list       CustomList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  tmdbId     String
+  mediaType  String     // "movie" or "tv"
+  title      String
+  posterPath String?
+  createdAt  DateTime   @default(now())
+
+  @@unique([listId, tmdbId, mediaType])
+}
+
+model Follow {
+  followerId  String
+  follower    User     @relation("FollowerUsers", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId String
+  following   User     @relation("FollowingUsers", fields: [followingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@id([followerId, followingId])
+}
