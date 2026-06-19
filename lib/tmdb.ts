@@ -182,8 +182,15 @@ function getMockMediaList(): MediaItem[] {
 // API Handlers
 // ==========================================
 
-const getHeaders = () => {
+const getApiKey = () => {
   const token = process.env.TMDB_API_KEY;
+  if (!token) return null;
+  // Strip any literal surrounding double/single quotes and trim
+  return token.replace(/^["']|["']$/g, "").trim();
+};
+
+const getHeaders = () => {
+  const token = getApiKey();
   if (!token) return null;
   
   // Accept both JWT format and standard short v3 API keys
@@ -197,7 +204,7 @@ const getHeaders = () => {
 };
 
 const getUrl = (path: string, params: Record<string, string> = {}) => {
-  const token = process.env.TMDB_API_KEY;
+  const token = getApiKey();
   const url = new URL(`${TMDB_BASE_URL}${path}`);
   
   // If it's a standard short api key, append it as a query param
@@ -217,7 +224,7 @@ export async function searchMedia(query: string): Promise<MediaItem[]> {
   if (!cleanQuery) return [];
 
   const headers = getHeaders();
-  const token = process.env.TMDB_API_KEY;
+  const token = getApiKey();
 
   if (!token) {
     console.log(`[TMDb Wrapper] Offline Mode: Filtering mock data for "${cleanQuery}"`);
@@ -231,7 +238,12 @@ export async function searchMedia(query: string): Promise<MediaItem[]> {
   try {
     const url = getUrl("/search/multi", { query: cleanQuery, include_adult: "false" });
     const res = await fetch(url, headers ? { headers, next: { revalidate: 3600 } } : { next: { revalidate: 3600 } });
-    if (!res.ok) throw new Error(`TMDb search failed: ${res.status}`);
+    if (!res.ok) {
+      console.warn(`TMDb search failed: ${res.status}`);
+      return getMockMediaList().filter((item) =>
+        item.title.toLowerCase().includes(cleanQuery)
+      );
+    }
     
     const data = await res.json();
     const results = data.results || [];
@@ -250,7 +262,7 @@ export async function searchMedia(query: string): Promise<MediaItem[]> {
         voteCount: item.vote_count || 0,
       }));
   } catch (error) {
-    console.error("TMDb wrapper search error:", error);
+    console.warn("TMDb wrapper search error:", error);
     // Fallback to mock on error
     return getMockMediaList().filter((item) =>
       item.title.toLowerCase().includes(cleanQuery)
@@ -260,7 +272,7 @@ export async function searchMedia(query: string): Promise<MediaItem[]> {
 
 export async function getMediaDetails(id: string, type: "movie" | "tv"): Promise<MediaDetails | null> {
   const key = `${type}:${id}`;
-  const token = process.env.TMDB_API_KEY;
+  const token = getApiKey();
 
   if (!token) {
     console.log(`[TMDb Wrapper] Offline Mode: Fetching mock details for "${key}"`);
@@ -274,7 +286,25 @@ export async function getMediaDetails(id: string, type: "movie" | "tv"): Promise
     const res = await fetch(url, headers ? { headers, next: { revalidate: 3600 } } : { next: { revalidate: 3600 } });
     if (!res.ok) {
       if (res.status === 404) return null;
-      throw new Error(`TMDb details failed: ${res.status}`);
+      console.warn(`TMDb details failed: ${res.status}`);
+      const mock = MOCK_MEDIA[key];
+      if (mock) return mock as MediaDetails;
+      return {
+        id,
+        title: `${type === "movie" ? "Movie" : "TV Show"} #${id}`,
+        overview: "Details could not be loaded from TMDb. Please verify your TMDB_API_KEY environment variable.",
+        posterPath: null,
+        backdropPath: null,
+        releaseDate: "",
+        mediaType: type,
+        voteAverage: 0,
+        voteCount: 0,
+        genres: ["Offline Fallback"],
+        runtime: 120,
+        tagline: "TMDB API Error Fallback",
+        cast: [],
+        trailerUrl: null,
+      };
     }
 
     const data = await res.json();
@@ -313,14 +343,32 @@ export async function getMediaDetails(id: string, type: "movie" | "tv"): Promise
       trailerUrl,
     };
   } catch (error) {
-    console.error(`TMDb wrapper getDetails error for ${key}:`, error);
+    console.warn(`TMDb wrapper getDetails error for ${key}:`, error);
     const mock = MOCK_MEDIA[key];
-    return mock ? (mock as MediaDetails) : null;
+    if (mock) return mock as MediaDetails;
+    
+    // Fallback template so details view page doesn't throw 404/blank screen on credentials/network failure
+    return {
+      id,
+      title: `${type === "movie" ? "Movie" : "TV Show"} #${id}`,
+      overview: "Details could not be loaded from TMDb. Please verify your TMDB_API_KEY environment variable.",
+      posterPath: null,
+      backdropPath: null,
+      releaseDate: "",
+      mediaType: type,
+      voteAverage: 0,
+      voteCount: 0,
+      genres: ["Offline Fallback"],
+      runtime: 120,
+      tagline: "TMDB API Error Fallback",
+      cast: [],
+      trailerUrl: null,
+    };
   }
 }
 
 export async function getPopularMedia(type: "movie" | "tv"): Promise<MediaItem[]> {
-  const token = process.env.TMDB_API_KEY;
+  const token = getApiKey();
 
   if (!token) {
     console.log(`[TMDb Wrapper] Offline Mode: Fetching popular mock ${type}s`);
@@ -331,7 +379,10 @@ export async function getPopularMedia(type: "movie" | "tv"): Promise<MediaItem[]
     const url = getUrl(`/${type}/popular`);
     const headers = getHeaders();
     const res = await fetch(url, headers ? { headers, next: { revalidate: 86400 } } : { next: { revalidate: 86400 } });
-    if (!res.ok) throw new Error(`TMDb popular failed: ${res.status}`);
+    if (!res.ok) {
+      console.warn(`TMDb popular failed: ${res.status}`);
+      return getMockMediaList().filter((item) => item.mediaType === type);
+    }
 
     const data = await res.json();
     const results = data.results || [];
@@ -348,7 +399,7 @@ export async function getPopularMedia(type: "movie" | "tv"): Promise<MediaItem[]
       voteCount: item.vote_count || 0,
     }));
   } catch (error) {
-    console.error(`TMDb wrapper getPopular error for ${type}:`, error);
+    console.warn(`TMDb wrapper getPopular error for ${type}:`, error);
     return getMockMediaList().filter((item) => item.mediaType === type);
   }
 }
