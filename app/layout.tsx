@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,14 +29,10 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col bg-[#09090b] text-zinc-100 font-sans">
+      <body className="min-h-full flex flex-col bg-[#0f1a1b] text-[#D3C3B9] font-sans">
         <Navbar />
         <main className="flex-grow flex flex-col">{children}</main>
-        <footer className="border-t border-zinc-900 bg-zinc-950 py-6 text-center text-xs text-zinc-500">
-          <div className="mx-auto max-w-7xl px-4">
-            &copy; {new Date().getFullYear()} Cinetrack. Created as your ultimate movie portfolio.
-          </div>
-        </footer>
+        <Footer />
       </body>
     </html>
   );

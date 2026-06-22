@@ -12,7 +12,39 @@ export interface MediaItem {
   mediaType: "movie" | "tv";
   voteAverage: number;
   voteCount: number;
+  genres?: string[];
 }
+
+// TMDb genre ID → name mapping (works for both movies and TV)
+const TMDB_GENRE_MAP: Record<number, string> = {
+  28: "Action",
+  12: "Adventure",
+  16: "Animation",
+  35: "Comedy",
+  80: "Crime",
+  99: "Documentary",
+  18: "Drama",
+  10751: "Family",
+  14: "Fantasy",
+  36: "History",
+  27: "Horror",
+  10402: "Music",
+  9648: "Mystery",
+  10749: "Romance",
+  878: "Science Fiction",
+  10770: "TV Movie",
+  53: "Thriller",
+  10752: "War",
+  37: "Western",
+  10759: "Action & Adventure",
+  10762: "Kids",
+  10763: "News",
+  10764: "Reality",
+  10765: "Sci-Fi & Fantasy",
+  10766: "Soap",
+  10767: "Talk",
+  10768: "War & Politics",
+};
 
 export interface CastMember {
   id: number;
@@ -175,6 +207,7 @@ function getMockMediaList(): MediaItem[] {
     mediaType: item.mediaType!,
     voteAverage: item.voteAverage!,
     voteCount: item.voteCount!,
+    genres: item.genres ?? [],
   }));
 }
 
@@ -387,7 +420,7 @@ export async function getPopularMedia(type: "movie" | "tv"): Promise<MediaItem[]
     const data = await res.json();
     const results = data.results || [];
 
-    return results.slice(0, 10).map((item: any) => ({
+    return results.slice(0, 20).map((item: any) => ({
       id: String(item.id),
       title: item.title || item.name || "",
       overview: item.overview || "",
@@ -397,9 +430,125 @@ export async function getPopularMedia(type: "movie" | "tv"): Promise<MediaItem[]
       mediaType: type,
       voteAverage: item.vote_average || 0,
       voteCount: item.vote_count || 0,
+      genres: (item.genre_ids || []).map((id: number) => TMDB_GENRE_MAP[id]).filter(Boolean),
     }));
   } catch (error) {
     console.warn(`TMDb wrapper getPopular error for ${type}:`, error);
     return getMockMediaList().filter((item) => item.mediaType === type);
   }
 }
+
+export async function getTopRatedMedia(type: "movie" | "tv"): Promise<MediaItem[]> {
+  const token = getApiKey();
+
+  if (!token) {
+    console.log(`[TMDb Wrapper] Offline Mode: Fetching top rated mock ${type}s`);
+    return getMockMediaList()
+      .filter((item) => item.mediaType === type)
+      .sort((a, b) => b.voteAverage - a.voteAverage);
+  }
+
+  try {
+    const url = getUrl(`/${type}/top_rated`);
+    const headers = getHeaders();
+    const res = await fetch(url, headers ? { headers, next: { revalidate: 86400 } } : { next: { revalidate: 86400 } });
+    if (!res.ok) {
+      console.warn(`TMDb top rated failed: ${res.status}`);
+      return getMockMediaList()
+        .filter((item) => item.mediaType === type)
+        .sort((a, b) => b.voteAverage - a.voteAverage);
+    }
+
+    const data = await res.json();
+    const results = data.results || [];
+
+    return results.slice(0, 20).map((item: any) => ({
+      id: String(item.id),
+      title: item.title || item.name || "",
+      overview: item.overview || "",
+      posterPath: item.poster_path,
+      backdropPath: item.backdrop_path,
+      releaseDate: item.release_date || item.first_air_date || "",
+      mediaType: type,
+      voteAverage: item.vote_average || 0,
+      voteCount: item.vote_count || 0,
+      genres: (item.genre_ids || []).map((id: number) => TMDB_GENRE_MAP[id]).filter(Boolean),
+    }));
+  } catch (error) {
+    console.warn(`TMDb wrapper getTopRated error for ${type}:`, error);
+    return getMockMediaList()
+      .filter((item) => item.mediaType === type)
+      .sort((a, b) => b.voteAverage - a.voteAverage);
+  }
+}
+
+/** Discover movies or TV shows filtered by genre IDs, sorted by vote_average desc. */
+export async function getDiscoverByGenre(
+  type: "movie" | "tv",
+  genreIds: number[],
+  page = 1
+): Promise<MediaItem[]> {
+  const token = getApiKey();
+  const genreParam = genreIds.join(",");
+
+  if (!token) {
+    // offline fallback: filter mock list by genre names
+    const genreNames = genreIds.map((id) => TMDB_GENRE_MAP[id]).filter(Boolean);
+    return getMockMediaList()
+      .filter(
+        (item) =>
+          item.mediaType === type &&
+          item.genres?.some((g) => genreNames.includes(g))
+      )
+      .sort((a, b) => b.voteAverage - a.voteAverage)
+      .slice(0, 40);
+  }
+
+  try {
+    const url = getUrl(`/discover/${type}`, {
+      with_genres: genreParam,
+      sort_by: "vote_average.desc",
+      "vote_count.gte": "200",
+      page: String(page),
+    });
+    const headers = getHeaders();
+    const res = await fetch(
+      url,
+      headers ? { headers, next: { revalidate: 3600 } } : { next: { revalidate: 3600 } }
+    );
+
+    if (!res.ok) {
+      console.warn(`TMDb discover failed: ${res.status}`);
+      return [];
+    }
+
+    const data = await res.json();
+    const results: any[] = data.results || [];
+
+    return results.slice(0, 40).map((item: any) => ({
+      id: String(item.id),
+      title: item.title || item.name || "",
+      overview: item.overview || "",
+      posterPath: item.poster_path,
+      backdropPath: item.backdrop_path,
+      releaseDate: item.release_date || item.first_air_date || "",
+      mediaType: type,
+      voteAverage: item.vote_average || 0,
+      voteCount: item.vote_count || 0,
+      genres: (item.genre_ids || [])
+        .map((id: number) => TMDB_GENRE_MAP[id])
+        .filter(Boolean),
+    }));
+  } catch (error) {
+    console.warn(`TMDb discover error:`, error);
+    return [];
+  }
+}
+
+/** Reverse-lookup: genre name → TMDb ID */
+export const GENRE_NAME_TO_ID: Record<string, number> = Object.fromEntries(
+  Object.entries(TMDB_GENRE_MAP).map(([id, name]) => [name, Number(id)])
+);
+
+/** All available genres exposed for the UI */
+export const ALL_GENRES = Object.values(TMDB_GENRE_MAP);

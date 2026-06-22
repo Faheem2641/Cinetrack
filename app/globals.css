@@ -1,8 +1,26 @@
 @import "tailwindcss";
 
+/* ─── Cinetrack Design Tokens ─────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Palette */
+  --ct-void:      #0f1a1b;   /* deepest bg layer             */
+  --ct-deep:      #103334;   /* primary dark teal background  */
+  --ct-surface:   #1e2e30;   /* raised card / panel surface   */
+  --ct-slate:     #3D4D55;   /* secondary surface / borders   */
+  --ct-warm-gray: #A79E9C;   /* muted / secondary text        */
+  --ct-sand:      #D3C3B9;   /* primary light text / labels   */
+  --ct-gold:      #B58863;   /* accent / CTA colour           */
+  --ct-gold-light:#d4a87c;   /* hover state of gold           */
+  --ct-near-black:#1A1A1C;   /* absolute darkest element      */
+
+  /* Semantic aliases */
+  --background:   var(--ct-void);
+  --foreground:   var(--ct-sand);
+  --accent:       var(--ct-gold);
+  --accent-hover: var(--ct-gold-light);
+  --muted:        var(--ct-warm-gray);
+  --border:       var(--ct-slate);
+  --surface:      var(--ct-surface);
 }
 
 @theme inline {
@@ -12,15 +30,41 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Base Reset ──────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--ct-void);
+  color: var(--ct-sand);
+  font-family: var(--font-sans, 'Geist', system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Scrollbar Styling ────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--ct-near-black);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ct-slate);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ct-gold);
+}
+
+/* ─── Selection ───────────────────────────────────────────────── */
+::selection {
+  background: var(--ct-gold);
+  color: var(--ct-void);
 }

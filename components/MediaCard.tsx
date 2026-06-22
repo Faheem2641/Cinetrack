@@ -16,54 +16,73 @@ export default function MediaCard({ item }: MediaCardProps) {
   const linkHref = mediaType === "movie" ? `/movies/${id}` : `/tv/${id}`;
 
   return (
-    <Link href={linkHref} className="group relative flex flex-col rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800/80 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl hover:shadow-indigo-600/10 hover:border-zinc-700/80">
-      {/* Poster Image Container */}
-      <div className="relative aspect-[2/3] w-full overflow-hidden bg-zinc-950">
+    <div className="group flex flex-col relative p-1.5 rounded-[22px] bg-[#103334]/40 border border-[#3D4D55]/30 hover:border-[#B58863]/30 hover:bg-[#1e2e30]/60 transition-all duration-500 hover:shadow-2xl hover:shadow-[#B58863]/10 hover:-translate-y-1.5 hover:scale-[1.02]">
+      {/* Inner Poster Wrapper */}
+      <Link
+        href={linkHref}
+        className="relative aspect-[2/3] w-full overflow-hidden rounded-[18px] bg-[#0f1a1b] border border-[#3D4D55]/20 shadow-inner"
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={posterUrl}
           alt={title}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
           loading="lazy"
         />
         
-        {/* Media Type Badge */}
-        <span className="absolute top-3 left-3 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-zinc-950/80 text-zinc-300 border border-zinc-800 backdrop-blur-sm">
+        {/* Media Type Badge (frosted top-left) */}
+        <span className="absolute top-2.5 left-2.5 text-[9px] uppercase font-black tracking-wider px-2 py-0.5 rounded-lg bg-[#0f1a1b]/75 backdrop-blur-md text-[#A79E9C] border border-[#3D4D55]/50 shadow">
           {mediaType === "movie" ? "Movie" : "TV"}
         </span>
 
-        {/* Rating Badge (top right) */}
+        {/* Rating Badge (frosted bottom-right) */}
         {voteAverage > 0 && (
-          <span className="absolute top-3 right-3 text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/90 text-zinc-950 border border-amber-400 flex items-center gap-1 shadow">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3">
+          <span className="absolute bottom-2.5 right-2.5 text-[9px] font-black tracking-wide px-2.5 py-1 rounded-xl bg-[#0f1a1b]/75 backdrop-blur-md text-[#B58863] border border-[#3D4D55]/40 flex items-center gap-1 shadow">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3 text-[#B58863]">
               <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clipRule="evenodd" />
             </svg>
             {voteAverage.toFixed(1)}
           </span>
         )}
+      </Link>
 
-        {/* Hover overlay details */}
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-          <h3 className="text-sm font-bold text-white leading-tight drop-shadow truncate">{title}</h3>
-          <p className="text-[11px] text-zinc-300 mt-1 font-semibold">{releaseYear}</p>
-          <span className="text-[10px] text-indigo-400 font-semibold group-hover:underline mt-2 flex items-center gap-1">
-            View Details
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3 h-3">
-              <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-            </svg>
-          </span>
+      {/* Details below poster inside outer card */}
+      <div className="mt-3.5 px-2.5 pb-2 flex flex-col justify-between">
+        {/* Metadata Pill row */}
+        <div className="flex items-center gap-2 mb-1.5">
+          {mediaType === "movie" ? (
+            <span className="bg-[#B58863]/10 text-[#B58863] border border-[#B58863]/20 rounded-full px-2 py-0.5 text-[8px] font-extrabold uppercase tracking-wider">
+              Movie
+            </span>
+          ) : (
+            <span className="bg-[#3D4D55]/30 text-[#A79E9C] border border-[#3D4D55]/40 rounded-full px-2 py-0.5 text-[8px] font-extrabold uppercase tracking-wider">
+              Series
+            </span>
+          )}
+          {releaseYear !== "N/A" && (
+            <span className="bg-[#1e2e30]/60 text-[#A79E9C] border border-[#3D4D55]/30 rounded-full px-2 py-0.5 text-[8px] font-extrabold tracking-wider">
+              {releaseYear}
+            </span>
+          )}
+        </div>
+        
+        {/* Title link with gradient hover */}
+        <div className="relative group/title overflow-hidden pt-0.5">
+          <Link
+            href={linkHref}
+            className="text-xs font-black text-[#D3C3B9] group-hover:bg-gradient-to-r group-hover:from-[#B58863] group-hover:via-[#d4a87c] group-hover:to-[#D3C3B9] group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300 truncate block leading-normal pr-4 relative"
+            title={title}
+          >
+            {title}
+            {/* Sliding caret indicator */}
+            <span className="absolute right-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-350 text-[10px] text-[#B58863] leading-none">
+              →
+            </span>
+          </Link>
+          {/* Expanding bottom gradient accent bar on hover */}
+          <div className="h-[1.5px] w-0 group-hover:w-full bg-gradient-to-r from-[#B58863] via-[#d4a87c] to-[#D3C3B9] transition-all duration-500 mt-1 rounded-full" />
         </div>
       </div>
-
-      {/* Card Info (always visible at bottom) */}
-      <div className="p-3.5 flex flex-col justify-between flex-grow">
-        <h3 className="text-sm font-bold text-zinc-200 line-clamp-1 group-hover:text-white transition-colors">
-          {title}
-        </h3>
-        <p className="text-xs text-zinc-500 mt-1">
-          {releaseYear}
-        </p>
-      </div>
-    </Link>
+    </div>
   );
 }

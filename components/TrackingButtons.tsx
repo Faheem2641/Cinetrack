@@ -73,7 +73,7 @@ export default function TrackingButtons({
           className={`flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all cursor-pointer ${
             entry.isWatched
               ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-              : "bg-zinc-950/40 border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700"
+              : "bg-[#103334]/40 border-[#3D4D55]/40 text-[#A79E9C] hover:text-[#D3C3B9] hover:border-[#3D4D55]/70"
           }`}
           title="Mark as Watched"
         >
@@ -90,8 +90,8 @@ export default function TrackingButtons({
           disabled={isPending}
           className={`flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all cursor-pointer ${
             entry.isWishlist
-              ? "bg-blue-500/10 border-blue-500/30 text-blue-400"
-              : "bg-zinc-950/40 border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700"
+              ? "bg-[#3D4D55]/30 border-[#3D4D55]/60 text-[#D3C3B9]"
+              : "bg-[#103334]/40 border-[#3D4D55]/40 text-[#A79E9C] hover:text-[#D3C3B9] hover:border-[#3D4D55]/70"
           }`}
           title="Add to Watch Later / Wishlist"
         >
@@ -107,8 +107,8 @@ export default function TrackingButtons({
           disabled={isPending}
           className={`flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all cursor-pointer ${
             entry.isCurrentlyWatching
-              ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
-              : "bg-zinc-950/40 border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700"
+              ? "bg-[#B58863]/10 border-[#B58863]/30 text-[#B58863]"
+              : "bg-[#103334]/40 border-[#3D4D55]/40 text-[#A79E9C] hover:text-[#D3C3B9] hover:border-[#3D4D55]/70"
           }`}
           title="Mark as Currently Watching"
         >
@@ -125,7 +125,7 @@ export default function TrackingButtons({
           className={`flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all cursor-pointer ${
             entry.isFavorite
               ? "bg-rose-500/10 border-rose-500/30 text-rose-400"
-              : "bg-zinc-950/40 border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700"
+              : "bg-[#103334]/40 border-[#3D4D55]/40 text-[#A79E9C] hover:text-[#D3C3B9] hover:border-[#3D4D55]/70"
           }`}
           title="Add to Favorites"
         >
@@ -139,16 +139,16 @@ export default function TrackingButtons({
       {/* Star Rating Widget (0.5 to 5.0 stars with split-star halves) */}
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-zinc-400">Your Rating:</span>
+          <span className="text-xs font-semibold text-[#A79E9C]">Your Rating:</span>
           {entry.rating !== null && (
-            <span className="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded">
+            <span className="text-xs font-bold text-[#B58863] bg-[#B58863]/10 border border-[#B58863]/20 px-2 py-0.5 rounded">
               {entry.rating.toFixed(1)} / 5.0
             </span>
           )}
           {entry.rating !== null && (
             <button
               onClick={() => handleRate(null)}
-              className="text-[10px] text-zinc-500 hover:text-zinc-300 underline cursor-pointer"
+              className="text-[10px] text-[#A79E9C] hover:text-[#D3C3B9] underline cursor-pointer"
             >
               Clear
             </button>
@@ -188,7 +188,7 @@ export default function TrackingButtons({
                       fillRule="evenodd"
                       d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
                       clipRule="evenodd"
-                      className="text-zinc-800"
+                      className="text-[#3D4D55]"
                     />
                     {/* Filled/Partial Amber Overlay */}
                     {ratingValue >= starIdx ? (

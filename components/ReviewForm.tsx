@@ -48,8 +48,8 @@ export default function ReviewForm({
   };
 
   return (
-    <div className="bg-zinc-900/30 border border-zinc-800/80 rounded-2xl p-6 backdrop-blur-md">
-      <h3 className="text-lg font-bold text-zinc-100 mb-4">Share Your Review</h3>
+    <div className="bg-[#103334]/40 border border-[#3D4D55]/30 rounded-2xl p-6 backdrop-blur-md">
+      <h3 className="text-lg font-bold text-[#D3C3B9] mb-4">Share Your Review</h3>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
@@ -65,7 +65,7 @@ export default function ReviewForm({
         )}
 
         <div>
-          <label htmlFor="review-content" className="block text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-2">
+          <label htmlFor="review-content" className="block text-[10px] font-semibold text-[#A79E9C] uppercase tracking-wider mb-2">
             Review Content
           </label>
           <textarea
@@ -74,7 +74,7 @@ export default function ReviewForm({
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Write your review here. What did you think of the cinematography, acting, story, or pacing?"
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all resize-none"
+            className="w-full bg-[#0f1a1b] border border-[#3D4D55]/40 rounded-xl p-3 text-sm text-[#D3C3B9] placeholder-[#A79E9C]/50 focus:outline-none focus:border-[#B58863]/50 focus:ring-1 focus:ring-[#B58863]/20 transition-all resize-none"
             maxLength={1000}
             required
           />
@@ -82,14 +82,14 @@ export default function ReviewForm({
 
         <div className="flex flex-wrap items-center gap-4 justify-between">
           <div className="flex items-center gap-2">
-            <label htmlFor="review-rating" className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+            <label htmlFor="review-rating" className="text-xs font-semibold text-[#A79E9C] uppercase tracking-wider">
               Rating:
             </label>
             <select
               id="review-rating"
               value={rating}
               onChange={(e) => setRating(e.target.value)}
-              className="bg-zinc-950 border border-zinc-800 text-zinc-200 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-indigo-500"
+              className="bg-[#0f1a1b] border border-[#3D4D55]/40 text-[#D3C3B9] text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-[#B58863]/50"
             >
               <option value="">No Rating</option>
               <option value="5">★★★★★ (5.0)</option>
@@ -108,7 +108,7 @@ export default function ReviewForm({
           <button
             type="submit"
             disabled={isPending}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-5 py-2.5 rounded-xl hover:shadow-lg hover:shadow-indigo-600/10 active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+            className="bg-gradient-to-r from-[#B58863] to-[#d4a87c] hover:opacity-90 text-[#0f1a1b] font-semibold text-xs px-5 py-2.5 rounded-xl shadow-lg shadow-[#B58863]/10 active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
           >
             {isPending ? "Posting..." : "Post Review"}
           </button>
