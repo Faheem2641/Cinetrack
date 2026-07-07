@@ -2,21 +2,52 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-[#3D4D55]/30 bg-[#103334]/80 backdrop-blur-md pt-16 pb-8 text-[#A79E9C] text-xs">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Cinema Thought (Centered Top Section) */}
-        <div className="flex flex-col items-center text-center pb-12 mb-12 border-b border-[#3D4D55]/30">
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#B58863]/70 mb-3 block">
-            Cinema Thought
-          </span>
-          <blockquote className="max-w-2xl mx-auto">
-            <p className="italic text-[#D3C3B9] leading-relaxed font-serif text-base md:text-lg">
-              &quot;Cinema is a matter of what&apos;s in the frame and what&apos;s out.&quot;
-            </p>
-            <cite className="block text-[10px] uppercase font-bold tracking-[0.15em] text-[#B58863]/80 mt-3">
-              — Martin Scorsese
-            </cite>
-          </blockquote>
+    <footer className="relative bg-[#103334]/85 backdrop-blur-md pt-20 pb-8 text-[#A79E9C] text-xs">
+
+
+      <div className="mx-auto max-w-[98%] px-4 sm:px-6 lg:px-8 relative">
+        {/* Viewfinder crosshairs at the bounds */}
+        <div className="absolute top-0 left-4 w-2.5 h-2.5 border-t border-l border-[#3D4D55]/30 pointer-events-none" />
+        <div className="absolute top-0 right-4 w-2.5 h-2.5 border-t border-r border-[#3D4D55]/30 pointer-events-none" />
+        <div className="absolute bottom-4 left-4 w-2.5 h-2.5 border-b border-l border-[#3D4D55]/30 pointer-events-none" />
+        <div className="absolute bottom-4 right-4 w-2.5 h-2.5 border-b border-r border-[#3D4D55]/30 pointer-events-none" />
+
+        {/* Cinema Thought (Skeuomorphic Clapperboard quote box) */}
+        <div className="max-w-xl mx-auto mb-16 relative">
+          {/* Clapper Board Wrapper */}
+          <div className="bg-[#0f1415] border border-[#3D4D55]/40 rounded-xl overflow-hidden shadow-2xl">
+            {/* Clapper Top Board (Striped pattern) */}
+            <div className="h-5 bg-[repeating-linear-gradient(45deg,#0a0e0f,#0a0e0f_12px,#d4a87c_12px,#d4a87c_24px)] border-b border-[#3D4D55]/40" />
+            
+            {/* Clapper Info Grid */}
+            <div className="grid grid-cols-3 border-b border-[#3D4D55]/30 text-[8px] font-mono tracking-widest text-[#B58863]/80 uppercase divide-x divide-[#3D4D55]/30 select-none text-center">
+              <div className="py-2.5 px-3">
+                <span className="text-[6px] text-slate-500 block mb-0.5">PROD.</span>
+                <span>CINETRACK // REEL_01</span>
+              </div>
+              <div className="py-2.5 px-3">
+                <span className="text-[6px] text-slate-500 block mb-0.5">SCENE</span>
+                <span>SCENE 01</span>
+              </div>
+              <div className="py-2.5 px-3">
+                <span className="text-[6px] text-slate-500 block mb-0.5">TAKE</span>
+                <span>TK-24FPS</span>
+              </div>
+            </div>
+
+            {/* Clapper Center Quote */}
+            <div className="p-8 text-center bg-[#0a0e0f]/50">
+              <p className="italic text-[#D3C3B9] leading-relaxed font-serif text-sm md:text-base">
+                &quot;Cinema is a matter of what&apos;s in the frame and what&apos;s out.&quot;
+              </p>
+              <cite className="block text-[9px] font-mono font-bold tracking-[0.2em] text-[#B58863] mt-4 uppercase not-italic">
+                DIR // Martin Scorsese
+              </cite>
+            </div>
+          </div>
+          
+          {/* Subtle clapper joint hinge pin details */}
+          <div className="w-1.5 h-3.5 bg-slate-600 rounded-sm absolute -top-1 left-4 border border-slate-500 shadow-sm pointer-events-none" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">

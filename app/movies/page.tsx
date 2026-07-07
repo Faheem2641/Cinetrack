@@ -1,25 +1,39 @@
 import { getPopularMedia } from "@/lib/tmdb";
 import MediaCard from "@/components/MediaCard";
+import FilmstripDivider from "@/components/FilmstripDivider";
 
 export default async function MoviesPage() {
   const movies = await getPopularMedia("movie");
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 pt-28 pb-12 sm:px-6 lg:px-8 flex-1">
-      <div className="border-b border-[#3D4D55]/20 pb-6 mb-8">
-        <h1 className="text-3xl font-extrabold tracking-tight text-[#D3C3B9] flex items-center gap-3">
-          <span className="w-1.5 h-8 rounded bg-[#B58863]" />
-          Popular Movies
-        </h1>
-        <p className="text-sm text-[#A79E9C] mt-2">
-          Discover the most watched and trending movies in the community today.
-        </p>
-      </div>
+    <div className="w-full bg-[#0f1a1b] text-[#D3C3B9] flex-1 flex flex-col">
+      {/* Spacer to clear fixed navbar */}
+      <div className="h-20 w-full" />
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-        {movies.map((item) => (
-          <MediaCard key={`movie:${item.id}`} item={item} />
-        ))}
+      {/* Filmstrip transition section border */}
+      <FilmstripDivider
+        bgClass="bg-[#122123]"
+        aboveColor="text-[#0f1a1b]"
+        belowColor="text-[#0f1a1b]"
+        reelLabel="REEL_04 // DISCOVER MOVIES"
+      />
+
+      <div className="mx-auto w-full max-w-7xl px-4 pt-12 pb-12 sm:px-6 lg:px-8 flex-1">
+        <div className="border-b border-[#3D4D55]/20 pb-6 mb-8">
+          <h1 className="text-3xl font-extrabold tracking-tight text-[#D3C3B9] flex items-center gap-3">
+            <span className="w-1.5 h-8 rounded bg-[#B58863]" />
+            Popular Movies
+          </h1>
+          <p className="text-sm text-[#A79E9C] mt-2">
+            Discover the most watched and trending movies in the community today.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+          {movies.map((item) => (
+            <MediaCard key={`movie:${item.id}`} item={item} />
+          ))}
+        </div>
       </div>
     </div>
   );

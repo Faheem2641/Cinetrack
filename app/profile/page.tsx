@@ -5,7 +5,13 @@ import UserProfileClient from "@/components/UserProfileClient";
 
 export const revalidate = 0;
 
-export default async function ProfilePage() {
+export default async function ProfilePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ mockOwner?: string }>;
+}) {
+  const resolvedParams = await searchParams;
+  const mockOwner = resolvedParams.mockOwner === "true";
   const session = await auth();
 
   // 1. Fallback Mock User Data (Alfikri Djati Mock Profile)
@@ -151,7 +157,13 @@ export default async function ProfilePage() {
     // If guest / offline, render the mock profile page
     return (
       <main className="pt-20 bg-[#0f1a1b] min-h-screen">
-        <UserProfileClient isOwnProfile={false} user={mockUser} />
+        {mockOwner && (
+          <div className="bg-[#B58863]/10 border-b border-[#B58863]/30 py-2.5 px-4 text-center text-xs font-mono text-[#d4a87c] select-none flex items-center justify-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#B58863] animate-pulse" />
+            <span>✦ DATABASE OFFLINE: PREVIEWING MOCK ACCOUNT AS OWNER</span>
+          </div>
+        )}
+        <UserProfileClient isOwnProfile={mockOwner} user={mockUser} />
       </main>
     );
   }

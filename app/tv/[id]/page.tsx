@@ -199,14 +199,20 @@ export default async function TVShowDetailPage({ params }: TVShowDetailPageProps
                       ? `https://image.tmdb.org/t/p/w185${actor.profilePath}`
                       : `https://ui-avatars.com/api/?name=${encodeURIComponent(actor.name)}&background=103334&color=A79E9C&size=128&bold=true`;
                     return (
-                      <div key={actor.id} className="w-[110px] shrink-0 flex flex-col text-center group cursor-pointer">
+                      <a
+                        key={actor.id}
+                        href={`https://www.google.com/search?q=${encodeURIComponent(actor.name)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-[110px] shrink-0 flex flex-col text-center group cursor-pointer"
+                      >
                         <div className="w-[85px] h-[85px] rounded-full overflow-hidden border border-[#3D4D55]/40 group-hover:border-[#B58863]/40 mx-auto bg-[#103334] aspect-square shadow transition-all duration-300 group-hover:scale-105">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={profileUrl} alt={actor.name} className="w-full h-full object-cover" />
                         </div>
                         <p className="text-[11px] font-extrabold text-[#D3C3B9] mt-2.5 line-clamp-1 group-hover:text-white transition-colors">{actor.name}</p>
                         <p className="text-[9px] text-[#A79E9C] font-medium line-clamp-1 mt-0.5">{actor.character}</p>
-                      </div>
+                      </a>
                     );
                   })}
                 </div>

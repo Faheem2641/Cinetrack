@@ -1,548 +1,579 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
-interface TasteProfileItem {
-  icon: string;
-  name: string;
-  percentage: number;
-  color: string;
-}
-
-interface MediaItem {
-  id: string;
-  title: string;
-  posterPath: string | null;
-  releaseDate: string;
-  mediaType: "movie" | "tv";
-  voteAverage: number;
-}
-
-interface ReviewItem {
-  id: string;
-  tmdbId: string;
-  mediaType: "movie" | "tv";
-  title: string;
-  posterPath: string | null;
-  content: string;
-  rating: number | null;
-  createdAt: string;
-}
-
+/* ───────── Types ───────── */
+interface TasteProfileItem { icon: string; name: string; percentage: number; color: string; }
+interface MediaItem { id: string; title: string; posterPath: string | null; releaseDate: string; mediaType: "movie" | "tv"; voteAverage: number; }
+interface ReviewItem { id: string; tmdbId: string; mediaType: "movie" | "tv"; title: string; posterPath: string | null; content: string; rating: number | null; createdAt: string; }
 interface UserProfileClientProps {
   isOwnProfile: boolean;
   user: {
-    username: string;
-    name: string;
-    avatarUrl: string | null;
-    bio: string | null;
-    stats: {
-      filmsCount: number;
-      followingCount: number;
-      followersCount: number;
-    };
+    username: string; name: string; avatarUrl: string | null; bio: string | null;
+    stats: { filmsCount: number; followingCount: number; followersCount: number; };
     tasteProfile: TasteProfileItem[];
-    watched: MediaItem[];
-    watchlist: MediaItem[];
-    reviews: ReviewItem[];
+    watched: MediaItem[]; watchlist: MediaItem[]; reviews: ReviewItem[];
   };
 }
 
-export default function UserProfileClient({ isOwnProfile, user }: UserProfileClientProps) {
-  const [activeTab, setActiveTab] = useState<"Watched" | "Watchlist" | "Reviews">("Watched");
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [followersCount, setFollowersCount] = useState(user.stats.followersCount);
-  const [copied, setCopied] = useState(false);
+/* ───────── Helpers ───────── */
+const TMDB = (path: string, w = "w342") => `https://image.tmdb.org/t/p/${w}${path}`;
 
-  // 1. Cover Photo Theme States
-  const [coverTheme, setCoverTheme] = useState<string>("mars");
-  const [showCoverPicker, setShowCoverPicker] = useState<boolean>(false);
-
-  const coverThemes = [
-    { id: "mars", label: "Mars Dunes", class: "bg-[#103334]", img: "/profile_cover_mars.png" },
-    { id: "teal", label: "Deep Teal", class: "bg-gradient-to-r from-[#103334] via-[#1e2e30] to-[#0f1a1b]", img: null },
-    { id: "slate", label: "Slate Dusk", class: "bg-gradient-to-r from-[#3D4D55] via-[#1e2e30] to-[#0f1a1b]", img: null },
-    { id: "sand", label: "Desert Sand", class: "bg-gradient-to-r from-[#B58863]/30 via-[#3D4D55] to-[#0f1a1b]", img: null },
-    { id: "noir", label: "Noir Theater", class: "bg-gradient-to-r from-[#1e2e30] via-[#1A1A1C] to-[#0f1a1b]", img: null },
-  ];
-
-  const activeCover = coverThemes.find((t) => t.id === coverTheme) || coverThemes[0];
-
-  // 2. Clickable Follower / Following Lists Modal States
-  const [activeModal, setActiveModal] = useState<"followers" | "following" | null>(null);
-
-  const mockFollowersList = [
-    { name: "Christopher Nolan", username: "chrisnolan", bio: "Director of Inception, Interstellar, Oppenheimer." },
-    { name: "Martin Scorsese", username: "marty", bio: "Cinema is a matter of what's in the frame..." },
-    { name: "Quentin Tarantino", username: "quentin", bio: "Writer. Director. Film geek." },
-    { name: "Greta Gerwig", username: "greta", bio: "Director of Lady Bird, Little Women, Barbie." }
-  ];
-
-  const mockFollowingList = [
-    { name: "Denis Villeneuve", username: "denis", bio: "Director of Arrival, Blade Runner 2049, Dune." },
-    { name: "Bong Joon Ho", username: "bong", bio: "Director of Parasite, Memories of Murder." },
-    { name: "David Fincher", username: "fincher", bio: "Director of Se7en, Fight Club, The Social Network." },
-    { name: "Stanley Kubrick", username: "kubrick", bio: "1928 - 1999. Filmmaker." }
-  ];
-
-  const activeList = activeModal === "followers" ? mockFollowersList : mockFollowingList;
-
-  // 3. Favorite Showcase Selection
-  const defaultFavorites = [
-    { id: "27205", title: "Inception", posterPath: "/o062xtYJm5AdzfsEs4tFa47TuRL.jpg", voteAverage: 8.4 },
-    { id: "157336", title: "Interstellar", posterPath: "/gEU2QvHOm52Yv0tprYhp3v2v1gY.jpg", voteAverage: 8.5 },
-    { id: "155", title: "The Dark Knight", posterPath: "/qJ2tWGB2XclmAEc97aIsG24GEtY.jpg", voteAverage: 9.0 },
-    { id: "603", title: "The Matrix", posterPath: "/f89U3wzqrjVnHwb9Y9OMhk0e2jC.jpg", voteAverage: 8.2 }
-  ];
-  const favoriteShowcaseItems = user.watched.length >= 4
-    ? user.watched.slice(0, 4)
-    : defaultFavorites;
-
-  // 4. Rating Distribution Data Calculations
-  const ratings = user.reviews.map((r) => r.rating).filter((r): r is number => r !== null);
-  const ratingCounts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-  ratings.forEach((rating) => {
-    const star = Math.round(rating);
-    if (star >= 1 && star <= 5) {
-      ratingCounts[star as 1 | 2 | 3 | 4 | 5] = (ratingCounts[star as 1 | 2 | 3 | 4 | 5] || 0) + 1;
-    }
-  });
-  const defaultCounts = { 5: 142, 4: 78, 3: 20, 2: 5, 1: 2 };
-  const finalCounts = ratings.length > 0 ? ratingCounts : defaultCounts;
-  const maxCount = Math.max(...Object.values(finalCounts));
-  const ratingBars = [5, 4, 3, 2, 1].map((stars) => {
-    const count = finalCounts[stars as 1 | 2 | 3 | 4 | 5];
-    return {
-      stars,
-      label: "★".repeat(stars),
-      count,
-      percentage: maxCount > 0 ? (count / maxCount) * 100 : 0,
+/* ─── Animated Counter ─── */
+function AnimatedCount({ to, duration = 1200 }: { to: number; duration?: number }) {
+  const [val, setVal] = useState(0);
+  const ref = useRef<number>(0);
+  useEffect(() => {
+    const start = performance.now();
+    const step = (now: number) => {
+      const p = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - p, 4);
+      setVal(Math.round(ease * to));
+      if (p < 1) ref.current = requestAnimationFrame(step);
     };
-  });
+    ref.current = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(ref.current);
+  }, [to, duration]);
+  return <>{val.toLocaleString()}</>;
+}
 
-  const handleFollowToggle = () => {
-    if (isFollowing) {
-      setIsFollowing(false);
-      setFollowersCount((prev) => prev - 1);
-    } else {
-      setIsFollowing(true);
-      setFollowersCount((prev) => prev + 1);
-    }
-  };
-
-  const handleShareProfile = () => {
-    if (typeof window !== "undefined" && navigator.clipboard) {
-      const shareUrl = `${window.location.origin}/user/${user.username}`;
-      navigator.clipboard.writeText(shareUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
-  // Reusable media card for inline use inside this component
-  const ProfileMediaCard = ({ item }: { item: MediaItem }) => {
-    const linkHref = item.mediaType === "movie" ? `/movies/${item.id}` : `/tv/${item.id}`;
-    const posterUrl = item.posterPath
-      ? `https://image.tmdb.org/t/p/w500${item.posterPath}`
-      : "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop&q=60";
-    return (
-      <div className="group flex flex-col relative p-1.5 rounded-[22px] bg-[#103334]/40 border border-[#3D4D55]/30 hover:border-[#B58863]/30 hover:bg-[#1e2e30]/60 transition-all duration-500 hover:shadow-2xl hover:shadow-[#B58863]/10 hover:-translate-y-1.5 hover:scale-[1.02]">
-        <Link
-          href={linkHref}
-          className="relative aspect-[2/3] w-full overflow-hidden rounded-[18px] bg-[#0f1a1b] border border-[#3D4D55]/20 shadow-inner"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={posterUrl}
-            alt={item.title}
-            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-            loading="lazy"
-          />
-          {/* Rating badge */}
-          {item.voteAverage > 0 && (
-            <span className="absolute bottom-2.5 right-2.5 text-[9px] font-black tracking-wide px-2.5 py-1 rounded-xl bg-[#0f1a1b]/75 backdrop-blur-md text-[#B58863] border border-[#3D4D55]/40 flex items-center gap-1 shadow">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3 text-[#B58863]">
-                <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clipRule="evenodd" />
-              </svg>
-              {item.voteAverage.toFixed(1)}
-            </span>
-          )}
-        </Link>
-        <div className="mt-3 px-2.5 pb-2">
-          <div className="flex items-center gap-2 mb-1.5">
-            {item.mediaType === "movie" ? (
-              <span className="bg-[#B58863]/10 text-[#B58863] border border-[#B58863]/20 rounded-full px-2 py-0.5 text-[8px] font-extrabold uppercase tracking-wider">Movie</span>
-            ) : (
-              <span className="bg-[#3D4D55]/30 text-[#A79E9C] border border-[#3D4D55]/40 rounded-full px-2 py-0.5 text-[8px] font-extrabold uppercase tracking-wider">Series</span>
-            )}
-            {item.releaseDate && (
-              <span className="bg-[#1e2e30]/60 text-[#A79E9C] border border-[#3D4D55]/30 rounded-full px-2 py-0.5 text-[8px] font-extrabold tracking-wider">
-                {item.releaseDate.split("-")[0]}
-              </span>
-            )}
-          </div>
-          <div className="relative group/title overflow-hidden pt-0.5">
-            <Link
-              href={linkHref}
-              className="text-xs font-black text-[#D3C3B9] group-hover:bg-gradient-to-r group-hover:from-[#B58863] group-hover:via-[#d4a87c] group-hover:to-[#D3C3B9] group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300 truncate block leading-normal pr-4 relative"
-              title={item.title}
-            >
-              {item.title}
-              <span className="absolute right-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-350 text-[10px] text-[#B58863] leading-none">→</span>
-            </Link>
-            <div className="h-[1.5px] w-0 group-hover:w-full bg-gradient-to-r from-[#B58863] via-[#d4a87c] to-[#D3C3B9] transition-all duration-500 mt-1 rounded-full" />
-          </div>
-        </div>
-      </div>
-    );
-  };
+/* ─── Lone Poster Card ─── */
+function FilmCard({ item, index }: { item: MediaItem; index: number }) {
+  const href = `/${item.mediaType === "movie" ? "movies" : "tv"}/${item.id}`;
+  const src = item.posterPath ? TMDB(item.posterPath) : null;
+  const year = item.releaseDate?.split("-")[0] ?? "—";
+  const score = item.voteAverage?.toFixed(1) ?? "—";
+  const frameId = String((Number(item.id) + index * 7) % 9900 + 100);
 
   return (
-    <div className="w-full bg-[#0f1a1b] text-[#D3C3B9] min-h-screen">
-      {/* Cover Image Container */}
-      <div className={`relative h-64 md:h-80 w-full overflow-hidden border-b border-[#3D4D55]/30 transition-all duration-500 ${activeCover.class}`}>
-        {activeCover.img ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={activeCover.img}
-            alt="Profile Cover"
-            className="w-full h-full object-cover object-center"
-          />
-        ) : (
-          <div className="w-full h-full opacity-70 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#B58863]/10 to-transparent" />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0f1a1b] via-[#0f1a1b]/20 to-transparent" />
-
-        {/* Cover Picker Trigger Button */}
-        <button
-          onClick={() => setShowCoverPicker(true)}
-          className="absolute top-4 right-4 z-30 p-2 bg-[#0f1a1b]/70 hover:bg-[#103334] text-[#A79E9C] hover:text-[#D3C3B9] rounded-full backdrop-blur-sm border border-[#3D4D55]/50 transition-all cursor-pointer"
-          title="Change Cover Theme"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-            <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-          </svg>
-        </button>
-      </div>
-
-      {/* Main Profile Content Container */}
-      <div className="max-w-4xl mx-auto px-4 pb-20 relative -mt-20 z-20">
-        {/* Profile Card / Header Info */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
-          <div className="flex flex-col sm:flex-row items-center sm:items-end gap-5">
-            {/* Avatar with gold ring */}
-            <div className="relative p-1 rounded-full bg-gradient-to-tr from-[#B58863] to-[#d4a87c] shadow-xl shadow-[#B58863]/20">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={user.avatarUrl || "/profile_avatar.png"}
-                alt={user.name}
-                className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover bg-[#103334] border-2 border-[#0f1a1b]"
-              />
-            </div>
-
-            {/* User Title & Handle */}
-            <div className="text-center sm:text-left pb-1">
-              <div className="flex items-center justify-center sm:justify-start gap-2">
-                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#D3C3B9]">{user.name}</h1>
-                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[#B58863] text-[#0f1a1b] shadow-md" title="Verified Member">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
-                    <path fillRule="evenodd" d="M16.403 12.652a3 3 0 0 0 0-5.304 3 3 0 0 0-3.75-3.751 3 3 0 0 0-5.305 0 3 3 0 0 0-3.751 3.75 3 3 0 0 0 0 5.305 3 3 0 0 0 3.75 3.751 3 3 0 0 0 5.305 0 3 3 0 0 0 3.751-3.75Zm-2.446-5.183a.75.75 0 0 0-1.06-1.06L9 10.384 7.606 8.99a.75.75 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0l4-4Z" clipRule="evenodd" />
-                  </svg>
-                </span>
-              </div>
-              <p className="text-[#A79E9C] text-sm mt-0.5">@{user.username}</p>
-
-              {user.bio && (
-                <p className="text-[#A79E9C] text-xs sm:text-sm mt-3.5 max-w-md leading-relaxed">
-                  {user.bio}
-                </p>
-              )}
-            </div>
+    <Link href={href} className="group relative flex-shrink-0 w-full select-none block">
+      <div className="relative overflow-hidden rounded-xl border border-white/[0.07] bg-[#0a1315] hover:border-[#B58863]/50 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_40px_rgba(0,0,0,0.6),0_0_20px_rgba(181,136,99,0.12)]">
+        {/* Sprocket strip left */}
+        <div className="absolute left-0 top-0 bottom-0 w-4 bg-[#060e0f] z-10 flex flex-col justify-evenly items-center py-2 pointer-events-none">
+          {Array.from({ length: 7 }).map((_, i) => (
+            <div key={i} className="w-2 h-3 rounded-[2px] bg-[#0f1a1b] border border-white/[0.06] shadow-inner" />
+          ))}
+        </div>
+        {/* Poster */}
+        <div className="ml-4 aspect-[2/3] overflow-hidden relative bg-[#0a1315]">
+          {src ? (
+            <img src={src} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.06]" loading="lazy" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-[8px] font-mono text-white/10">NO IMAGE</div>
+          )}
+          {/* Score badge */}
+          <span className="absolute top-2 right-2 bg-[#0a1315]/90 backdrop-blur border border-[#B58863]/40 text-[#B58863] text-[9px] font-mono font-black px-2 py-0.5 rounded-md leading-none">
+            ★ {score}
+          </span>
+          {/* Type tag */}
+          <span className={`absolute top-2 left-2 text-[7px] font-mono font-black uppercase tracking-widest px-1.5 py-0.5 rounded-sm leading-none ${
+            item.mediaType === "movie"
+              ? "bg-[#B58863]/20 text-[#d4a87c] border border-[#B58863]/25"
+              : "bg-teal-900/40 text-teal-400 border border-teal-700/30"
+          }`}>{item.mediaType === "movie" ? "FILM" : "SERIES"}</span>
+          {/* Bottom gradient */}
+          <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-[#0a1315] via-[#0a1315]/40 to-transparent pointer-events-none" />
+        </div>
+        {/* Metadata strip */}
+        <div className="ml-4 px-3 pt-2 pb-3 flex items-center justify-between">
+          <div className="min-w-0">
+            <p className="text-[10px] font-black text-[#D3C3B9] group-hover:text-white leading-tight truncate transition-colors">{item.title}</p>
+            <p className="text-[7px] font-mono text-slate-600 mt-1">{year}</p>
           </div>
-
-          {/* Follow / Edit Button Layout */}
-          <div className="flex justify-center gap-3 shrink-0 sm:mb-2">
-            {!isOwnProfile ? (
-              <>
-                <button
-                  onClick={handleFollowToggle}
-                  className={`px-6 py-2 rounded-full text-xs font-bold tracking-wide transition-all shadow-md ${
-                    isFollowing
-                      ? "bg-[#3D4D55]/60 hover:bg-[#3D4D55] text-[#D3C3B9] border border-[#3D4D55]/80"
-                      : "bg-gradient-to-r from-[#B58863] to-[#d4a87c] hover:opacity-90 text-[#0f1a1b] shadow-[#B58863]/20"
-                  }`}
-                >
-                  {isFollowing ? "Following" : "Follow"}
-                </button>
-                <button className="px-6 py-2 bg-[#103334]/60 border border-[#3D4D55]/50 text-[#A79E9C] hover:text-[#D3C3B9] rounded-full text-xs font-bold tracking-wide hover:bg-[#1e2e30] transition-all">
-                  Message
-                </button>
-              </>
-            ) : (
-              <Link
-                href="/dashboard"
-                className="px-6 py-2 bg-[#103334]/60 border border-[#3D4D55]/50 hover:border-[#3D4D55]/80 text-[#A79E9C] hover:text-[#D3C3B9] rounded-full text-xs font-bold tracking-wide transition-all"
-              >
-                Edit Profile
-              </Link>
-            )}
-            <button
-              onClick={handleShareProfile}
-              className="p-2 bg-[#103334]/60 border border-[#3D4D55]/50 text-[#A79E9C] hover:text-[#D3C3B9] rounded-full hover:bg-[#1e2e30] transition-all relative group cursor-pointer"
-              aria-label="Share profile"
-            >
-              {copied ? (
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 text-emerald-400">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                </svg>
-              ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186 2.504-1.253m-2.504 3.439 2.504 1.253m0-4.692a2.25 2.25 0 1 1 0-3.328m0 3.328a2.25 2.25 0 0 1-2.504 1.253m2.504 2.186a2.25 2.25 0 1 0 0 3.328m0-3.328a2.25 2.25 0 0 0-2.504-1.253" />
-                </svg>
-              )}
-              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[9px] font-bold bg-[#1e2e30] border border-[#3D4D55]/50 text-[#A79E9C] rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-30">
-                {copied ? "Portfolio link copied!" : "Copy public portfolio link"}
-              </span>
-            </button>
+          <div className="text-[6px] font-mono text-slate-700 text-right shrink-0 pl-2">
+            <div>F:{frameId}</div>
+            <div>35MM</div>
           </div>
         </div>
+      </div>
+    </Link>
+  );
+}
 
-        {/* Stats Row */}
-        {(user.stats.filmsCount > 0 || user.stats.followingCount > 0 || followersCount > 0) && (
-          <div className="flex justify-center sm:justify-start gap-8 py-4 border-y border-[#3D4D55]/30 mb-8 text-sm">
-            {user.stats.filmsCount > 0 && (
-              <div>
-                <span className="font-extrabold text-[#D3C3B9] text-base mr-1.5">{user.stats.filmsCount}</span>
-                <span className="text-[#A79E9C] font-medium">Films</span>
-              </div>
-            )}
-            {user.stats.followingCount > 0 && (
-              <button
-                onClick={() => setActiveModal("following")}
-                className="hover:opacity-80 transition-opacity text-left cursor-pointer focus:outline-none"
-              >
-                <span className="font-extrabold text-[#D3C3B9] text-base mr-1.5">{user.stats.followingCount}</span>
-                <span className="text-[#A79E9C] font-medium">Following</span>
-              </button>
-            )}
-            {followersCount > 0 && (
-              <button
-                onClick={() => setActiveModal("followers")}
-                className="hover:opacity-80 transition-opacity text-left cursor-pointer focus:outline-none"
-              >
-                <span className="font-extrabold text-[#D3C3B9] text-base mr-1.5">{followersCount}</span>
-                <span className="text-[#A79E9C] font-medium">Followers</span>
-              </button>
-            )}
-          </div>
+/* ─── Review Ticket ─── */
+function ReviewTicket({ rev }: { rev: ReviewItem }) {
+  const href = `/${rev.mediaType === "movie" ? "movies" : "tv"}/${rev.tmdbId}`;
+  const month = new Date(rev.createdAt).toLocaleDateString("en-US", { month: "short", year: "numeric" }).toUpperCase();
+  const stars = rev.rating ? Math.round(rev.rating) : 0;
+
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-[#3D4D55]/40 bg-gradient-to-br from-[#0d1f20] via-[#0f1a1b] to-[#0a1315] ticket-shimmer-effect group hover:border-[#B58863]/35 transition-all duration-300">
+      {/* Perforation holes on the left */}
+      <div className="absolute left-0 top-0 bottom-0 w-5 flex flex-col justify-evenly items-center py-3 z-10 pointer-events-none">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="w-2 h-2 rounded-full bg-[#060e0f] border border-[#1e2e30]/70 shadow-inner" />
+        ))}
+      </div>
+      {/* Dashed tear line */}
+      <div className="absolute left-5 top-0 bottom-0 border-l border-dashed border-[#3D4D55]/30 pointer-events-none" />
+
+      <div className="pl-8 pr-5 py-5 flex gap-4">
+        {/* Poster */}
+        {rev.posterPath && (
+          <Link href={href} className="flex-shrink-0 w-14 aspect-[2/3] rounded-lg overflow-hidden border border-white/[0.08] block relative">
+            <Image src={TMDB(rev.posterPath, "w185")} alt={rev.title} fill sizes="56px" className="object-cover group-hover:scale-105 transition-transform duration-500" />
+          </Link>
         )}
 
-        {/* Tabs Bar */}
-        <div className="flex border-b border-[#3D4D55]/30 mb-8 gap-6 sm:gap-8 justify-center sm:justify-start overflow-x-auto pb-px">
-          {(["Watched", "Watchlist", "Reviews"] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`pb-3 text-xs sm:text-sm font-semibold tracking-wider transition-all relative cursor-pointer ${
-                activeTab === tab
-                  ? "text-[#D3C3B9]"
-                  : "text-[#A79E9C] hover:text-[#D3C3B9]"
-              }`}
-            >
-              {tab}
-              {activeTab === tab && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#B58863] to-[#d4a87c] rounded-full" />
-              )}
-            </button>
+        <div className="flex-grow min-w-0">
+          {/* Header */}
+          <div className="flex items-start justify-between gap-2 mb-2.5">
+            <Link href={href} className="text-[11px] font-black uppercase tracking-wider text-[#FAF6E8] hover:text-[#B58863] transition-colors leading-tight line-clamp-1 flex-grow">
+              {rev.title}
+            </Link>
+            <div className="flex gap-0.5 flex-shrink-0">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <svg key={i} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                  className={`w-2.5 h-2.5 transition-colors ${i < stars ? "text-[#B58863]" : "text-white/10"}`}>
+                  <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clipRule="evenodd" />
+                </svg>
+              ))}
+            </div>
+          </div>
+
+          {/* Italic critic text */}
+          <p className="text-[11px] leading-relaxed text-[#A79E9C] italic line-clamp-3 font-serif">
+            &ldquo;{rev.content}&rdquo;
+          </p>
+
+          {/* Footer stamp */}
+          <div className="mt-3 flex items-center justify-between">
+            <span className="text-[7px] font-mono text-slate-600 uppercase tracking-widest">{month}</span>
+            <span className="text-[7px] font-mono text-[#B58863]/50 uppercase tracking-widest">
+              {rev.rating ? `${rev.rating.toFixed(1)} / 5.0` : "UNRATED"}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ───────── Main Component ───────── */
+export default function UserProfileClient({ isOwnProfile, user }: UserProfileClientProps) {
+  const [activeTab, setActiveTab] = useState<"FILMS" | "QUEUE" | "DISPATCH">("FILMS");
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followerCount, setFollowerCount] = useState(user.stats.followersCount);
+  const [copied, setCopied] = useState(false);
+  const [coverTheme, setCoverTheme] = useState("void");
+  const [showCoverPicker, setShowCoverPicker] = useState(false);
+  const [activeModal, setActiveModal] = useState<"followers" | "following" | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
+
+  const coverThemes = [
+    { id: "void", label: "Void Black", gradient: "from-[#060e0f] via-[#0f1a1b] to-[#060e0f]", img: null },
+    { id: "mars", label: "Mars Dunes", gradient: "from-[#1a0a00] via-[#2e1500] to-[#0f1a1b]", img: null },
+    { id: "teal", label: "Deep Teal", gradient: "from-[#001a1a] via-[#103334] to-[#0f1a1b]", img: null },
+    { id: "slate", label: "Midnight Slate", gradient: "from-[#0a0d14] via-[#1c2535] to-[#0f1a1b]", img: null },
+    { id: "sand", label: "Amber Dusk", gradient: "from-[#1a1200] via-[#2a1f00] to-[#0f1a1b]", img: null },
+  ];
+  const activeCover = coverThemes.find(t => t.id === coverTheme) || coverThemes[0];
+
+  const mockFollowers = [
+    { name: "Christopher Nolan", username: "chrisnolan", bio: "Director. Architect of time." },
+    { name: "Martin Scorsese", username: "marty", bio: "Cinema is a mirror of life itself." },
+    { name: "Quentin Tarantino", username: "quentint", bio: "Film is my religion." },
+    { name: "Greta Gerwig", username: "gretagw", bio: "Stories are empathy machines." },
+  ];
+  const mockFollowing = [
+    { name: "Denis Villeneuve", username: "denisvill", bio: "Silence speaks louder than words." },
+    { name: "Bong Joon Ho", username: "bongjoonho", bio: "Parasite. Snowpiercer. Memories." },
+    { name: "David Fincher", username: "fincher", bio: "Details are not details." },
+    { name: "Stanley Kubrick", username: "kubrick2001", bio: "1928–1999. Still relevant." },
+  ];
+
+  // Rating buckets
+  const ratings = user.reviews.map(r => r.rating).filter((r): r is number => r !== null);
+  const rBuckets = { 5: 142, 4: 78, 3: 20, 2: 5, 1: 2 };
+  if (ratings.length > 0) { Object.keys(rBuckets).forEach(k => { (rBuckets as any)[k] = 0; }); ratings.forEach(r => { const s = Math.round(r) as 1|2|3|4|5; rBuckets[s] = (rBuckets[s]||0)+1; }); }
+  const maxR = Math.max(...Object.values(rBuckets), 1);
+
+  // Favorites
+  const defaultFavs = [
+    { id: "27205", title: "Inception", posterPath: "/o062xtYJm5AdzfsEs4tFa47TuRL.jpg", releaseDate: "2010-07-15", mediaType: "movie" as const, voteAverage: 8.4 },
+    { id: "157336", title: "Interstellar", posterPath: "/gEU2QvHOm52Yv0tprYhp3v2v1gY.jpg", releaseDate: "2014-11-05", mediaType: "movie" as const, voteAverage: 8.5 },
+    { id: "155", title: "The Dark Knight", posterPath: "/qJ2tWGB2XclmAEc97aIsG24GEtY.jpg", releaseDate: "2008-07-16", mediaType: "movie" as const, voteAverage: 9.0 },
+    { id: "603", title: "The Matrix", posterPath: "/f89U3wzqrjVnHwb9Y9OMhk0e2jC.jpg", releaseDate: "1999-03-30", mediaType: "movie" as const, voteAverage: 8.2 },
+  ];
+  const favs: MediaItem[] = user.watched.length >= 4 ? user.watched.slice(0, 4) : defaultFavs;
+
+  const handleFollow = () => {
+    setIsFollowing(p => !p);
+    setFollowerCount(p => isFollowing ? p - 1 : p + 1);
+  };
+  const handleShare = () => {
+    if (typeof window !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(`${window.location.origin}/user/${user.username}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
+  };
+
+  const modalList = activeModal === "followers" ? mockFollowers : mockFollowing;
+
+  return (
+    <div className="w-full min-h-screen bg-[#0f1a1b] text-[#D3C3B9] selection:bg-[#B58863]/30 selection:text-[#FAF6E8] overflow-x-hidden">
+
+      {/* ════════════════ COVER BANNER ════════════════ */}
+      <div className={`relative h-64 md:h-80 w-full bg-gradient-to-br ${activeCover.gradient} overflow-hidden`}>
+        {/* Animated scan line */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="animate-scan-sweep absolute left-0 right-0 h-24 bg-gradient-to-b from-transparent via-white/[0.025] to-transparent" />
+        </div>
+
+        {/* Horizontal film-frame lines top & bottom */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-[#B58863]/25 z-20" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-[#B58863]/25 z-20" />
+
+        {/* Film sprocket row — top */}
+        <div className="absolute top-2.5 left-0 right-0 flex justify-between px-4 z-20 pointer-events-none select-none">
+          {Array.from({ length: 20 }).map((_, i) => (
+            <div key={i} className="w-3 h-2 rounded-[1px] bg-[#0f1a1b]/60 border border-white/[0.04]" />
+          ))}
+        </div>
+        {/* Film sprocket row — bottom */}
+        <div className="absolute bottom-2.5 left-0 right-0 flex justify-between px-4 z-20 pointer-events-none select-none">
+          {Array.from({ length: 20 }).map((_, i) => (
+            <div key={i} className="w-3 h-2 rounded-[1px] bg-[#0f1a1b]/60 border border-white/[0.04]" />
           ))}
         </div>
 
-        {/* Tabs Content Areas */}
-        <div className="space-y-10">
-          {activeTab === "Watched" && (
-            <div className="space-y-12">
-              {/* Taste Profile & Rating Distribution */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Taste Profile */}
-                <div className="md:col-span-2 space-y-5 bg-[#103334]/40 border border-[#3D4D55]/30 p-5 rounded-2xl flex flex-col justify-between">
-                  <div>
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.15em] text-[#A79E9C] mb-4">Taste Breakdown</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      {user.tasteProfile.map((genre) => (
-                        <div
-                          key={genre.name}
-                          className="bg-[#0f1a1b]/60 border border-[#3D4D55]/30 p-4 rounded-xl flex flex-col justify-between transition-all group relative hover:border-[#B58863]/20"
-                        >
-                          <div className="flex items-center justify-between text-xs font-extrabold tracking-wider text-[#D3C3B9] mb-4">
-                            <span className="flex items-center gap-1.5">
-                              <span>{genre.icon}</span>
-                              <span>{genre.name}</span>
-                            </span>
-                            <span className="text-[#B58863]">{genre.percentage}%</span>
-                          </div>
-                          <div className="w-full bg-[#0f1a1b] h-1.5 rounded-full overflow-hidden">
-                            <div
-                              className="h-full rounded-full transition-all duration-1000 bg-gradient-to-r from-[#B58863] to-[#d4a87c]"
-                              style={{ width: `${genre.percentage}%` }}
-                            />
-                          </div>
-                          <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[8px] bg-[#1e2e30] border border-[#3D4D55]/50 text-[#A79E9C] rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 font-bold uppercase tracking-wider">
-                            {genre.percentage}% of logged films
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+        {/* Subtle radial ambient */}
+        <div className="absolute inset-0 bg-radial-[ellipse_at_center] from-white/[0.03] to-transparent pointer-events-none" />
 
-                {/* Rating Distribution */}
-                <div className="bg-[#103334]/40 border border-[#3D4D55]/30 p-5 rounded-2xl">
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.15em] text-[#A79E9C] mb-4">Rating Frequency</h3>
-                  <div className="space-y-2.5">
-                    {ratingBars.map((bar) => (
-                      <div key={bar.stars} className="flex items-center gap-3 text-[10px] text-[#A79E9C]">
-                        <span className="w-12 font-bold whitespace-nowrap text-[#B58863]/80 text-right">{bar.stars} ★</span>
-                        <div className="flex-1 bg-[#0f1a1b] h-2 rounded-full overflow-hidden">
-                          <div className="h-full bg-gradient-to-r from-[#B58863] to-[#d4a87c] rounded-full" style={{ width: `${bar.percentage}%` }} />
-                        </div>
-                        <span className="w-8 text-right text-[#A79E9C] font-bold">{bar.count}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+        {/* TOP-LEFT METADATA STRIP */}
+        <div className="absolute top-9 left-6 z-20 flex items-center gap-3 font-mono text-[7.5px] text-white/20 tracking-[0.2em] uppercase select-none">
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+          <span>REC • PORTFOLIO_SCAN • EXT_1.85:1 • @{user.username}</span>
+        </div>
+
+        {/* TOP-RIGHT: Cover picker (owner only) */}
+        {isOwnProfile && (
+          <button
+            onClick={() => setShowCoverPicker(true)}
+            className="absolute top-8 right-5 z-30 flex items-center gap-1.5 px-3 py-1.5 bg-black/50 hover:bg-black/70 text-white/40 hover:text-white/70 rounded-full border border-white/10 text-[8px] font-mono uppercase tracking-widest transition-all cursor-pointer backdrop-blur"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3 h-3">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
+            </svg>
+            <span>Filter</span>
+          </button>
+        )}
+
+        {/* BOTTOM GRADIENT: bleeds into profile content */}
+        <div className="absolute bottom-0 left-0 right-0 h-3/4 bg-gradient-to-t from-[#0f1a1b] to-transparent z-10" />
+      </div>
+
+      {/* ════════════════ MAIN CONTENT ════════════════ */}
+      <div className="relative z-20 -mt-28 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto pb-32">
+
+        {/* ─── HERO IDENTITY ROW ─── */}
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 items-start mb-10">
+
+          {/* LEFT: Avatar + ID Card */}
+          <div className={`flex-shrink-0 w-full lg:w-72 animate-panel-enter`}>
+            {/* Director's Clapper ID Card */}
+            <div className="relative bg-[#0d1f20]/95 backdrop-blur-2xl border border-[#3D4D55]/50 rounded-3xl overflow-hidden animate-glow-breathe shadow-2xl">
+              {/* Top clapper bar (black & white stripes) */}
+              <div className="h-5 flex overflow-hidden">
+                {Array.from({ length: 30 }).map((_, i) => (
+                  <div key={i} className={`flex-1 h-full ${i % 2 === 0 ? "bg-[#0f1a1b]" : "bg-[#FAF6E8]/10"}`} />
+                ))}
+              </div>
+              {/* Card header */}
+              <div className="bg-[#B58863] px-4 py-1.5 flex items-center justify-between">
+                <span className="text-[7.5px] font-mono font-black uppercase tracking-[0.3em] text-[#0f1a1b]">CINETRACK // DIRECTOR I.D.</span>
+                <span className="text-[7px] font-mono text-[#0f1a1b]/60">SCENE 01-A</span>
               </div>
 
-              {/* Favorite Cinema Showcase */}
-              <div className="bg-[#103334]/40 border border-[#3D4D55]/30 p-5 rounded-2xl">
-                <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#A79E9C] mb-4 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#B58863] animate-pulse" />
-                  Favorite Cinema
-                </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  {favoriteShowcaseItems.map((item) => (
-                    <ProfileMediaCard key={item.id} item={item as MediaItem} />
-                  ))}
-                </div>
-              </div>
-
-              {/* Recently Watched Section */}
-              <div>
-                <div className="flex items-center justify-between mb-5 group cursor-pointer">
-                  <h2 className="text-lg font-bold tracking-tight text-[#D3C3B9] flex items-center gap-2">
-                    Recently Watched
-                  </h2>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4 text-[#A79E9C] group-hover:text-[#D3C3B9] group-hover:translate-x-0.5 transition-all">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                  </svg>
-                </div>
-
-                {user.watched.length > 0 ? (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
-                    {user.watched.map((item) => (
-                      <ProfileMediaCard key={item.id} item={item} />
-                    ))}
+              {/* Content */}
+              <div className="px-5 pt-5 pb-6 flex flex-col items-center text-center gap-4">
+                {/* Avatar with spinning ring */}
+                <div className="relative w-24 h-24">
+                  {/* Spinning outer halo */}
+                  <div className="animate-halo absolute inset-[-6px] rounded-full border border-dashed border-[#B58863]/30 pointer-events-none" />
+                  {/* Inner static ring */}
+                  <div className="absolute inset-[-2px] rounded-full bg-gradient-to-tr from-[#B58863]/60 via-[#d4a87c]/30 to-[#3D4D55]/20" />
+                  <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-[#0d1f20]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={user.avatarUrl || "/profile_avatar.png"}
+                      alt={user.name}
+                      className="w-full h-full object-cover grayscale brightness-90"
+                    />
                   </div>
-                ) : (
-                  <p className="text-[#A79E9C] italic text-sm">No watched entries cataloged yet.</p>
+                </div>
+
+                {/* Name & username */}
+                <div>
+                  <h1 className="text-base font-black uppercase tracking-wider text-[#FAF6E8] leading-tight">
+                    {user.name}
+                  </h1>
+                  <p className="text-[9px] font-mono text-[#B58863]/70 mt-0.5 tracking-widest">
+                    @{user.username}
+                  </p>
+                </div>
+
+                {/* Bio in screenplay style */}
+                {user.bio && (
+                  <div className="w-full border-t border-b border-[#3D4D55]/30 py-3.5 text-left">
+                    <span className="block text-[6.5px] font-mono text-slate-600 uppercase tracking-widest mb-1.5 select-none">
+                      [INT. CHARACTER INTRO]
+                    </span>
+                    <p className="text-[10.5px] text-[#A79E9C] leading-relaxed italic font-serif">
+                      &ldquo;{user.bio}&rdquo;
+                    </p>
+                  </div>
                 )}
+
+                {/* Stats row — mini odometers */}
+                <div className="w-full grid grid-cols-3 text-center">
+                  <div>
+                    <div className="text-base font-black font-mono text-[#FAF6E8] overflow-hidden">
+                      {mounted ? <AnimatedCount to={user.stats.filmsCount} /> : user.stats.filmsCount}
+                    </div>
+                    <div className="text-[6.5px] font-mono text-slate-500 uppercase tracking-wider mt-0.5">Films</div>
+                  </div>
+                  <button onClick={() => setActiveModal("following")} className="hover:opacity-75 transition-opacity cursor-pointer">
+                    <div className="text-base font-black font-mono text-[#FAF6E8]">
+                      {mounted ? <AnimatedCount to={user.stats.followingCount} duration={900} /> : user.stats.followingCount}
+                    </div>
+                    <div className="text-[6.5px] font-mono text-slate-500 uppercase tracking-wider mt-0.5">Following</div>
+                  </button>
+                  <button onClick={() => setActiveModal("followers")} className="hover:opacity-75 transition-opacity cursor-pointer">
+                    <div className="text-base font-black font-mono text-[#FAF6E8]">
+                      {mounted ? <AnimatedCount to={followerCount} duration={1000} /> : followerCount}
+                    </div>
+                    <div className="text-[6.5px] font-mono text-slate-500 uppercase tracking-wider mt-0.5">Followers</div>
+                  </button>
+                </div>
+
+                {/* Action buttons */}
+                <div className="w-full flex gap-2.5">
+                  {!isOwnProfile ? (
+                    <>
+                      <button
+                        onClick={handleFollow}
+                        className={`flex-grow py-2.5 rounded-xl text-[9px] font-mono font-black uppercase tracking-widest transition-all cursor-pointer shadow ${
+                          isFollowing
+                            ? "bg-[#3D4D55]/40 border border-[#3D4D55]/60 text-[#A79E9C] hover:bg-[#3D4D55]/60"
+                            : "bg-gradient-to-r from-[#B58863] to-[#d4a87c] text-[#0f1a1b] hover:brightness-110 hover:scale-[1.02] active:scale-[0.98]"
+                        }`}
+                      >
+                        {isFollowing ? "✓ Following" : "✦ Follow"}
+                      </button>
+                      <button className="px-3.5 py-2.5 bg-[#103334]/60 border border-[#3D4D55]/50 text-[#A79E9C] rounded-xl text-[9px] font-mono font-black uppercase hover:text-white hover:bg-[#1e2e30] transition-all cursor-pointer">
+                        MSG
+                      </button>
+                    </>
+                  ) : (
+                    <Link href="/dashboard" className="flex-grow py-2.5 rounded-xl text-[9px] font-mono font-black uppercase tracking-widest text-center text-[#A79E9C] bg-[#103334]/40 border border-[#3D4D55]/50 hover:border-[#B58863]/40 hover:text-[#FAF6E8] hover:bg-[#1e2e30] transition-all">
+                      Edit Portfolio
+                    </Link>
+                  )}
+                  <button
+                    onClick={handleShare}
+                    title="Share profile"
+                    className="relative px-3.5 py-2.5 bg-[#103334]/40 border border-[#3D4D55]/50 text-[#A79E9C] rounded-xl hover:text-[#FAF6E8] hover:bg-[#1e2e30] transition-all cursor-pointer group"
+                  >
+                    {copied
+                      ? <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5 text-emerald-400"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                      : <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186 2.504-1.253m-2.504 3.439 2.504 1.253m0-4.692a2.25 2.25 0 1 1 0-3.328m0 3.328a2.25 2.25 0 0 1-2.504 1.253m2.504 2.186a2.25 2.25 0 1 0 0 3.328m0-3.328a2.25 2.25 0 0 0-2.504-1.253" /></svg>
+                    }
+                    {copied && <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 text-[7px] font-mono font-black bg-emerald-900/80 border border-emerald-600/40 text-emerald-300 rounded whitespace-nowrap z-30">Link copied!</span>}
+                  </button>
+                </div>
+
+                {/* Bottom barcode */}
+                <div className="w-full flex flex-col items-center pt-2 border-t border-[#3D4D55]/25">
+                  <div className="flex gap-[1.5px] items-stretch h-5 opacity-20 select-none">
+                    {[2,3,1,4,1.5,1,2.5,1,3.5,2,1,3,1.5,1,2,3,1,4,1.5,2].map((w, i) => (
+                      <div key={i} style={{ width: `${w * 1.5}px` }} className="bg-[#B58863]" />
+                    ))}
+                  </div>
+                  <span className="text-[5.5px] font-mono tracking-[0.35em] text-[#B58863]/30 mt-1 uppercase select-none">
+                    CT-{user.username.padEnd(8, "0").toUpperCase().slice(0, 8)}
+                  </span>
+                </div>
               </div>
             </div>
-          )}
+          </div>
 
-          {activeTab === "Watchlist" && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
-              {user.watchlist.length > 0 ? (
-                user.watchlist.map((item) => (
-                  <ProfileMediaCard key={item.id} item={item} />
-                ))
-              ) : (
-                <p className="text-[#A79E9C] italic text-sm col-span-3">No movies or TV shows in watchlist yet.</p>
-              )}
-            </div>
-          )}
+          {/* RIGHT: Analytics + Favorite Cinema */}
+          <div className="flex-grow space-y-6 min-w-0">
 
-          {activeTab === "Reviews" && (
-            <div className="space-y-6">
-              {user.reviews.length > 0 ? (
-                user.reviews.map((rev) => (
-                  <div key={rev.id} className="p-6 bg-[#103334]/40 border border-[#3D4D55]/30 rounded-2xl flex flex-col sm:flex-row gap-5 hover:border-[#3D4D55]/60 transition-all">
-                    {rev.posterPath && (
-                      <div className="w-[80px] shrink-0 mx-auto sm:mx-0 rounded-xl overflow-hidden border border-[#3D4D55]/30 aspect-[2/3] bg-[#0f1a1b] shadow-md">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={`https://image.tmdb.org/t/p/w185${rev.posterPath}`}
-                          alt={rev.title}
-                          className="w-full h-full object-cover"
-                        />
+            {/* Genre VU Meters */}
+            <div className="animate-panel-enter-delay-1 bg-[#0d1f20]/80 backdrop-blur-xl border border-[#3D4D55]/40 rounded-3xl p-6 relative overflow-hidden">
+              {/* Viewfinder ticks */}
+              <div className="absolute top-3 left-3 w-2.5 h-2.5 border-t border-l border-[#B58863]/30 pointer-events-none" />
+              <div className="absolute top-3 right-3 w-2.5 h-2.5 border-t border-r border-[#B58863]/30 pointer-events-none" />
+
+              <h2 className="text-[7.5px] font-mono font-black uppercase tracking-[0.25em] text-[#B58863] mb-5 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#B58863] animate-pulse" />
+                GENRE AFFINITY // SIGNAL MATRIX
+              </h2>
+
+              <div className="space-y-5">
+                {user.tasteProfile.map((g, idx) => {
+                  const lit = Math.max(1, Math.round(g.percentage / 8.5));
+                  return (
+                    <div key={g.name}>
+                      <div className="flex justify-between items-center mb-1.5">
+                        <span className="text-[10px] font-mono font-black uppercase tracking-wider text-[#D3C3B9] flex items-center gap-1.5">
+                          <span>{g.icon}</span><span>{g.name}</span>
+                        </span>
+                        <span className="text-[9px] font-mono text-[#FAF6E8] font-black">{g.percentage}%</span>
                       </div>
-                    )}
-                    <div className="flex-1">
-                      <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                        <Link
-                          href={`/${rev.mediaType === "movie" ? "movies" : "tv"}/${rev.tmdbId}`}
-                          className="text-sm font-black text-[#D3C3B9] hover:bg-gradient-to-r hover:from-[#B58863] hover:to-[#d4a87c] hover:bg-clip-text hover:text-transparent transition-all duration-300"
-                        >
-                          {rev.title}
-                        </Link>
-                        {rev.rating && (
-                          <span className="text-[10px] font-bold text-[#B58863] bg-[#B58863]/10 border border-[#B58863]/20 px-2 py-0.5 rounded flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-2.5 h-2.5">
-                              <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clipRule="evenodd" />
-                            </svg>
-                            {rev.rating.toFixed(1)} / 5.0
-                          </span>
-                        )}
+                      {/* VU meter segments */}
+                      <div className="flex gap-[2px] h-3">
+                        {Array.from({ length: 12 }).map((_, si) => {
+                          const isLit = si < lit;
+                          const color = isLit
+                            ? si < 6 ? "bg-teal-500/80 shadow-[0_0_4px_rgba(20,184,166,0.5)]"
+                              : si < 9 ? "bg-[#B58863] shadow-[0_0_5px_rgba(181,136,99,0.5)]"
+                              : "bg-[#d4a87c] shadow-[0_0_8px_rgba(212,168,124,0.7)]"
+                            : "bg-[#1e2e30]/60 border border-white/[0.04]";
+                          return <div key={si} className={`flex-grow rounded-[1px] transition-all duration-700 ${color}`} style={{ transitionDelay: `${idx * 60 + si * 20}ms` }} />;
+                        })}
                       </div>
-                      <p className="text-xs sm:text-sm text-[#A79E9C] leading-relaxed">{rev.content}</p>
-                      <p className="text-[10px] text-[#3D4D55] mt-4">
-                        Logged on {new Date(rev.createdAt).toLocaleDateString()}
-                      </p>
                     </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-[#A79E9C] italic text-sm">No reviews posted yet.</p>
-              )}
+                  );
+                })}
+              </div>
+
+              {/* Rating Histogram inline */}
+              <div className="mt-6 pt-5 border-t border-[#3D4D55]/25">
+                <h3 className="text-[7.5px] font-mono font-black uppercase tracking-[0.25em] text-[#B58863] mb-3">
+                  GRADING HISTOGRAM // FREQ_DIST
+                </h3>
+                <div className="space-y-2">
+                  {[5, 4, 3, 2, 1].map((s) => {
+                    const count = rBuckets[s as 1|2|3|4|5];
+                    const pct = (count / maxR) * 100;
+                    return (
+                      <div key={s} className="flex items-center gap-3">
+                        <span className="text-[8px] font-mono w-8 text-right text-[#B58863] font-black shrink-0">{"★".repeat(s)}</span>
+                        <div className="flex-grow bg-[#0a1315] h-1.5 rounded-full overflow-hidden border border-white/[0.04]">
+                          <div className="h-full bg-gradient-to-r from-[#B58863]/60 to-[#d4a87c] rounded-full transition-all duration-1000" style={{ width: `${pct}%` }} />
+                        </div>
+                        <span className="w-6 text-[8px] font-mono text-right text-[#FAF6E8] font-black shrink-0">{count}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
+
+            {/* Favorite Cinema — 4-poster grid with dramatic hover */}
+            <div className="animate-panel-enter-delay-2 bg-[#0d1f20]/80 backdrop-blur-xl border border-[#3D4D55]/40 rounded-3xl p-6 relative overflow-hidden">
+              <div className="absolute top-3 left-3 w-2.5 h-2.5 border-t border-l border-[#B58863]/30 pointer-events-none" />
+              <div className="absolute top-3 right-3 w-2.5 h-2.5 border-t border-r border-[#B58863]/30 pointer-events-none" />
+              <div className="absolute bottom-3 left-3 w-2.5 h-2.5 border-b border-l border-[#B58863]/30 pointer-events-none" />
+              <div className="absolute bottom-3 right-3 w-2.5 h-2.5 border-b border-r border-[#B58863]/30 pointer-events-none" />
+
+              <h2 className="text-[7.5px] font-mono font-black uppercase tracking-[0.25em] text-[#B58863] mb-5 flex items-center gap-2 select-none">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                SPOTLIGHT REEL // FAVORITE CINEMA
+              </h2>
+
+              <div className="grid grid-cols-4 gap-3">
+                {favs.map((item, i) => (
+                  <FilmCard key={item.id} item={item} index={i} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ─── TAB CONSOLE ─── */}
+        <div className="animate-panel-enter-delay-3 mb-8">
+          {/* Mixing board style tab strip */}
+          <div className="flex items-end gap-0 border-b border-[#3D4D55]/35 overflow-x-auto scrollbar-none">
+            {(["FILMS", "QUEUE", "DISPATCH"] as const).map((tab, i) => {
+              const labels: Record<string, string> = { FILMS: "FILM LOG", QUEUE: "WATCHLIST", DISPATCH: "CRITIC DISPATCH" };
+              const counts: Record<string, number> = { FILMS: user.watched.length, QUEUE: user.watchlist.length, DISPATCH: user.reviews.length };
+              const isActive = activeTab === tab;
+              return (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`relative flex items-center gap-2 px-5 py-3.5 text-[9px] font-mono font-black uppercase tracking-widest transition-all cursor-pointer whitespace-nowrap ${
+                    isActive
+                      ? "text-[#FAF6E8] bg-[#0d1f20]/80 border border-b-0 border-[#3D4D55]/35 -mb-px rounded-t-xl"
+                      : "text-[#A79E9C]/60 hover:text-[#A79E9C]"
+                  }`}
+                >
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-[#B58863] animate-pulse" />}
+                  <span>{labels[tab]}</span>
+                  <span className={`text-[7px] px-1.5 py-0.5 rounded font-black ${isActive ? "bg-[#B58863]/20 text-[#B58863]" : "bg-[#1e2e30] text-[#3D4D55]"}`}>
+                    {counts[tab]}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ─── TAB CONTENT ─── */}
+        <div className="animate-panel-enter-delay-4">
+
+          {/* FILM LOG */}
+          {activeTab === "FILMS" && (
+            user.watched.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                {user.watched.map((item, i) => <FilmCard key={item.id} item={item} index={i} />)}
+              </div>
+            ) : (
+              <EmptyState text="NO FILM RECORDS LOGGED" />
+            )
+          )}
+
+          {/* WATCHLIST / QUEUE */}
+          {activeTab === "QUEUE" && (
+            user.watchlist.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                {user.watchlist.map((item, i) => <FilmCard key={item.id} item={item} index={i} />)}
+              </div>
+            ) : (
+              <EmptyState text="WATCHLIST IS EMPTY" />
+            )
+          )}
+
+          {/* REVIEWS */}
+          {activeTab === "DISPATCH" && (
+            user.reviews.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {user.reviews.map(rev => <ReviewTicket key={rev.id} rev={rev} />)}
+              </div>
+            ) : (
+              <EmptyState text="NO REVIEWS DISPATCHED" />
+            )
           )}
         </div>
       </div>
 
-      {/* Cover Picker Overlay Dialog */}
+      {/* ════════ COVER PICKER MODAL ════════ */}
       {showCoverPicker && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#1e2e30] border border-[#3D4D55]/60 rounded-3xl p-6 w-full max-w-sm mx-4 shadow-2xl relative">
-            <button
-              onClick={() => setShowCoverPicker(false)}
-              className="absolute top-4 right-4 text-[#A79E9C] hover:text-[#D3C3B9] cursor-pointer transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-              </svg>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md" onClick={() => setShowCoverPicker(false)}>
+          <div className="bg-[#0d1f20] border border-[#3D4D55]/60 rounded-3xl p-6 w-full max-w-xs mx-4 shadow-2xl relative" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowCoverPicker(false)} className="absolute top-4 right-4 text-[#A79E9C] hover:text-white cursor-pointer transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
             </button>
-            <h3 className="text-xs font-black uppercase tracking-wider text-[#A79E9C] mb-4">Choose Cover Theme</h3>
-            <div className="space-y-2.5">
-              {coverThemes.map((theme) => (
-                <button
-                  key={theme.id}
-                  onClick={() => {
-                    setCoverTheme(theme.id);
-                    setShowCoverPicker(false);
-                  }}
-                  className={`w-full text-left p-3.5 rounded-2xl border flex items-center justify-between transition-all cursor-pointer ${
-                    coverTheme === theme.id
-                      ? "border-[#B58863] bg-[#B58863]/5 text-[#B58863] font-bold"
-                      : "border-[#3D4D55]/40 bg-[#0f1a1b]/50 text-[#A79E9C] hover:border-[#3D4D55]/70 hover:bg-[#103334]/60"
+            <h3 className="text-[8.5px] font-mono font-black uppercase tracking-[0.25em] text-[#B58863] mb-4">COVER FILTER // LENS SELECT</h3>
+            <div className="space-y-2">
+              {coverThemes.map(t => (
+                <button key={t.id} onClick={() => { setCoverTheme(t.id); setShowCoverPicker(false); }}
+                  className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
+                    coverTheme === t.id ? "border-[#B58863]/60 bg-[#B58863]/8 text-[#FAF6E8]" : "border-[#3D4D55]/35 text-[#A79E9C] hover:border-[#3D4D55]/60 hover:bg-[#1e2e30]/40"
                   }`}
                 >
-                  <span className="text-xs font-semibold">{theme.label}</span>
-                  <div className={`w-14 h-7 rounded-lg border border-[#3D4D55]/40 overflow-hidden ${theme.class}`}>
-                    {theme.img && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={theme.img} alt="" className="w-full h-full object-cover" />
-                    )}
-                  </div>
+                  <div className={`w-12 h-7 rounded-lg bg-gradient-to-br ${t.gradient} flex-shrink-0 border border-white/10`} />
+                  <span className="text-[10px] font-mono font-black uppercase tracking-wider">{t.label}</span>
+                  {coverTheme === t.id && <span className="ml-auto text-[#B58863] text-[8px] font-mono">ACTIVE</span>}
                 </button>
               ))}
             </div>
@@ -550,39 +581,31 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
         </div>
       )}
 
-      {/* Followers / Following Modal Dialog */}
+      {/* ════════ FOLLOWER / FOLLOWING MODAL ════════ */}
       {activeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#1e2e30] border border-[#3D4D55]/60 rounded-3xl p-6 w-full max-w-sm mx-4 shadow-2xl relative max-h-[75vh] flex flex-col">
-            <button
-              onClick={() => setActiveModal(null)}
-              className="absolute top-4 right-4 text-[#A79E9C] hover:text-[#D3C3B9] cursor-pointer transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-              </svg>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md" onClick={() => setActiveModal(null)}>
+          <div className="bg-[#0d1f20] border border-[#3D4D55]/60 rounded-3xl p-6 w-full max-w-sm mx-4 shadow-2xl relative max-h-[70vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setActiveModal(null)} className="absolute top-4 right-4 text-[#A79E9C] hover:text-white cursor-pointer transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
             </button>
-            <h3 className="text-xs font-black uppercase tracking-wider text-[#A79E9C] mb-4 capitalize">
-              {activeModal}
+            <h3 className="text-[8px] font-mono font-black uppercase tracking-[0.25em] text-[#B58863] mb-4">
+              {activeModal === "followers" ? "AUDIENCE // ROLL CALL" : "TRACKED // TARGET LIST"}
             </h3>
-            <div className="overflow-y-auto divide-y divide-[#3D4D55]/30 pr-1 space-y-4">
-              {activeList.map((userItem) => (
-                <div key={userItem.username} className="flex items-center justify-between gap-4 pt-4 first:pt-0">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-[#103334] overflow-hidden shrink-0 border border-[#3D4D55]/40 flex items-center justify-center text-[#B58863] font-black text-xs uppercase shadow-inner">
-                      {userItem.name.slice(0, 2)}
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-[#D3C3B9] flex items-center gap-1">
-                        {userItem.name}
-                        <span className="w-3.5 h-3.5 rounded-full bg-[#B58863] flex items-center justify-center text-[#0f1a1b] text-[8px] font-black leading-none">✓</span>
-                      </h4>
-                      <p className="text-[10px] text-[#A79E9C]">@{userItem.username}</p>
-                      <p className="text-[10px] text-[#A79E9C]/70 mt-1 line-clamp-1 leading-relaxed">{userItem.bio}</p>
-                    </div>
+            <div className="overflow-y-auto space-y-4 scrollbar-none pr-1">
+              {modalList.map(u => (
+                <div key={u.username} className="flex items-center gap-3 group">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#3D4D55]/60 to-[#103334] border border-[#3D4D55]/40 flex items-center justify-center text-[#B58863] font-mono font-black text-xs uppercase flex-shrink-0 select-none">
+                    {u.name.slice(0, 2)}
                   </div>
-                  <button className="text-[9px] font-black uppercase tracking-wider px-3.5 py-1.5 bg-[#B58863]/10 hover:bg-[#B58863]/20 text-[#B58863] rounded-full transition-all border border-[#B58863]/20 cursor-pointer">
-                    Follow
+                  <div className="flex-grow min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[11px] font-black text-[#D3C3B9] group-hover:text-white transition-colors truncate">{u.name}</span>
+                      <span className="w-3 h-3 rounded-full bg-[#B58863] flex items-center justify-center text-[#0f1a1b] text-[6px] font-black flex-shrink-0">✓</span>
+                    </div>
+                    <span className="text-[8px] font-mono text-slate-500">@{u.username}</span>
+                  </div>
+                  <button className="text-[7.5px] font-mono font-black px-2.5 py-1 bg-[#B58863]/10 border border-[#B58863]/20 text-[#B58863] rounded-lg hover:bg-[#B58863]/20 transition-all cursor-pointer flex-shrink-0">
+                    VIEW
                   </button>
                 </div>
               ))}
@@ -590,6 +613,20 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/* ── Empty State ── */
+function EmptyState({ text }: { text: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-20 border border-dashed border-[#3D4D55]/30 rounded-2xl gap-3">
+      <div className="flex gap-1 opacity-20">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="w-8 h-12 bg-[#1e2e30] rounded border border-[#3D4D55]/30" />
+        ))}
+      </div>
+      <p className="text-[8.5px] font-mono uppercase tracking-[0.3em] text-slate-600">{text}</p>
     </div>
   );
 }

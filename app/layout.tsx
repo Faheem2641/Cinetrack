@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Caveat, Playfair_Display } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import FilmstripDivider from "@/components/FilmstripDivider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -11,6 +12,16 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const caveat = Caveat({
+  variable: "--font-caveat",
+  subsets: ["latin"],
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin"],
 });
 
@@ -27,11 +38,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
+      className={`${geistSans.variable} ${geistMono.variable} ${caveat.variable} ${playfair.variable} h-full antialiased dark`}
     >
       <body className="min-h-full flex flex-col bg-[#0f1a1b] text-[#D3C3B9] font-sans">
         <Navbar />
         <main className="flex-grow flex flex-col">{children}</main>
+        <FilmstripDivider
+          bgClass="bg-[#122123]"
+          aboveColor="text-[#0f1a1b]"
+          belowColor="text-[#103334]"
+          reelLabel="REEL_03 // EXT. ROLL CREDITS"
+        />
         <Footer />
       </body>
     </html>

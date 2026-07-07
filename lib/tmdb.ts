@@ -552,3 +552,104 @@ export const GENRE_NAME_TO_ID: Record<string, number> = Object.fromEntries(
 
 /** All available genres exposed for the UI */
 export const ALL_GENRES = Object.values(TMDB_GENRE_MAP);
+
+// ─── Person / Filmography APIs ──────────────────────────────────────────────
+
+export interface PersonProfile {
+  id: number;
+  name: string;
+  profilePath: string | null;
+  knownFor: string; // "Directing" | "Acting" | etc.
+  biography?: string;
+}
+
+/**
+ * Fetch basic profile info for a TMDB person ID.
+ * Cached for 24h (person data rarely changes).
+ */
+export async function getPersonDetails(personId: number): Promise<PersonProfile | null> {
+  const token = getApiKey();
+  if (!token) return null;
+
+  try {
+    const url = getUrl(`/person/${personId}`);
+    const headers = getHeaders();
+    const res = await fetch(
+      url,
+      headers ? { headers, next: { revalidate: 86400 } } : { next: { revalidate: 86400 } }
+    );
+    if (!res.ok) return null;
+    const d = await res.json();
+    return {
+      id: d.id,
+      name: d.name,
+      profilePath: d.profile_path,
+      knownFor: d.known_for_department || "Acting",
+      biography: d.biography,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Fetch the top-rated movie credits for a person (as cast OR crew/director).
+ * Returns up to `limit` MediaItems sorted by vote average descending.
+ */
+export async function getPersonMovies(
+  personId: number,
+  limit = 10
+): Promise<MediaItem[]> {
+  const token = getApiKey();
+  if (!token) return [];
+
+  try {
+    const url = getUrl(`/person/${personId}/combined_credits`);
+    const headers = getHeaders();
+    const res = await fetch(
+      url,
+      headers ? { headers, next: { revalidate: 86400 } } : { next: { revalidate: 86400 } }
+    );
+    if (!res.ok) return [];
+
+    const data = await res.json();
+
+    // Merge cast + crew (director), deduplicate by id, filter out items with no poster
+    const castCredits: any[] = (data.cast || []).filter(
+      (c: any) => (c.media_type === "movie" || c.media_type === "tv") && c.poster_path
+    );
+    const crewCredits: any[] = (data.crew || []).filter(
+      (c: any) =>
+        (c.media_type === "movie" || c.media_type === "tv") &&
+        c.job === "Director" &&
+        c.poster_path
+    );
+
+    const seen = new Set<number>();
+    const merged: any[] = [];
+    for (const item of [...crewCredits, ...castCredits]) {
+      if (!seen.has(item.id) && item.vote_count > 100) {
+        seen.add(item.id);
+        merged.push(item);
+      }
+    }
+
+    return merged
+      .sort((a, b) => b.vote_average - a.vote_average)
+      .slice(0, limit)
+      .map((item: any) => ({
+        id: String(item.id),
+        title: item.title || item.name || "",
+        overview: item.overview || "",
+        posterPath: item.poster_path,
+        backdropPath: item.backdrop_path,
+        releaseDate: item.release_date || item.first_air_date || "",
+        mediaType: (item.media_type as "movie" | "tv") || "movie",
+        voteAverage: item.vote_average || 0,
+        voteCount: item.vote_count || 0,
+        genres: (item.genre_ids || []).map((id: number) => TMDB_GENRE_MAP[id]).filter(Boolean),
+      }));
+  } catch {
+    return [];
+  }
+}
