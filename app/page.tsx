@@ -217,10 +217,10 @@ export default async function Home() {
                   key={icon.id}
                   className="group/icon relative bg-[#0a1214]/80 border border-white/10 rounded-3xl hover:border-[#B58863]/40 transition-all duration-300 p-0 overflow-hidden shadow-2xl hover:shadow-[0_0_40px_rgba(181,136,99,0.15)]"
                 >
-                  <div className="flex h-full min-h-[360px]">
+                  <div className="flex h-full min-h-[240px]">
 
                     {/* Left — tall portrait */}
-                    <div className="relative w-[120px] sm:w-[150px] flex-shrink-0 overflow-hidden bg-[#080e0f]">
+                    <div className="relative w-[140px] sm:w-[180px] flex-shrink-0 overflow-hidden bg-[#080e0f]">
                       {profileImg ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -243,14 +243,14 @@ export default async function Home() {
                     </div>
 
                     {/* Right — name + horizontal film slides */}
-                    <div className="flex-grow flex flex-col justify-between p-5 sm:p-7">
+                    <div className="flex-grow flex flex-col justify-between p-3.5 sm:p-5">
 
                       {/* Name block */}
                       <div>
                         <span className="font-mono text-[7px] tracking-[0.25em] text-[#B58863]/60 uppercase block mb-2">
                           {icon.label}
                         </span>
-                        <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white leading-tight group-hover/icon:text-[#d4a87c] transition-colors duration-300">
+                        <h3 className="text-base sm:text-lg font-black tracking-tight text-white leading-tight group-hover/icon:text-[#d4a87c] transition-colors duration-300">
                           {icon.profile.name}
                         </h3>
                         {/* Minimal gold rule */}
@@ -275,7 +275,7 @@ export default async function Home() {
                                 <Link
                                   key={film.id}
                                   href={href}
-                                  className="group/film relative w-[68px] sm:w-[84px] md:w-[96px] aspect-[2/3] rounded-lg border border-white/10 shadow-md bg-[#0c1416] transition-[transform,opacity,border-color] duration-200 ease-out hover:z-30 hover:-translate-y-2.5 hover:scale-[1.08] hover:border-[#B58863]/60 flex-shrink-0 opacity-65 hover:opacity-100"
+                                  className="group/film relative w-[72px] sm:w-[90px] md:w-[104px] aspect-[2/3] rounded-md border border-white/10 shadow-md bg-[#0c1416] transition-[transform,opacity,border-color] duration-200 ease-out hover:z-30 hover:-translate-y-2.5 hover:scale-[1.08] hover:border-[#B58863]/60 flex-shrink-0 opacity-65 hover:opacity-100"
                                   title={`${film.title} (${film.releaseDate?.split("-")[0] ?? ""})`}
                                 >
                                   {poster ? (
