@@ -118,9 +118,8 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
           return (
             <div
               key={`ambient-${item.id}`}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                isSelected ? "opacity-100" : "opacity-0"
-              }`}
+              className="absolute inset-0 transition-opacity duration-700 ease-in-out"
+              style={{ opacity: isSelected ? 1 : 0 }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img

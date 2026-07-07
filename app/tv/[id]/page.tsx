@@ -22,39 +22,39 @@ export default async function TVShowDetailPage({ params }: TVShowDetailPageProps
 
   const session = await auth();
   
-  // Look up if user has logged this TV show
+  // Look up if user has logged this TV show (guarded — DB may be offline in production)
   let watchEntry = null;
-  if (session?.user) {
-    watchEntry = await prisma.watchEntry.findUnique({
-      where: {
-        userId_tmdbId_mediaType: {
-          userId: session.user.id,
-          tmdbId: id,
-          mediaType: "tv",
+  try {
+    if (session?.user) {
+      watchEntry = await prisma.watchEntry.findUnique({
+        where: {
+          userId_tmdbId_mediaType: {
+            userId: session.user.id,
+            tmdbId: id,
+            mediaType: "tv",
+          },
         },
-      },
-    });
+      });
+    }
+  } catch {
+    // DB offline — watchEntry remains null
   }
 
-  // Look up public reviews for this TV show
-  const reviews = await prisma.review.findMany({
-    where: {
-      tmdbId: id,
-      mediaType: "tv",
-    },
-    include: {
-      user: {
-        select: {
-          username: true,
-          name: true,
-          avatarUrl: true,
+  // Look up public reviews for this TV show (guarded — DB may be offline in production)
+  let reviews: any[] = [];
+  try {
+    reviews = await prisma.review.findMany({
+      where: { tmdbId: id, mediaType: "tv" },
+      include: {
+        user: {
+          select: { username: true, name: true, avatarUrl: true },
         },
       },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+      orderBy: { createdAt: "desc" },
+    });
+  } catch {
+    // DB offline — reviews remains empty array
+  }
 
   const backdropUrl = show.backdropPath
     ? `https://image.tmdb.org/t/p/original${show.backdropPath}`

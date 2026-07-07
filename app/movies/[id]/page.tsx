@@ -22,39 +22,39 @@ export default async function MovieDetailPage({ params }: MovieDetailPageProps) 
 
   const session = await auth();
   
-  // Look up if user has logged this movie
+  // Look up if user has logged this movie (guarded — DB may be offline in production)
   let watchEntry = null;
-  if (session?.user) {
-    watchEntry = await prisma.watchEntry.findUnique({
-      where: {
-        userId_tmdbId_mediaType: {
-          userId: session.user.id,
-          tmdbId: id,
-          mediaType: "movie",
+  try {
+    if (session?.user) {
+      watchEntry = await prisma.watchEntry.findUnique({
+        where: {
+          userId_tmdbId_mediaType: {
+            userId: session.user.id,
+            tmdbId: id,
+            mediaType: "movie",
+          },
         },
-      },
-    });
+      });
+    }
+  } catch {
+    // DB offline — watchEntry remains null
   }
 
-  // Look up public reviews for this movie
-  const reviews = await prisma.review.findMany({
-    where: {
-      tmdbId: id,
-      mediaType: "movie",
-    },
-    include: {
-      user: {
-        select: {
-          username: true,
-          name: true,
-          avatarUrl: true,
+  // Look up public reviews for this movie (guarded — DB may be offline in production)
+  let reviews: any[] = [];
+  try {
+    reviews = await prisma.review.findMany({
+      where: { tmdbId: id, mediaType: "movie" },
+      include: {
+        user: {
+          select: { username: true, name: true, avatarUrl: true },
         },
       },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+      orderBy: { createdAt: "desc" },
+    });
+  } catch {
+    // DB offline — reviews remains empty array
+  }
 
   const backdropUrl = movie.backdropPath
     ? `https://image.tmdb.org/t/p/original${movie.backdropPath}`
