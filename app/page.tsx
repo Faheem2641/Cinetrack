@@ -162,7 +162,7 @@ export default async function Home() {
       }
     });
   } catch (error) {
-    console.error("Failed to query database community feeds on homepage:", error);
+    // Quietly fallback to static reviews/lists if connection is transiently unreachable
   }
 
   // Gracefully fallback if databases are unseeded
@@ -357,7 +357,7 @@ export default async function Home() {
 
         <MediaCarousel>
           {popularMovies.map((item) => (
-            <div key={`movie:${item.id}`} className="w-[140px] sm:w-[170px] md:w-[190px] flex-shrink-0 snap-start">
+            <div key={`movie:${item.id}`} className="w-[140px] sm:w-[170px] md:w-[190px] flex-shrink-0">
               <MediaCard item={item} />
             </div>
           ))}
@@ -397,7 +397,7 @@ export default async function Home() {
 
         <MediaCarousel>
           {topRatedMovies.map((item) => (
-            <div key={`top-movie:${item.id}`} className="w-[140px] sm:w-[170px] md:w-[190px] flex-shrink-0 snap-start">
+            <div key={`top-movie:${item.id}`} className="w-[140px] sm:w-[170px] md:w-[190px] flex-shrink-0">
               <MediaCard item={item} />
             </div>
           ))}
@@ -437,7 +437,7 @@ export default async function Home() {
 
         <MediaCarousel>
           {popularTV.map((item) => (
-            <div key={`tv:${item.id}`} className="w-[140px] sm:w-[170px] md:w-[190px] flex-shrink-0 snap-start">
+            <div key={`tv:${item.id}`} className="w-[140px] sm:w-[170px] md:w-[190px] flex-shrink-0">
               <MediaCard item={item} />
             </div>
           ))}
@@ -477,7 +477,7 @@ export default async function Home() {
 
         <MediaCarousel>
           {topRatedTV.map((item) => (
-            <div key={`top-tv:${item.id}`} className="w-[140px] sm:w-[170px] md:w-[190px] flex-shrink-0 snap-start">
+            <div key={`top-tv:${item.id}`} className="w-[140px] sm:w-[170px] md:w-[190px] flex-shrink-0">
               <MediaCard item={item} />
             </div>
           ))}

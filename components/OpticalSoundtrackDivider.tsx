@@ -7,154 +7,146 @@ interface OpticalSoundtrackDividerProps {
 }
 
 export default function OpticalSoundtrackDivider({
-  quote = "THE CINEMA IS AN INVENTION WITHOUT ANY FUTURE.",
-  source = "LOUIS LUMIÈRE // 1895",
+  quote = "CINEMA IS TRUTH 24 FRAMES-PER-SECOND.",
+  source = "JEAN-LUC GODARD // 1960",
   className = ""
 }: OpticalSoundtrackDividerProps) {
   return (
-    <div className={`relative w-full h-16 bg-[#091011] overflow-hidden select-none pointer-events-none z-20 flex items-center justify-between border-y border-white/[0.03] px-6 group/soundtrack ${className}`}>
+    <div className={`relative w-full h-16 bg-[#080e0f] overflow-hidden select-none pointer-events-none z-20 flex items-center justify-between border-y border-[#B58863]/20 px-4 sm:px-8 group/projector ${className}`}>
       
-      {/* Self-contained CSS Animations for wave pulse and laser scan */}
+      {/* 35mm Projector & Light Shuttle Keyframe Animations */}
       <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes laser-scan {
-          0% { left: -10%; }
-          100% { left: 110%; }
+        @keyframes projector-shuttle {
+          0% { left: -8%; }
+          50% { left: 98%; }
+          100% { left: -8%; }
         }
-        @keyframes wave-bounce {
-          0%, 100% { transform: scaleY(1); opacity: 0.7; }
-          50% { transform: scaleY(1.35); opacity: 1; }
+        @keyframes shutter-spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
-        @keyframes signal-glow {
-          0%, 100% { opacity: 0.3; }
+        @keyframes beam-flicker {
+          0%, 100% { opacity: 0.85; }
+          25% { opacity: 0.65; }
           50% { opacity: 0.95; }
+          75% { opacity: 0.75; }
         }
-        .animate-laser {
-          animation: laser-scan 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        @keyframes reel-pulse {
+          0%, 100% { opacity: 0.3; transform: scale(0.95); }
+          50% { opacity: 0.9; transform: scale(1.05); }
         }
-        .animate-wave-p {
-          animation: wave-bounce 2s ease-in-out infinite;
+        .animate-projector {
+          animation: projector-shuttle 10s ease-in-out infinite;
         }
-        .animate-sig {
-          animation: signal-glow 1.5s ease-in-out infinite;
+        .animate-shutter {
+          animation: shutter-spin 2.5s linear infinite;
+        }
+        .animate-beam {
+          animation: beam-flicker 0.15s infinite;
+        }
+        .animate-reel {
+          animation: reel-pulse 2s ease-in-out infinite;
         }
       `}} />
 
-      {/* Background optical sound track lines */}
-      <div className="absolute inset-y-0 left-24 right-24 flex items-center justify-between opacity-20 pointer-events-none">
-        {Array.from({ length: 60 }).map((_, i) => (
-          <div
-            key={i}
-            className="w-[1px] bg-[#B58863]"
-            style={{
-              height: `${15 + Math.sin(i * 0.4) * 12}px`,
-              opacity: 0.3 + Math.cos(i * 0.15) * 0.3
-            }}
-          />
+      {/* Background 35mm Celluloid Sprocket Holes Track (Top & Bottom edges) */}
+      <div className="absolute top-1 inset-x-0 flex justify-between px-2 opacity-30">
+        {Array.from({ length: 50 }).map((_, i) => (
+          <div key={`sprock-t-${i}`} className="w-2 h-1.5 bg-[#0f1a1b] rounded-[1px] border border-white/10" />
+        ))}
+      </div>
+      <div className="absolute bottom-1 inset-x-0 flex justify-between px-2 opacity-30">
+        {Array.from({ length: 50 }).map((_, i) => (
+          <div key={`sprock-b-${i}`} className="w-2 h-1.5 bg-[#0f1a1b] rounded-[1px] border border-white/10" />
         ))}
       </div>
 
-      {/* Left Column — Analog VU Levels Panel */}
-      <div className="flex items-center gap-3 flex-shrink-0 z-10">
-        <div className="flex flex-col gap-0.5 text-[6px] font-mono tracking-widest text-[#B58863]/50">
-          <span>CH L</span>
-          <span>CH R</span>
+      {/* Left Column — Vintage Projector Motor Controls */}
+      <div className="flex items-center gap-3.5 flex-shrink-0 z-10">
+        {/* Spinning Mechanical Reel Indicator */}
+        <div className="relative w-7 h-7 rounded-full border border-[#B58863]/50 flex items-center justify-center bg-[#0f1a1b] shadow-[0_0_12px_rgba(181,136,99,0.2)]">
+          <div className="w-5 h-5 rounded-full border border-dashed border-[#d4a87c] animate-shutter flex items-center justify-center">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#B58863]" />
+          </div>
         </div>
-        
-        {/* VU LED Bars */}
-        <div className="flex flex-col gap-1.5">
-          {/* L Channel */}
-          <div className="flex gap-0.5">
-            {Array.from({ length: 12 }).map((_, i) => {
-              const color = i < 8 ? "bg-emerald-500/60" : i < 10 ? "bg-amber-500/60" : "bg-red-500/60";
-              const glow = i < 8 ? "group-hover/soundtrack:bg-emerald-400" : i < 10 ? "group-hover/soundtrack:bg-amber-400" : "group-hover/soundtrack:bg-red-400";
-              return (
-                <div
-                  key={`vu-l-${i}`}
-                  className={`w-1 h-1.5 rounded-[0.5px] transition-colors duration-300 ${color} ${glow}`}
-                  style={{ transitionDelay: `${i * 30}ms` }}
-                />
-              );
-            })}
-          </div>
-          {/* R Channel */}
-          <div className="flex gap-0.5">
-            {Array.from({ length: 12 }).map((_, i) => {
-              const color = i < 7 ? "bg-emerald-500/60" : i < 10 ? "bg-amber-500/60" : "bg-red-500/60";
-              const glow = i < 7 ? "group-hover/soundtrack:bg-emerald-400" : i < 10 ? "group-hover/soundtrack:bg-amber-400" : "group-hover/soundtrack:bg-red-400";
-              return (
-                <div
-                  key={`vu-r-${i}`}
-                  className={`w-1 h-1.5 rounded-[0.5px] transition-colors duration-300 ${color} ${glow}`}
-                  style={{ transitionDelay: `${(12 - i) * 35}ms` }}
-                />
-              );
-            })}
-          </div>
+
+        <div className="flex flex-col gap-0.5 font-mono text-[7px] tracking-widest text-[#B58863]">
+          <span className="font-bold uppercase text-[#FAF6E8] flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-reel" />
+            MOTOR RUNNING
+          </span>
+          <span className="text-slate-400">24.00 FPS // 35MM</span>
         </div>
       </div>
 
-      {/* Center Section — The Waveform Soundtrack & Optical Reader Scan line */}
-      <div className="relative flex-grow mx-8 h-10 flex items-center justify-center overflow-hidden bg-black/45 border border-white/[0.03] rounded-lg">
+      {/* Center Section — Moving 35mm Projector Lens & Light Shuttle */}
+      <div className="relative flex-grow mx-4 sm:mx-10 h-11 flex items-center justify-center overflow-hidden bg-black/60 border border-[#B58863]/30 rounded-xl shadow-[inner_0_2px_10px_rgba(0,0,0,0.8)]">
         
-        {/* Laser Reading Head Scan Bar (moves on hover) */}
-        <div className="absolute inset-y-0 w-0.5 bg-red-500/80 shadow-[0_0_12px_#ef4444,0_0_4px_#ef4444] animate-laser pointer-events-none z-20" />
-        
-        {/* Dynamic Waveform SVG */}
-        <svg
-          viewBox="0 0 800 40"
-          preserveAspectRatio="none"
-          className="w-full h-8 px-10 text-[#d4a87c] animate-wave-p origin-center z-10"
-        >
-          <path
-            d="M0,20 Q10,12 20,20 T40,20 T60,20 T80,10 T100,30 T120,20 T140,20 T160,28 T180,12 T200,20 T220,20 T240,5 T260,35 T280,20 T300,20 T320,15 T340,25 T360,20 T380,20 T400,20 T420,10 T440,30 T460,20 T480,20 T500,8 T520,32 T540,20 T560,20 T580,18 T600,22 T620,20 T640,20 T660,10 T680,30 T700,20 T720,20 T740,15 T760,25 T780,20 T800,20 L800,20 L0,20 Z"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            className="opacity-70 group-hover/soundtrack:opacity-100 transition-opacity duration-300"
-          />
-          <path
-            d="M0,20 Q10,28 20,20 T40,20 T60,20 T80,30 T100,10 T120,20 T140,20 T160,12 T180,28 T200,20 T220,20 T240,35 T260,5 T280,20 T300,20 T320,25 T340,15 T360,20 T380,20 T400,20 T420,30 T440,10 T460,20 T480,20 T500,32 T520,8 T540,20 T560,20 T580,22 T600,18 T620,20 T640,20 T660,30 T680,10 T700,20 T720,20 T740,25 T760,15 T780,20 T800,20 L800,20 L0,20 Z"
-            fill="none"
-            stroke="#B58863"
-            strokeWidth="1"
-            strokeLinecap="round"
-            className="opacity-40 group-hover/soundtrack:opacity-75 transition-opacity duration-300"
-          />
-        </svg>
-        
-        {/* Glowing time marker label */}
-        <div className="absolute top-1 left-2 font-mono text-[5px] text-white/20 select-none tracking-widest uppercase">
-          optical track // 8000hz
-        </div>
-        <div className="absolute bottom-1 right-2 font-mono text-[5px] text-[#d4a87c]/40 select-none tracking-widest uppercase flex items-center gap-1.5">
-          <span className="w-1 h-1 rounded-full bg-red-500 animate-sig" />
-          scanner active
+        {/* Celluloid Frame Grid Guidelines */}
+        <div className="absolute inset-0 flex items-center justify-between opacity-15 pointer-events-none px-6">
+          {Array.from({ length: 30 }).map((_, i) => (
+            <div key={i} className="w-[1px] h-full bg-[#B58863]" />
+          ))}
         </div>
 
-        {/* Cinematic quote print in the background */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none mix-blend-overlay">
-          <span className="font-mono text-[6px] sm:text-[7px] font-black tracking-[0.45em] text-[#FAF6E8] opacity-5 sm:opacity-10 uppercase truncate max-w-[80%]">
+        {/* ── THE MOVING 35MM PROJECTOR LENS CARRIAGE & LIGHT BEAM ── */}
+        <div className="absolute top-0 bottom-0 animate-projector pointer-events-none z-30 flex items-center">
+          
+          {/* Forward Light Beam Cone (illuminates background text as it sweeps) */}
+          <div 
+            className="absolute left-4 w-48 h-24 bg-gradient-to-r from-[#B58863]/40 via-[#d4a87c]/20 to-transparent animate-beam"
+            style={{
+              clipPath: "polygon(0% 40%, 100% 0%, 100% 100%, 0% 60%)"
+            }}
+          />
+
+          {/* Mechanical Projector Lens Housing */}
+          <div className="relative w-8 h-8 rounded-full border-2 border-[#B58863] bg-[#0f1a1b] flex items-center justify-center shadow-[0_0_20px_#B58863,0_0_35px_rgba(181,136,99,0.5)] z-20">
+            {/* Spinning 3-Blade Shutter inside Lens */}
+            <div className="absolute inset-0.5 rounded-full border border-[#FAF6E8]/20 animate-shutter flex items-center justify-center">
+              <div className="w-full h-0.5 bg-[#B58863]/70 rotate-0 absolute" />
+              <div className="w-full h-0.5 bg-[#B58863]/70 rotate-60 absolute" />
+              <div className="w-full h-0.5 bg-[#B58863]/70 rotate-120 absolute" />
+            </div>
+
+            {/* Glowing Lens Center Crystal */}
+            <div className="w-3 h-3 rounded-full bg-[#FAF6E8] shadow-[0_0_10px_#FAF6E8] z-30" />
+          </div>
+
+          {/* Trailing Lens Flare Trace */}
+          <div className="absolute right-4 w-24 h-0.5 bg-gradient-to-l from-[#B58863] to-transparent shadow-[0_0_8px_#B58863]" />
+        </div>
+
+        {/* Illuminated Director Quote in background */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-6">
+          <span className="font-mono text-[7px] sm:text-[9px] font-bold tracking-[0.35em] text-[#FAF6E8]/30 group-hover/projector:text-[#FAF6E8]/60 transition-colors uppercase truncate max-w-[90%] select-none">
             &ldquo;{quote}&rdquo; — {source}
           </span>
         </div>
+
+        {/* Telemetry Frame Counter in corner */}
+        <div className="absolute bottom-1 right-3 font-mono text-[6px] text-[#B58863]/60 uppercase tracking-widest flex items-center gap-2">
+          <span>KODAK SAFETY</span>
+          <span>//</span>
+          <span className="text-[#FAF6E8]">FRAME 024</span>
+        </div>
       </div>
 
-      {/* Right Column — Optical Sound standard indicators */}
-      <div className="flex items-center gap-6 flex-shrink-0 z-10">
-        <div className="hidden md:flex flex-col items-end text-right font-mono text-[6px] tracking-widest text-[#B58863]/50 uppercase gap-0.5">
-          <span>Dolby SR A-Type</span>
-          <span>analog optical</span>
+      {/* Right Column — Projector Optics & Sound Standard Badge */}
+      <div className="flex items-center gap-3.5 flex-shrink-0 z-10">
+        <div className="hidden lg:flex flex-col items-end text-right font-mono text-[7px] tracking-widest text-[#B58863]/60 uppercase gap-0.5">
+          <span>PROJECTOR SHUTTER // OK</span>
+          <span>ANAMORPHIC LENS 2.39:1</span>
         </div>
 
-        <div className="flex items-center gap-1.5 border border-[#B58863]/25 bg-[#B58863]/5 px-2.5 py-1 rounded">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#d4a87c] animate-sig" />
-          <span className="font-mono text-[7px] font-black tracking-widest text-[#d4a87c]">
-            35MM MONO
+        <div className="flex items-center gap-2 border border-[#B58863]/40 bg-[#B58863]/10 px-3 py-1 rounded-full backdrop-blur-md shadow-[0_0_15px_rgba(181,136,99,0.15)]">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#d4a87c] animate-reel" />
+          <span className="font-mono text-[8px] font-black tracking-widest text-[#d4a87c]">
+            35MM BEAM
           </span>
         </div>
       </div>
-      
+
     </div>
   );
 }

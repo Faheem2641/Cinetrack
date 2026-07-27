@@ -66,19 +66,30 @@ body {
 }
 
 /* ─── Scrollbar Styling ────────────────────────────────────────── */
-::-webkit-scrollbar {
+/* Main page scrollbars (html and body) */
+html::-webkit-scrollbar, body::-webkit-scrollbar {
   width: 6px;
   height: 6px;
+  display: block;
 }
-::-webkit-scrollbar-track {
+html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
   background: var(--ct-near-black);
 }
-::-webkit-scrollbar-thumb {
+html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb {
   background: var(--ct-slate);
   border-radius: 999px;
 }
-::-webkit-scrollbar-thumb:hover {
+html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover {
   background: var(--ct-gold);
+}
+
+/* Hide scrollbars globally for all nested scrollable containers */
+:not(html):not(body) {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+:not(html):not(body)::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 /* ─── Selection ───────────────────────────────────────────────── */

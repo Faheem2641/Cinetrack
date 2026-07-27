@@ -8,6 +8,26 @@ interface HeroSpotlightProps {
   items: MediaItem[];
 }
 
+function TimecodeCounter({ activeIndex }: { activeIndex: number }) {
+  const [timecode, setTimecode] = useState("00:00:00:00");
+
+  useEffect(() => {
+    const start = Date.now();
+    const interval = setInterval(() => {
+      const diff = Date.now() - start;
+      const totalSec = Math.floor(diff / 1000);
+      const hours = String(Math.floor(totalSec / 3600) % 24).padStart(2, "0");
+      const mins = String(Math.floor(totalSec / 60) % 60).padStart(2, "0");
+      const secs = String(totalSec % 60).padStart(2, "0");
+      const frames = String(Math.floor((diff % 1000) / 41)).padStart(2, "0");
+      setTimecode(`${hours}:${mins}:${secs}:${frames}`);
+    }, 41);
+    return () => clearInterval(interval);
+  }, [activeIndex]);
+
+  return <span>TC {timecode}</span>;
+}
+
 export default function HeroSpotlight({ items }: HeroSpotlightProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -17,8 +37,10 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 1200, height: 720 });
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     if (!containerRef.current) return;
 
     const updateDimensions = () => {
@@ -33,7 +55,9 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
     updateDimensions();
 
     const observer = new ResizeObserver(() => {
-      updateDimensions();
+      requestAnimationFrame(() => {
+        updateDimensions();
+      });
     });
     
     if (containerRef.current) {
@@ -47,20 +71,7 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
 
   const isMobile = dimensions.width < 768;
 
-  const [timecode, setTimecode] = useState("00:00:00:00");
-  useEffect(() => {
-    const start = Date.now();
-    const interval = setInterval(() => {
-      const diff = Date.now() - start;
-      const totalSec = Math.floor(diff / 1000);
-      const hours = String(Math.floor(totalSec / 3600) % 24).padStart(2, "0");
-      const mins = String(Math.floor(totalSec / 60) % 60).padStart(2, "0");
-      const secs = String(totalSec % 60).padStart(2, "0");
-      const frames = String(Math.floor((diff % 1000) / 41)).padStart(2, "0");
-      setTimecode(`${hours}:${mins}:${secs}:${frames}`);
-    }, 41);
-    return () => clearInterval(interval);
-  }, [activeIndex]);
+
 
   useEffect(() => {
     if (featured.length === 0) return;
@@ -139,8 +150,8 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
 
         <section
           ref={containerRef}
-          style={{ clipPath: isMobile ? "none" : "url(#hero-cutout-clip)" }}
-          className="relative w-full aspect-[21/10] min-h-[500px] sm:min-h-[600px] md:min-h-[650px] lg:min-h-[720px] overflow-hidden bg-black rounded-3xl md:rounded-[40px] shadow-2xl transition-all duration-300"
+          style={{ clipPath: mounted && !isMobile ? "url(#hero-cutout-clip)" : "none" }}
+          className="relative w-full aspect-[21/10] min-h-[500px] sm:min-h-[600px] md:min-h-[650px] lg:min-h-[720px] overflow-hidden bg-black rounded-3xl md:rounded-[40px] shadow-2xl transition-shadow duration-300"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
@@ -164,7 +175,7 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
                   <img
                     src={bgUrl}
                     alt={item.title}
-                    className="w-full h-full object-cover brightness-[0.4] contrast-[1.05]"
+                    className="w-full h-full object-cover brightness-[0.55] contrast-[1.05]"
                   />
                 </div>
               );
@@ -196,7 +207,7 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
           {/* Viewfinder Telemetry Overlay */}
           <div className="absolute top-6 left-6 md:top-10 md:left-12 z-30 font-mono text-[9px] tracking-widest text-[#B58863] select-none flex items-center gap-2.5 bg-[#0f1a1b]/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/5 shadow-lg">
             <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-            <span>TC {timecode}</span>
+            <TimecodeCounter activeIndex={activeIndex} />
             <span className="text-white/20">|</span>
             <span>TAKE_0{activeIndex + 1}</span>
             <span className="text-white/20">|</span>
@@ -227,58 +238,73 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
 
           {/* Slide Content */}
           <div className="absolute inset-0 z-20 flex flex-col justify-end px-6 sm:px-12 md:px-20 pb-16 md:pb-24 max-w-7xl mx-auto w-full">
-            <div className="max-w-2xl text-left space-y-4 md:space-y-6">
-              
-              {/* Film Slate Metadata Row */}
-              <div className="flex flex-wrap items-center gap-3 font-mono text-[9px] tracking-widest text-[#B58863]">
-                <span className="px-2.5 py-1 rounded bg-[#B58863]/25 border border-[#B58863]/30 text-[#d4a87c] font-black uppercase">
-                  ROLL A_0{activeIndex + 1}
-                </span>
-                {releaseYear && (
-                  <span className="text-slate-400">
-                    [YEAR // {releaseYear}]
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 w-full">
+              <div className="max-w-2xl text-left space-y-4 md:space-y-6">
+                
+                {/* Film Slate Metadata Row */}
+                <div className="flex flex-wrap items-center gap-3 font-mono text-[9px] tracking-widest text-[#B58863]">
+                  <span className="px-2.5 py-1 rounded bg-[#B58863]/25 border border-[#B58863]/30 text-[#d4a87c] font-black uppercase">
+                    ROLL A_0{activeIndex + 1}
                   </span>
-                )}
-                <span className="text-white/20">•</span>
-                <span className="text-slate-400">FPS 24.0</span>
-                <span className="text-white/20">•</span>
-                <span className="text-slate-400 font-bold">RATING {currentItem.voteAverage ? currentItem.voteAverage.toFixed(1) : "N/A"}/10</span>
+                  {releaseYear && (
+                    <span className="text-slate-400">
+                      [YEAR // {releaseYear}]
+                    </span>
+                  )}
+                  <span className="text-white/20">•</span>
+                  <span className="text-slate-400">FPS 24.0</span>
+                  <span className="text-white/20">•</span>
+                  <span className="text-slate-400 font-bold">RATING {currentItem.voteAverage ? currentItem.voteAverage.toFixed(1) : "N/A"}/10</span>
+                </div>
+
+                {/* Title */}
+                <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-white leading-tight">
+                  {currentItem.title}
+                </h1>
+
+                {/* Script-Citation styled description */}
+                <div className="border-l-2 border-[#B58863]/40 pl-4 py-0.5 space-y-1">
+                  <span className="block font-mono text-[8px] tracking-widest text-slate-500 uppercase select-none">
+                    [LOG LINE // EXP-0{activeIndex + 1}]
+                  </span>
+                  <p className="text-xs sm:text-sm md:text-base text-slate-200/90 leading-relaxed line-clamp-3 max-w-xl">
+                    {currentItem.overview}
+                  </p>
+                </div>
+
+                {/* CTA Buttons */}
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <Link
+                    href={linkHref}
+                    className="px-6 py-3 rounded-full bg-gradient-to-r from-[#B58863] to-[#d4a87c] text-[#0f1a1b] font-bold text-xs sm:text-sm hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#B58863]/20 flex items-center gap-2"
+                  >
+                    <span>Explore Title</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                    </svg>
+                  </Link>
+
+                  <Link
+                    href="/search"
+                    className="px-6 py-3 rounded-full bg-white/5 border border-white/10 text-slate-200 font-bold text-xs sm:text-sm hover:bg-white/10 hover:text-white transition-colors"
+                  >
+                    Browse Catalog
+                  </Link>
+                </div>
               </div>
 
-              {/* Title */}
-              <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-white leading-tight">
-                {currentItem.title}
-              </h1>
-
-              {/* Script-Citation styled description */}
-              <div className="border-l-2 border-[#B58863]/40 pl-4 py-0.5 space-y-1">
-                <span className="block font-mono text-[8px] tracking-widest text-slate-500 uppercase select-none">
-                  [LOG LINE // EXP-0{activeIndex + 1}]
-                </span>
-                <p className="text-xs sm:text-sm md:text-base text-slate-200/90 leading-relaxed line-clamp-3 max-w-xl">
-                  {currentItem.overview}
-                </p>
-              </div>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                <Link
-                  href={linkHref}
-                  className="px-6 py-3 rounded-full bg-gradient-to-r from-[#B58863] to-[#d4a87c] text-[#0f1a1b] font-bold text-xs sm:text-sm hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#B58863]/20 flex items-center gap-2"
-                >
-                  <span>Explore Title</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                  </svg>
-                </Link>
-
-                <Link
-                  href="/search"
-                  className="px-6 py-3 rounded-full bg-white/5 border border-white/10 text-slate-200 font-bold text-xs sm:text-sm hover:bg-white/10 hover:text-white transition-colors"
-                >
-                  Browse Catalog
-                </Link>
-              </div>
+              {/* Right: Floating Movie Poster */}
+              {currentItem.posterPath && (
+                <div className="hidden md:block w-44 lg:w-52 aspect-[2/3] rounded-2xl overflow-hidden border border-white/10 shadow-[0_15px_35px_rgba(0,0,0,0.8)] transform rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-300 flex-shrink-0 bg-black/40">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`https://image.tmdb.org/t/p/w500${currentItem.posterPath}`}
+                    alt={`${currentItem.title} Poster`}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+              )}
             </div>
           </div>
 
