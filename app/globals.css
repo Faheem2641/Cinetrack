@@ -3,24 +3,33 @@
 /* ─── Cinetrack Design Tokens ─────────────────────────────────── */
 :root {
   /* Palette */
-  --ct-void:      #0f1a1b;   /* deepest bg layer             */
-  --ct-deep:      #103334;   /* primary dark teal background  */
-  --ct-surface:   #1e2e30;   /* raised card / panel surface   */
-  --ct-slate:     #3D4D55;   /* secondary surface / borders   */
-  --ct-warm-gray: #A79E9C;   /* muted / secondary text        */
-  --ct-sand:      #D3C3B9;   /* primary light text / labels   */
-  --ct-gold:      #B58863;   /* accent / CTA colour           */
-  --ct-gold-light:#d4a87c;   /* hover state of gold           */
-  --ct-near-black:#1A1A1C;   /* absolute darkest element      */
+  --ct-void: #0f1a1b;
+  /* deepest bg layer             */
+  --ct-deep: #103334;
+  /* primary dark teal background  */
+  --ct-surface: #1e2e30;
+  /* raised card / panel surface   */
+  --ct-slate: #3D4D55;
+  /* secondary surface / borders   */
+  --ct-warm-gray: #A79E9C;
+  /* muted / secondary text        */
+  --ct-sand: #D3C3B9;
+  /* primary light text / labels   */
+  --ct-gold: #B58863;
+  /* accent / CTA colour           */
+  --ct-gold-light: #d4a87c;
+  /* hover state of gold           */
+  --ct-near-black: #1A1A1C;
+  /* absolute darkest element      */
 
   /* Semantic aliases */
-  --background:   var(--ct-void);
-  --foreground:   var(--ct-sand);
-  --accent:       var(--ct-gold);
+  --background: var(--ct-void);
+  --foreground: var(--ct-sand);
+  --accent: var(--ct-gold);
   --accent-hover: var(--ct-gold-light);
-  --muted:        var(--ct-warm-gray);
-  --border:       var(--ct-slate);
-  --surface:      var(--ct-surface);
+  --muted: var(--ct-warm-gray);
+  --border: var(--ct-slate);
+  --surface: var(--ct-surface);
 }
 
 /* Custom Typography Utility Classes */
@@ -49,7 +58,9 @@
 }
 
 /* ─── Base Reset ──────────────────────────────────────────────── */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -67,29 +78,40 @@ body {
 
 /* ─── Scrollbar Styling ────────────────────────────────────────── */
 /* Main page scrollbars (html and body) */
-html::-webkit-scrollbar, body::-webkit-scrollbar {
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
   width: 6px;
   height: 6px;
   display: block;
 }
-html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
   background: var(--ct-near-black);
 }
-html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb {
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
   background: var(--ct-slate);
   border-radius: 999px;
 }
-html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover {
+
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover {
   background: var(--ct-gold);
 }
 
 /* Hide scrollbars globally for all nested scrollable containers */
 :not(html):not(body) {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
 }
+
 :not(html):not(body)::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
+  /* Chrome, Safari, Opera */
 }
 
 /* ─── Selection ───────────────────────────────────────────────── */
@@ -117,25 +139,59 @@ html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover {
 }
 
 @keyframes grain {
-  0%, 100% { transform:translate(0, 0); }
-  10% { transform:translate(-5%, -10%); }
-  20% { transform:translate(-15%, 5%); }
-  30% { transform:translate(7%, -25%); }
-  40% { transform:translate(-5%, 25%); }
-  50% { transform:translate(-15%, 10%); }
-  60% { transform:translate(15%, 0%); }
-  70% { transform:translate(0%, 15%); }
-  80% { transform:translate(3%, 35%); }
-  90% { transform:translate(-10%, 10%); }
+
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  10% {
+    transform: translate(-5%, -10%);
+  }
+
+  20% {
+    transform: translate(-15%, 5%);
+  }
+
+  30% {
+    transform: translate(7%, -25%);
+  }
+
+  40% {
+    transform: translate(-5%, 25%);
+  }
+
+  50% {
+    transform: translate(-15%, 10%);
+  }
+
+  60% {
+    transform: translate(15%, 0%);
+  }
+
+  70% {
+    transform: translate(0%, 15%);
+  }
+
+  80% {
+    transform: translate(3%, 35%);
+  }
+
+  90% {
+    transform: translate(-10%, 10%);
+  }
 }
 
 /* Hide scrollbar utility for horizontal scrolling */
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
+
 .scrollbar-none {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 
@@ -143,50 +199,99 @@ html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover {
 /* ─── Innovative Viewfinder Navbar Styles ─────────────────────── */
 
 @keyframes ct-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.3; transform: scale(0.9); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.3;
+    transform: scale(0.9);
+  }
 }
+
 .pulse-red {
   animation: ct-pulse 1.8s infinite ease-in-out;
 }
 
 .film-sprockets {
-  background-image: repeating-linear-gradient(
-    to right,
-    var(--ct-void) 0px,
-    var(--ct-void) 5px,
-    transparent 5px,
-    transparent 14px
-  );
+  background-image: repeating-linear-gradient(to right,
+      var(--ct-void) 0px,
+      var(--ct-void) 5px,
+      transparent 5px,
+      transparent 14px);
 }
 
 /* ─── Immersive Active Slide Progress Bar Animation ────────────── */
 @keyframes slide-progress-kf {
-  0% { width: 0%; }
-  100% { width: 100%; }
+  0% {
+    width: 0%;
+  }
+
+  100% {
+    width: 100%;
+  }
 }
+
 .animate-slide-progress {
   animation: slide-progress-kf linear forwards;
 }
 
 /* ─── Projector Shutter Flash celluloid animation ────────────────── */
 @keyframes shutter-flash-kf {
-  0% { opacity: 0; filter: brightness(1); }
-  20% { opacity: 0.7; filter: brightness(1.4) contrast(1.1); }
-  35% { opacity: 0.1; filter: brightness(0.9); }
-  50% { opacity: 0.45; filter: brightness(1.2); }
-  100% { opacity: 0; filter: brightness(1); }
+  0% {
+    opacity: 0;
+    filter: brightness(1);
+  }
+
+  20% {
+    opacity: 0.7;
+    filter: brightness(1.4) contrast(1.1);
+  }
+
+  35% {
+    opacity: 0.1;
+    filter: brightness(0.9);
+  }
+
+  50% {
+    opacity: 0.45;
+    filter: brightness(1.2);
+  }
+
+  100% {
+    opacity: 0;
+    filter: brightness(1);
+  }
 }
+
 .animate-shutter-flash {
   animation: shutter-flash-kf 650ms cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 /* ─── Swipe Hint Nudge – cascading chevron pulse ─────────────────── */
 @keyframes swipe-nudge {
-  0%   { opacity: 0.25; transform: translateX(0); }
-  40%  { opacity: 1;    transform: translateX(4px); }
-  70%  { opacity: 0.6;  transform: translateX(2px); }
-  100% { opacity: 0.25; transform: translateX(0); }
+  0% {
+    opacity: 0.25;
+    transform: translateX(0);
+  }
+
+  40% {
+    opacity: 1;
+    transform: translateX(4px);
+  }
+
+  70% {
+    opacity: 0.6;
+    transform: translateX(2px);
+  }
+
+  100% {
+    opacity: 0.25;
+    transform: translateX(0);
+  }
 }
 
 /* ─── Ultra Snappy & Smooth Search Autocomplete Dropdown Animation ─── */
@@ -195,11 +300,13 @@ html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover {
     opacity: 0;
     transform: translateY(4px) scale(0.97);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
 }
+
 .animate-search-dropdown {
   animation: search-dropdown-in 140ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
   will-change: transform, opacity;
@@ -207,9 +314,15 @@ html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover {
 
 /* ─── Profile Page: Scan-line sweep overlay ──────────────────────── */
 @keyframes scan-sweep {
-  0%   { transform: translateY(-100%); }
-  100% { transform: translateY(200%); }
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(200%);
+  }
 }
+
 .animate-scan-sweep {
   animation: scan-sweep 3.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   will-change: transform;
@@ -217,55 +330,123 @@ html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover {
 
 /* ─── Profile Page: Breathing gold glow ─────────────────────────── */
 @keyframes glow-breathe {
-  0%, 100% { box-shadow: 0 0 20px rgba(181,136,99,0.15), 0 0 40px rgba(181,136,99,0.06); }
-  50%       { box-shadow: 0 0 35px rgba(181,136,99,0.35), 0 0 80px rgba(181,136,99,0.12); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(181, 136, 99, 0.15), 0 0 40px rgba(181, 136, 99, 0.06);
+  }
+
+  50% {
+    box-shadow: 0 0 35px rgba(181, 136, 99, 0.35), 0 0 80px rgba(181, 136, 99, 0.12);
+  }
 }
+
 .animate-glow-breathe {
   animation: glow-breathe 4s ease-in-out infinite;
 }
 
 /* ─── Profile Page: Film-tick entrance (slide up + fade) ─────────── */
 @keyframes panel-entrance {
-  0%   { opacity: 0; transform: translateY(18px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
+
 .animate-panel-enter {
   animation: panel-entrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
-.animate-panel-enter-delay-1 { animation-delay: 0.1s; opacity: 0; animation-fill-mode: forwards; animation-duration: 0.6s; animation-name: panel-entrance; animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
-.animate-panel-enter-delay-2 { animation-delay: 0.2s; opacity: 0; animation-fill-mode: forwards; animation-duration: 0.6s; animation-name: panel-entrance; animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
-.animate-panel-enter-delay-3 { animation-delay: 0.3s; opacity: 0; animation-fill-mode: forwards; animation-duration: 0.6s; animation-name: panel-entrance; animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
-.animate-panel-enter-delay-4 { animation-delay: 0.45s; opacity: 0; animation-fill-mode: forwards; animation-duration: 0.6s; animation-name: panel-entrance; animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+
+.animate-panel-enter-delay-1 {
+  animation-delay: 0.1s;
+  opacity: 0;
+  animation-fill-mode: forwards;
+  animation-duration: 0.6s;
+  animation-name: panel-entrance;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-panel-enter-delay-2 {
+  animation-delay: 0.2s;
+  opacity: 0;
+  animation-fill-mode: forwards;
+  animation-duration: 0.6s;
+  animation-name: panel-entrance;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-panel-enter-delay-3 {
+  animation-delay: 0.3s;
+  opacity: 0;
+  animation-fill-mode: forwards;
+  animation-duration: 0.6s;
+  animation-name: panel-entrance;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-panel-enter-delay-4 {
+  animation-delay: 0.45s;
+  opacity: 0;
+  animation-fill-mode: forwards;
+  animation-duration: 0.6s;
+  animation-name: panel-entrance;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
 
 /* ─── Profile Page: Ticket Shimmer ──────────────────────────────── */
 @keyframes ticket-shimmer {
-  0%   { left: -100%; }
-  100% { left: 200%; }
+  0% {
+    left: -100%;
+  }
+
+  100% {
+    left: 200%;
+  }
 }
+
 .ticket-shimmer-effect::after {
   content: '';
   position: absolute;
-  top: 0; bottom: 0;
+  top: 0;
+  bottom: 0;
   width: 40%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.04), transparent);
   animation: ticket-shimmer 3.5s ease-in-out infinite;
 }
 
 /* ─── Profile Page: Counter odometer spin ───────────────────────── */
 @keyframes odometer-in {
-  0%   { transform: translateY(100%); opacity: 0; }
-  100% { transform: translateY(0);    opacity: 1; }
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
+
 .animate-odometer {
   animation: odometer-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* ─── Profile Page: Avatar halo spin ────────────────────────────── */
 @keyframes halo-spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
+
 .animate-halo {
   animation: halo-spin 18s linear infinite;
 }
-

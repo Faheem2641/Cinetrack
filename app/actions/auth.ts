@@ -14,30 +14,29 @@ export async function loginAction(prevState: any, formData: FormData) {
   const password = formData.get("password") as string;
 
   if (!email || !password) {
-    return { error: "Please fill in all fields" };
+    return { error: "Please fill in all fields." };
   }
 
   try {
     await signIn("credentials", {
-      email,
+      email: email.trim(),
       password,
       redirectTo: "/dashboard",
     });
   } catch (error) {
     if (error instanceof AuthError) {
-      return { error: "Invalid email or password." };
+      return { error: "Invalid credentials." };
     }
     throw error; // Rethrow redirect errors! Next.js uses errors for redirects.
   }
 }
 
 export async function signupAction(prevState: any, formData: FormData) {
-  const username = formData.get("username") as string;
   const email = formData.get("email") as string;
   const name = formData.get("name") as string;
   const password = formData.get("password") as string;
 
-  if (!username || !email || !password || !name) {
+  if (!email || !password || !name) {
     return { error: "Please fill in all fields." };
   }
 
@@ -45,51 +44,55 @@ export async function signupAction(prevState: any, formData: FormData) {
     return { error: "Password must be at least 6 characters long." };
   }
 
-  if (username.length < 3) {
-    return { error: "Username must be at least 3 characters long." };
-  }
-
-  if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-    return { error: "Username can only contain letters, numbers, and underscores." };
-  }
+  const cleanEmail = email.toLowerCase().trim();
+  const cleanName = name.trim();
 
   try {
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        OR: [{ email }, { username }],
-      },
+    const existingUser = await prisma.user.findUnique({
+      where: { email: cleanEmail },
     });
 
     if (existingUser) {
-      if (existingUser.email === email) {
-        return { error: "Email already registered." };
-      }
-      if (existingUser.username === username) {
-        return { error: "Username already taken." };
-      }
+      return { error: "Email already registered." };
+    }
+
+    // Auto-generate username from Full Name (fallback to email prefix)
+    let baseUsername = cleanName.toLowerCase().replace(/[^a-z0-9_]/g, "");
+    if (baseUsername.length < 3) {
+      baseUsername = cleanEmail.split("@")[0].toLowerCase().replace(/[^a-z0-9_]/g, "");
+    }
+    if (baseUsername.length < 3) {
+      baseUsername = `user_${baseUsername || "cinema"}`;
+    }
+
+    let uniqueUsername = baseUsername;
+    const existingUsername = await prisma.user.findUnique({ where: { username: baseUsername } });
+    if (existingUsername) {
+      uniqueUsername = `${baseUsername}_${Math.floor(100 + Math.random() * 900)}`;
     }
 
     const passwordHash = hashPassword(password);
-    const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0f172a&color=f8fafc&size=158&bold=true`;
+    const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(cleanName)}&background=0f172a&color=f8fafc&size=158&bold=true`;
 
     await prisma.user.create({
       data: {
-        username: username.toLowerCase().trim(),
-        email: email.toLowerCase().trim(),
-        name,
+        username: uniqueUsername,
+        email: cleanEmail,
+        name: cleanName,
         passwordHash,
         avatarUrl,
-        bio: `Hi, I am ${name}! Welcome to my movie journey.`,
+        bio: `Hi, I am ${cleanName}! Welcome to my movie journey.`,
       },
     });
-  } catch (dbError) {
+  } catch (dbError: any) {
     console.error("Database error during signup:", dbError);
-    return { error: "Failed to create user. Please try again." };
+    const msg = dbError?.message || String(dbError);
+    return { error: `Database Error: ${msg.slice(0, 150)}` };
   }
 
   try {
     await signIn("credentials", {
-      email,
+      email: cleanEmail,
       password,
       redirectTo: "/dashboard",
     });
@@ -100,4 +103,8 @@ export async function signupAction(prevState: any, formData: FormData) {
 
 export async function logoutAction() {
   await signOut({ redirectTo: "/" });
+}
+
+export async function googleLoginAction() {
+  await signIn("google", { redirectTo: "/dashboard" });
 }

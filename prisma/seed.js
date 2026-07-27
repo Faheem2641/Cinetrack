@@ -1,13 +1,16 @@
 require("dotenv").config();
 const { PrismaClient } = require("@prisma/client");
-const { PrismaPg } = require("@prisma/adapter-pg");
-const { Pool } = require("pg");
+const { PrismaBetterSqlite3 } = require("@prisma/adapter-better-sqlite3");
 const crypto = require("crypto");
 
-const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL;
-const pool = new Pool({ connectionString });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+const dbUrl = process.env.DATABASE_URL || "file:./dev.db";
+let prisma;
+if (dbUrl.startsWith("file:")) {
+  const adapter = new PrismaBetterSqlite3({ url: dbUrl });
+  prisma = new PrismaClient({ adapter });
+} else {
+  prisma = new PrismaClient();
+}
 
 function hashPassword(password) {
   return crypto.createHash("sha256").update(password).digest("hex");
