@@ -67,14 +67,23 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
   ];
 
   return (
-    <header className="fixed top-4 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8 select-none pointer-events-none">
-      {/* Floating Glassmorphic Container */}
-      <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6 rounded-2xl bg-[#0a1214]/85 backdrop-blur-xl border border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.7),0_0_20px_rgba(181,136,99,0.12)] pointer-events-auto transition-all duration-300">
+    <header className="fixed top-0 left-0 right-0 z-50 px-2 sm:px-4 lg:px-6 select-none pointer-events-none">
+      {/* 
+        Seamless Hero Integration Container 
+        Shapes & docks perfectly to the width of the Hero Spotlight card (max-w-[98%])
+        with matching obsidian glass, gold viewfinder ticks, and telemetry borders
+      */}
+      <div className="w-full max-w-[98%] mx-auto flex h-16 items-center justify-between px-4 sm:px-8 rounded-b-2xl bg-[#0c1416]/90 backdrop-blur-2xl border-x border-b border-[#B58863]/30 shadow-[0_12px_35px_rgba(0,0,0,0.6),0_0_20px_rgba(181,136,99,0.15)] pointer-events-auto transition-all duration-500 relative">
         
-        {/* Left Segment: Brand Logo & Camera Viewfinder Frame */}
+        {/* Left Viewfinder Dock Accent Corner */}
+        <div className="absolute -bottom-1 left-3 w-3 h-3 border-b-2 border-l-2 border-[#B58863] pointer-events-none" />
+        {/* Right Viewfinder Dock Accent Corner */}
+        <div className="absolute -bottom-1 right-3 w-3 h-3 border-b-2 border-r-2 border-[#B58863] pointer-events-none" />
+
+        {/* Left Segment: Brand Logo & Integrated Spec Badges */}
         <div className="flex items-center gap-6">
           <Link href="/" className="relative px-3 py-1 group flex items-center gap-2.5">
-            {/* Viewfinder Corner Ticks */}
+            {/* Gold Viewfinder Markings */}
             <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-[#B58863] group-hover:border-[#d4a87c] transition-colors" />
             <div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-[#B58863] group-hover:border-[#d4a87c] transition-colors" />
             <div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-[#B58863] group-hover:border-[#d4a87c] transition-colors" />
@@ -85,8 +94,15 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
             </span>
           </Link>
 
-          {/* Navigation Links (Desktop) */}
-          <nav className="hidden md:flex items-center gap-1.5 border-l border-white/10 pl-6">
+          {/* Integrated Telemetry Tech Spec */}
+          <div className="hidden lg:flex items-center gap-2 text-[8px] font-mono text-slate-400 border-l border-[#B58863]/30 pl-5">
+            <span className="text-[#B58863] font-bold">35MM // 24FPS</span>
+            <span className="text-white/20">|</span>
+            <span className="text-slate-300">RAW_LOG</span>
+          </div>
+
+          {/* Console Navigation Pills */}
+          <nav className="hidden md:flex items-center gap-1.5 border-l border-white/10 pl-5">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
@@ -95,7 +111,7 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                   href={link.href}
                   className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-300 flex items-center gap-1.5 ${
                     link.highlight
-                      ? "text-[#FAF6E8] bg-[#B58863]/20 border border-[#B58863]/40 hover:bg-[#B58863]/30 hover:border-[#B58863] shadow-[0_0_12px_rgba(181,136,99,0.2)]"
+                      ? "text-[#FAF6E8] bg-[#B58863]/20 border border-[#B58863]/40 hover:bg-[#B58863]/35 hover:border-[#B58863] shadow-[0_0_15px_rgba(181,136,99,0.25)]"
                       : isActive
                       ? "text-white bg-white/10 border border-white/15"
                       : "text-slate-300 hover:text-white hover:bg-white/5"
@@ -109,14 +125,14 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
           </nav>
         </div>
 
-        {/* Right Segment: Search, REC Indicator & Profile/Auth */}
+        {/* Right Segment: Search, REC Camera Marker & User Profile */}
         <div className="hidden md:flex items-center gap-4">
           
-          {/* Autocomplete Search Bar */}
+          {/* Autocomplete Search Input */}
           <form 
             action="/search" 
             method="GET" 
-            className="relative flex items-center rounded-xl bg-white/5 border border-white/10 focus-within:border-[#B58863]/80 focus-within:bg-black/40 px-3.5 py-1.5 transition-all duration-300"
+            className="relative flex items-center rounded-xl bg-black/40 border border-white/10 focus-within:border-[#B58863] px-3.5 py-1.5 transition-all duration-300"
             onFocus={() => setShowSuggestions(searchQuery.trim().length >= 2)}
             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
           >
@@ -126,7 +142,7 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
               value={searchQuery}
               onChange={handleSearchChange}
               placeholder="Search catalog..."
-              className="w-40 lg:w-56 bg-transparent text-xs text-white placeholder-white/40 focus:outline-none font-mono"
+              className="w-36 lg:w-52 bg-transparent text-xs text-white placeholder-white/40 focus:outline-none font-mono"
               required
               autoComplete="off"
             />
@@ -190,10 +206,10 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
             )}
           </form>
 
-          {/* Director REC Camera Tag */}
-          <div className="hidden lg:flex items-center gap-1.5 font-mono text-[8px] tracking-widest text-red-500/90 bg-red-950/40 border border-red-500/30 px-2.5 py-1 rounded-full select-none shadow-sm">
+          {/* Director REC Indicator */}
+          <div className="hidden xl:flex items-center gap-1.5 font-mono text-[8px] tracking-widest text-red-400 bg-red-950/40 border border-red-500/30 px-2.5 py-1 rounded-full select-none shadow-sm">
             <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-            <span className="text-red-400 font-bold">REC</span>
+            <span className="font-bold">REC</span>
           </div>
 
           {/* User Auth Profile Dropdown */}
