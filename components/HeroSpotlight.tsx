@@ -141,12 +141,11 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
             </div>
           );
         })}
-        {/* Dark overlay for cinema readability & bottom blending */}
-        <div className="absolute inset-0 bg-slate-950/60" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/30 to-[#0f1a1b]" />
+        {/* Single continuous gradient overlay: Dark at top behind floating nav -> transparent through hero -> smooth blend into #0f1a1b */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#080e0f]/90 via-[#080e0f]/20 to-[#0f1a1b] z-1 pointer-events-none" />
       </div>
 
-      <div className="mx-auto w-full max-w-[98%] relative pt-20 z-10">
+      <div className="mx-auto w-full max-w-[98%] relative pt-12 sm:pt-14 z-10">
 
         <section
           ref={containerRef}

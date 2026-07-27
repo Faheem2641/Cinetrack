@@ -11,6 +11,7 @@ interface NavbarClientProps {
 
 export default function NavbarClient({ session, logoutAction }: NavbarClientProps) {
   const pathname = usePathname();
+  const isHome = pathname === "/";
 
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
@@ -60,79 +61,76 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
     }
   };
 
-  const navLinks = [
-    { href: "/movies", label: "Movies" },
-    { href: "/tv", label: "TV Shows" },
-    { href: "/recommend", label: "Match Finder", highlight: true },
-  ];
+
+
+  const searchFormClass = isHome
+    ? "bg-black/25 border border-white/10 focus-within:border-[#B58863] focus-within:bg-black/45"
+    : "bg-white/5 border border-white/10 focus-within:border-[#B58863] focus-within:bg-white/10";
+
+  const searchInputClass = isHome
+    ? "text-white placeholder-white/40"
+    : "text-white placeholder-white/40";
+
+  const searchBtnClass = isHome
+    ? "text-white/60 hover:text-[#B58863]"
+    : "text-white/60 hover:text-[#B58863]";
+
+  const authTextClass = isHome
+    ? "text-slate-300 hover:text-white"
+    : "text-slate-300 hover:text-white";
+
+  const brandTextClass = isHome
+    ? "bg-gradient-to-r from-[#B58863] via-[#d4a87c] to-white bg-clip-text text-transparent"
+    : "bg-gradient-to-r from-[#B58863] via-[#d4a87c] to-white bg-clip-text text-transparent";
+
+  const dividerClass = isHome
+    ? "border-white/15"
+    : "border-white/15";
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 px-2 sm:px-4 lg:px-6 select-none pointer-events-none">
-      {/* 
-        Seamless Hero Integration Container 
-        Shapes & docks perfectly to the width of the Hero Spotlight card (max-w-[98%])
-        with matching obsidian glass, gold viewfinder ticks, and telemetry borders
-      */}
-      <div className="w-full max-w-[98%] mx-auto flex h-16 items-center justify-between px-4 sm:px-8 rounded-b-2xl bg-[#0c1416]/90 backdrop-blur-2xl border-x border-b border-[#B58863]/30 shadow-[0_12px_35px_rgba(0,0,0,0.6),0_0_20px_rgba(181,136,99,0.15)] pointer-events-auto transition-all duration-500 relative">
+    <header
+      className="absolute top-0 left-0 right-0 z-40 w-full flex h-20 items-center justify-between px-4 sm:px-8 lg:px-12 select-none bg-gradient-to-b from-[#080e0f]/85 via-[#080e0f]/30 to-transparent border-none shadow-none transition-all duration-500 ease-in-out"
+    >
+      <div className="mx-auto flex w-full max-w-[98%] items-center justify-between relative">
         
-        {/* Left Viewfinder Dock Accent Corner */}
-        <div className="absolute -bottom-1 left-3 w-3 h-3 border-b-2 border-l-2 border-[#B58863] pointer-events-none" />
-        {/* Right Viewfinder Dock Accent Corner */}
-        <div className="absolute -bottom-1 right-3 w-3 h-3 border-b-2 border-r-2 border-[#B58863] pointer-events-none" />
-
-        {/* Left Segment: Brand Logo & Integrated Spec Badges */}
-        <div className="flex items-center gap-6">
-          <Link href="/" className="relative px-3 py-1 group flex items-center gap-2.5">
-            {/* Gold Viewfinder Markings */}
-            <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-[#B58863] group-hover:border-[#d4a87c] transition-colors" />
-            <div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-[#B58863] group-hover:border-[#d4a87c] transition-colors" />
-            <div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-[#B58863] group-hover:border-[#d4a87c] transition-colors" />
-            <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-[#B58863] group-hover:border-[#d4a87c] transition-colors" />
-
-            <span className="text-sm sm:text-base font-black tracking-[0.25em] bg-gradient-to-r from-[#B58863] via-[#d4a87c] to-white bg-clip-text text-transparent group-hover:brightness-110 transition-all font-mono">
+        {/* Left Segment: Skeuomorphic Viewfinder Brand Logo & Info */}
+        <div className="flex items-center gap-4 z-10">
+          <Link href="/" className="relative px-3.5 py-1.5 group flex-shrink-0">
+            {/* Viewfinder Crop Marks in Gold */}
+            <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-[#B58863]/60 group-hover:border-[#d4a87c] transition-colors" />
+            <div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-[#B58863]/60 group-hover:border-[#d4a87c] transition-colors" />
+            <div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-[#B58863]/60 group-hover:border-[#d4a87c] transition-colors" />
+            <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-[#B58863]/60 group-hover:border-[#d4a87c] transition-colors" />
+            
+            <span className={`text-xs sm:text-sm font-black tracking-[0.25em] ${brandTextClass} group-hover:brightness-110 transition-all font-mono`}>
               CINETRACK
             </span>
           </Link>
-
-          {/* Integrated Telemetry Tech Spec */}
-          <div className="hidden lg:flex items-center gap-2 text-[8px] font-mono text-slate-400 border-l border-[#B58863]/30 pl-5">
-            <span className="text-[#B58863] font-bold">35MM // 24FPS</span>
-            <span className="text-white/20">|</span>
-            <span className="text-slate-300">RAW_LOG</span>
-          </div>
-
-          {/* Console Navigation Pills */}
-          <nav className="hidden md:flex items-center gap-1.5 border-l border-white/10 pl-5">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-300 flex items-center gap-1.5 ${
-                    link.highlight
-                      ? "text-[#FAF6E8] bg-[#B58863]/20 border border-[#B58863]/40 hover:bg-[#B58863]/35 hover:border-[#B58863] shadow-[0_0_15px_rgba(181,136,99,0.25)]"
-                      : isActive
-                      ? "text-white bg-white/10 border border-white/15"
-                      : "text-slate-300 hover:text-white hover:bg-white/5"
-                  }`}
-                >
-                  {link.highlight && <span className="w-1.5 h-1.5 rounded-full bg-[#d4a87c] animate-pulse" />}
-                  <span>{link.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-
-        {/* Right Segment: Search, REC Camera Marker & User Profile */}
-        <div className="hidden md:flex items-center gap-4">
           
-          {/* Autocomplete Search Input */}
+          {/* Tech Spec Overlay Tags */}
+          <div className={`hidden lg:flex flex-col text-[7px] font-mono text-slate-400 border-l ${dividerClass} pl-3.5 leading-none select-none tracking-wider`}>
+            <span>LENS: 35MM</span>
+            <span className="text-[#B58863]/80 mt-0.5 font-bold">24FPS • 1.85:1</span>
+          </div>
+        </div>
+        
+        {/* Right Segment: Links, Search, REC dot & Auth (Desktop - Nested in Hero Cutout Shelf) */}
+        <div className="hidden md:flex items-center gap-2.5 lg:gap-3.5 z-10 translate-y-11 lg:translate-y-12 transition-all duration-300">
+          
+          {/* Premium Capsule Navigation Controls (Desktop) */}
+          <div className="flex items-center gap-2">
+            <Link
+              href="/profile"
+              className="relative group px-3.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest text-[#D3C3B9] bg-white/5 border border-white/10 hover:border-[#B58863]/40 hover:text-white hover:shadow-[0_0_15px_rgba(255,255,255,0.05)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 h-8.5 flex items-center justify-center"
+            >
+              Profile
+            </Link>
+          </div>
+          
           <form 
             action="/search" 
             method="GET" 
-            className="relative flex items-center rounded-xl bg-black/40 border border-white/10 focus-within:border-[#B58863] px-3.5 py-1.5 transition-all duration-300"
+            className={`relative flex items-center rounded-full px-3 py-1 transition-all duration-300 h-8.5 ${searchFormClass}`}
             onFocus={() => setShowSuggestions(searchQuery.trim().length >= 2)}
             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
           >
@@ -142,21 +140,27 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
               value={searchQuery}
               onChange={handleSearchChange}
               placeholder="Search catalog..."
-              className="w-36 lg:w-52 bg-transparent text-xs text-white placeholder-white/40 focus:outline-none font-mono"
+              className={`w-32 sm:w-40 md:w-48 lg:w-54 bg-transparent text-[10px] focus:outline-none transition-all duration-300 font-mono ${searchInputClass}`}
               required
               autoComplete="off"
             />
-            <button type="submit" className="cursor-pointer text-white/50 hover:text-[#B58863] transition-colors pl-1">
+            <button type="submit" className={`cursor-pointer pl-1 transition-colors ${searchBtnClass}`}>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.604 10.604Z" />
               </svg>
             </button>
 
-            {/* Viewfinder Autocomplete Dropdown */}
+            {/* Viewfinder-styled Autocomplete Dropdown */}
             {showSuggestions && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-[#0c1416]/98 backdrop-blur-2xl border border-[#3D4D55]/60 rounded-2xl p-2.5 shadow-2xl z-50 animate-search-dropdown flex flex-col gap-1 min-w-[260px]">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-[#0c1416]/98 backdrop-blur-2xl border border-[#3D4D55]/60 rounded-2xl p-2.5 shadow-2xl z-50 animate-search-dropdown flex flex-col gap-1 min-w-[240px]">
+                {/* Viewfinder ticks */}
+                <div className="absolute top-1.5 left-1.5 w-2 h-2 border-t border-l border-[#B58863]/30 pointer-events-none" />
+                <div className="absolute top-1.5 right-1.5 w-2 h-2 border-t border-r border-[#B58863]/30 pointer-events-none" />
+                <div className="absolute bottom-1.5 left-1.5 w-2 h-2 border-b border-l border-[#B58863]/30 pointer-events-none" />
+                <div className="absolute bottom-1.5 right-1.5 w-2 h-2 border-b border-r border-[#B58863]/30 pointer-events-none" />
+
                 <span className="block font-mono text-[7px] text-slate-500 uppercase tracking-widest pl-2 mb-1 select-none">
-                  SEARCH MATCHES // LENS_INSPECT
+                  MATCHING FRAMES // LENS_INSPECT
                 </span>
 
                 {suggestions.length > 0 ? (
@@ -206,45 +210,46 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
             )}
           </form>
 
-          {/* Director REC Indicator */}
-          <div className="hidden xl:flex items-center gap-1.5 font-mono text-[8px] tracking-widest text-red-400 bg-red-950/40 border border-red-500/30 px-2.5 py-1 rounded-full select-none shadow-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-            <span className="font-bold">REC</span>
+          {/* Director Shutter REC Marker */}
+          <div className="hidden xl:flex items-center gap-1.5 font-mono text-[7.5px] tracking-widest text-red-500/80 bg-red-550/5 border border-red-500/30 px-2.5 py-0.5 rounded-full select-none h-7.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-500 pulse-red" />
+            <span className="text-red-500 font-bold">REC</span>
           </div>
 
-          {/* User Auth Profile Dropdown */}
+          {/* Auth dropdown */}
           {session?.user ? (
             <div className="group relative flex items-center">
               <button className="flex items-center focus:outline-none cursor-pointer">
-                <div className="relative p-0.5 rounded-full bg-gradient-to-tr from-[#B58863] to-[#d4a87c] shadow-md shadow-[#B58863]/20 hover:scale-105 transition-transform duration-200">
+                <div className="relative p-0.5 rounded-full bg-gradient-to-tr from-[#B58863] to-[#d4a87c] shadow-md shadow-[#B58863]/10 hover:scale-105 transition-transform duration-200">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={session.user.image || "/avatar-placeholder.png"}
                     alt={session.user.name || "User Avatar"}
-                    className="w-8 h-8 rounded-full object-cover bg-slate-900"
+                    className="w-7 h-7 rounded-full object-cover bg-slate-100"
                   />
-                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-[#0a1214] rounded-full" />
+                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border border-white rounded-full" />
                 </div>
               </button>
               
-              <div className="absolute right-0 top-full mt-3.5 w-52 rounded-2xl bg-[#0c1416]/98 backdrop-blur-2xl border border-white/10 py-2.5 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 transform origin-top-right translate-y-1 group-hover:translate-y-0">
-                <div className="px-4 py-2 border-b border-white/10 mb-1.5">
+              <div className="absolute right-0 top-full mt-3.5 w-52 rounded-xl bg-[#0e1a1c]/95 backdrop-blur-xl border border-white/[0.08] py-2.5 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 transform origin-top-right translate-y-1 group-hover:translate-y-0">
+                <div className="absolute -top-1.5 right-3.5 w-3 h-3 rotate-45 bg-[#0e1a1c] border-t border-l border-white/[0.08]" />
+                <div className="relative z-10 px-4 py-2 border-b border-white/[0.07] mb-1.5">
                   <p className="text-xs font-bold text-white truncate">{session.user.name}</p>
                   <p className="text-[9px] font-mono text-slate-400 truncate">@{session.user.username}</p>
                 </div>
                 <Link
                   href={`/user/${session.user.username}`}
-                  className="block px-4 py-2 text-xs text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
+                  className="relative z-10 block px-4 py-2 text-xs text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
                 >
                   My Profile
                 </Link>
                 <Link
                   href="/dashboard"
-                  className="block px-4 py-2 text-xs text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
+                  className="relative z-10 block px-4 py-2 text-xs text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
                 >
                   Dashboard
                 </Link>
-                <form action={logoutAction} className="border-t border-white/10 mt-1.5 pt-1.5">
+                <form action={logoutAction} className="relative z-10 border-t border-white/[0.07] mt-1.5 pt-1.5">
                   <button
                     type="submit"
                     className="block w-full text-left px-4 py-2 text-xs text-red-400 hover:bg-white/5 cursor-pointer transition-colors"
@@ -255,62 +260,75 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
               </div>
             </div>
           ) : (
-            <Link
-              href="/login"
-              className="text-xs font-bold bg-gradient-to-r from-[#B58863] to-[#d4a87c] text-[#0a1214] px-4 py-1.5 rounded-xl transition-all shadow-md shadow-[#B58863]/20 hover:opacity-90 font-mono tracking-wider"
-            >
-              Sign In
-            </Link>
+            <div className="flex items-center">
+              <Link
+                href="/login"
+                className="text-[10px] font-bold bg-gradient-to-r from-[#B58863] to-[#d4a87c] text-[#0f1a1b] px-4.5 py-1 rounded-full transition-all shadow-md shadow-[#B58863]/20 hover:shadow-[#B58863]/40 hover:opacity-90 font-mono tracking-wider h-8.5 flex items-center justify-center"
+              >
+                Sign In
+              </Link>
+            </div>
           )}
         </div>
 
-        {/* Mobile Navigation Drawer Trigger */}
-        <div className="flex md:hidden items-center gap-3">
+        {/* Mobile Layout: Responsive Drawer Interface */}
+        <div className="flex md:hidden items-center gap-3 z-10">
+          {/* Mobile Drawer Checkbox Toggle */}
           <input type="checkbox" id="mobile-menu-toggle" className="peer hidden" />
           
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none peer-checked:opacity-100 peer-checked:pointer-events-auto transition-opacity duration-300 z-40 md:hidden" />
+          {/* Dark blurred background overlay */}
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none peer-checked:opacity-100 peer-checked:pointer-events-auto transition-opacity duration-300 z-40 md:hidden" />
           
+          {/* Hamburger trigger */}
           <label
             htmlFor="mobile-menu-toggle"
-            className="flex items-center justify-center p-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-all cursor-pointer"
+            className="flex items-center justify-center p-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-all cursor-pointer"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4.5 h-4.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
           </label>
           
-          {/* Mobile Drawer Menu */}
-          <div className="fixed top-0 right-0 bottom-0 w-72 bg-[#0a1214]/98 backdrop-blur-2xl border-l border-white/10 shadow-2xl translate-x-full peer-checked:translate-x-0 transition-transform duration-300 ease-in-out z-50 p-6 flex flex-col justify-between pointer-events-auto">
-            <div className="space-y-6">
+          {/* Drawer Sidebar Menu */}
+          <div className="fixed top-0 right-0 bottom-0 w-72 bg-[#0c1618]/97 backdrop-blur-2xl border-l border-white/[0.07] shadow-2xl translate-x-full peer-checked:translate-x-0 transition-transform duration-300 ease-in-out z-50 p-6 flex flex-col justify-between pointer-events-auto">
+            <div className="space-y-8">
               
-              <div className="flex justify-between items-center border-b border-white/10 pb-4">
-                <span className="font-mono text-[10px] text-[#B58863] tracking-widest uppercase font-bold">NAV CONSOLE</span>
-                <label htmlFor="mobile-menu-toggle" className="cursor-pointer text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10">
+              {/* Close button header */}
+              <div className="flex justify-between items-center border-b border-white/[0.07] pb-4">
+                <span className="font-mono text-[9px] text-[#B58863] tracking-widest uppercase">NAV CONSOLE</span>
+                <label htmlFor="mobile-menu-toggle" className="cursor-pointer text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-white/10">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                   </svg>
                 </label>
               </div>
               
-              <nav className="flex flex-col gap-2">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-200 hover:text-[#FAF6E8] py-2 border-b border-white/5 transition-colors"
-                  >
-                    <span>{link.label}</span>
-                    {link.highlight && <span className="text-[9px] text-[#B58863] font-mono">[MATCH]</span>}
-                  </Link>
-                ))}
+              {/* Navigation lists */}
+              <nav className="flex flex-col gap-3">
+                
+                <Link
+                  href="/recommend"
+                  className="flex items-center justify-between text-xs font-black uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-[#B58863] to-[#d4a87c] py-2 border-b border-white/[0.07] transition-all hover:brightness-110"
+                >
+                  <span>✦ Match Finder</span>
+                  <span className="text-[9px] text-[#B58863] font-mono">[MATCH]</span>
+                </Link>
+                
+                <Link
+                  href="/profile"
+                  className="flex items-center justify-between text-xs font-black uppercase tracking-widest text-slate-300 hover:text-white py-2 border-b border-white/[0.07] transition-colors"
+                >
+                  <span>Profile</span>
+                  <span className="text-[9px] text-[#B58863]/80 font-mono">[USER]</span>
+                </Link>
               </nav>
               
-              {/* Mobile Search Input */}
+              {/* Mobile Search Tool */}
               <div className="pt-2">
                 <form 
                   action="/search" 
                   method="GET" 
-                  className="relative flex items-center bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 focus-within:border-[#B58863] transition-all"
+                  className="relative flex items-center bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 focus-within:border-[#B58863] transition-all duration-300"
                   onFocus={() => setShowMobileSuggestions(mobileQuery.trim().length >= 2)}
                   onBlur={() => setTimeout(() => setShowMobileSuggestions(false), 200)}
                 >
@@ -330,9 +348,9 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                     </svg>
                   </button>
 
-                  {/* Autocomplete for Mobile */}
+                  {/* Autocomplete suggestions for Mobile */}
                   {showMobileSuggestions && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-[#0c1618] border border-white/10 rounded-xl p-2 shadow-2xl z-50 flex flex-col gap-1 w-full max-h-60 overflow-y-auto">
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-[#0c1618] border border-white/[0.08] rounded-xl p-2 shadow-2xl z-50 animate-search-dropdown flex flex-col gap-1 w-full max-h-60 overflow-y-auto">
                       {mobileSuggestions.length > 0 ? (
                         mobileSuggestions.map((item) => (
                           <Link
@@ -342,7 +360,7 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                               setMobileQuery("");
                               setShowMobileSuggestions(false);
                             }}
-                            className="flex items-center gap-3 p-1.5 rounded-lg hover:bg-white/5 text-left"
+                            className="flex items-center gap-3.5 p-1.5 rounded-lg hover:bg-white/5 transition-colors text-left"
                           >
                             <div className="relative w-7 h-10 bg-black rounded overflow-hidden flex-shrink-0 border border-white/5">
                               {item.posterPath ? (
@@ -380,38 +398,43 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
               </div>
             </div>
             
-            <div className="border-t border-white/10 pt-4">
+            {/* Drawer User Control Panel */}
+            <div className="border-t border-white/[0.07] pt-6">
               {session?.user ? (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <img
-                      src={session.user.image || "/avatar-placeholder.png"}
-                      alt={session.user.name || "User Avatar"}
-                      className="w-9 h-9 rounded-full object-cover bg-slate-900 border border-white/10"
-                    />
+                    <div className="relative p-0.5 rounded-full bg-gradient-to-tr from-[#B58863] to-[#d4a87c] shadow-md">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={session.user.image || "/avatar-placeholder.png"}
+                        alt={session.user.name || "User Avatar"}
+                        className="w-10 h-10 rounded-full object-cover bg-slate-100"
+                      />
+                      <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
+                    </div>
                     <div className="leading-tight">
-                      <p className="text-xs font-bold text-white">{session.user.name}</p>
-                      <p className="text-[10px] font-mono text-slate-400">@{session.user.username}</p>
+                      <p className="text-xs font-bold text-slate-800">{session.user.name}</p>
+                      <p className="text-[10px] font-mono text-slate-500">@{session.user.username}</p>
                     </div>
                   </div>
                   
-                  <div className="flex flex-col gap-2 pt-1">
+                  <div className="flex flex-col gap-2 pt-2">
                     <Link
                       href={`/user/${session.user.username}`}
-                      className="block w-full text-center px-4 py-2 text-xs bg-white/5 border border-white/10 text-slate-300 rounded-xl hover:bg-white/10 transition-all font-bold"
+                      className="block w-full text-center px-4 py-2.5 text-xs bg-white/5 border border-white/10 text-slate-300 rounded-xl hover:bg-white/10 transition-all font-bold"
                     >
                       My Profile
                     </Link>
                     <Link
                       href="/dashboard"
-                      className="block w-full text-center px-4 py-2 text-xs bg-white/5 border border-white/10 text-slate-300 rounded-xl hover:bg-white/10 transition-all font-bold"
+                      className="block w-full text-center px-4 py-2.5 text-xs bg-white/5 border border-white/10 text-slate-300 rounded-xl hover:bg-white/10 transition-all font-bold"
                     >
                       Dashboard
                     </Link>
-                    <form action={logoutAction} className="pt-1">
+                    <form action={logoutAction} className="pt-2">
                       <button
                         type="submit"
-                        className="block w-full text-center px-4 py-2 text-xs bg-red-950/40 border border-red-500/30 text-red-400 rounded-xl hover:bg-red-900/50 transition-all font-bold cursor-pointer"
+                        className="block w-full text-center px-4 py-2.5 text-xs bg-red-50 border border-red-100 text-red-500 rounded-xl hover:bg-red-100/50 transition-all font-bold cursor-pointer"
                       >
                         Sign Out
                       </button>
@@ -419,13 +442,21 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                   </div>
                 </div>
               ) : (
-                <Link
-                  href="/login"
-                  className="block w-full text-center px-4 py-2.5 text-xs bg-gradient-to-r from-[#B58863] to-[#d4a87c] text-[#0a1214] rounded-xl font-bold font-mono tracking-wider"
-                >
-                  Sign In
-                </Link>
+                <div className="flex flex-col">
+                  <Link
+                    href="/login"
+                    className="block w-full text-center px-4 py-2.5 text-xs bg-gradient-to-r from-[#B58863] to-[#d4a87c] text-[#0f1a1b] rounded-xl hover:opacity-90 transition-all font-bold font-mono tracking-wider"
+                  >
+                    Sign In
+                  </Link>
+                </div>
               )}
+              
+              {/* Monospaced Viewfinder metadata inside Drawer */}
+              <div className="mt-8 flex justify-between text-[7px] font-mono text-slate-400 select-none">
+                <span>SYS LOG: ONLINE</span>
+                <span>24FPS SAFETY FILM</span>
+              </div>
             </div>
             
           </div>
