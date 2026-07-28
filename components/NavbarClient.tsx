@@ -237,19 +237,7 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                   <p className="text-xs font-bold text-white truncate">{session.user.name}</p>
                   <p className="text-[9px] font-mono text-slate-400 truncate">@{session.user.username}</p>
                 </div>
-                <Link
-                  href={`/user/${session.user.username}`}
-                  className="relative z-10 block px-4 py-2 text-xs text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
-                >
-                  My Profile
-                </Link>
-                <Link
-                  href="/dashboard"
-                  className="relative z-10 block px-4 py-2 text-xs text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
-                >
-                  Dashboard
-                </Link>
-                <form action={logoutAction} className="relative z-10 border-t border-white/[0.07] mt-1.5 pt-1.5">
+                <form action={logoutAction} className="relative z-10 mt-1">
                   <button
                     type="submit"
                     className="block w-full text-left px-4 py-2 text-xs text-red-400 hover:bg-white/5 cursor-pointer transition-colors"
@@ -419,22 +407,10 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                   </div>
                   
                   <div className="flex flex-col gap-2 pt-2">
-                    <Link
-                      href={`/user/${session.user.username}`}
-                      className="block w-full text-center px-4 py-2.5 text-xs bg-white/5 border border-white/10 text-slate-300 rounded-xl hover:bg-white/10 transition-all font-bold"
-                    >
-                      My Profile
-                    </Link>
-                    <Link
-                      href="/dashboard"
-                      className="block w-full text-center px-4 py-2.5 text-xs bg-white/5 border border-white/10 text-slate-300 rounded-xl hover:bg-white/10 transition-all font-bold"
-                    >
-                      Dashboard
-                    </Link>
-                    <form action={logoutAction} className="pt-2">
+                    <form action={logoutAction}>
                       <button
                         type="submit"
-                        className="block w-full text-center px-4 py-2.5 text-xs bg-red-50 border border-red-100 text-red-500 rounded-xl hover:bg-red-100/50 transition-all font-bold cursor-pointer"
+                        className="block w-full text-center px-4 py-2.5 text-xs bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl hover:bg-red-500/20 transition-all font-bold cursor-pointer"
                       >
                         Sign Out
                       </button>
