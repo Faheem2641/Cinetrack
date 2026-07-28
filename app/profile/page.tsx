@@ -43,16 +43,17 @@ export default async function ProfilePage() {
   const followersCount = dbUser.followers.length;
   const followingCount = dbUser.following.length;
 
-  // Compute dynamic taste profile (genres)
-  const detailRequests = watchedEntries.slice(0, 10).map((w) => getMediaDetails(w.tmdbId, w.mediaType as "movie" | "tv"));
+  // Compute dynamic taste profile (genres) across ALL watched entries
+  const detailRequests = watchedEntries.map((w) => getMediaDetails(w.tmdbId, w.mediaType as "movie" | "tv"));
   const watchedDetails = (await Promise.all(detailRequests)).filter((d) => d !== null);
 
+  const totalWatched = watchedDetails.length;
   const genreCounts: Record<string, number> = {};
-  let totalGenreHits = 0;
+
   watchedDetails.forEach((details) => {
-    details?.genres.forEach((genre) => {
+    const uniqueGenres = new Set(details?.genres || []);
+    uniqueGenres.forEach((genre) => {
       genreCounts[genre] = (genreCounts[genre] || 0) + 1;
-      totalGenreHits++;
     });
   });
 
@@ -60,13 +61,34 @@ export default async function ProfilePage() {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 3);
 
+  const GENRE_ICONS: Record<string, string> = {
+    "Science Fiction": "🚀",
+    "Sci-Fi & Fantasy": "🚀",
+    "Action": "⚡",
+    "Action & Adventure": "⚡",
+    "Drama": "🎭",
+    "Comedy": "🍿",
+    "Thriller": "🔪",
+    "Horror": "😱",
+    "Romance": "💖",
+    "Animation": "🎨",
+    "Adventure": "🤠",
+    "Fantasy": "🔮",
+    "Crime": "🕵️",
+    "Mystery": "🕵️",
+    "History": "📜",
+    "War": "📜",
+    "Music": "🎵",
+    "Family": "👨‍👩‍👧",
+    "Documentary": "📹",
+  };
+
   const colors = ["bg-gradient-to-r from-[#B58863] to-[#d4a87c]", "bg-[#3D4D55]", "bg-[#A79E9C]/60"];
-  const icons = ["🚀", "🎭", "🍿"];
 
   const tasteProfile = topGenres.map(([name, count], index) => ({
-    icon: icons[index] || "🎬",
+    icon: GENRE_ICONS[name] || "🎬",
     name,
-    percentage: totalGenreHits > 0 ? Math.round((count / totalGenreHits) * 100) : 0,
+    percentage: totalWatched > 0 ? Math.min(100, Math.round((count / totalWatched) * 100)) : 0,
     color: colors[index] || "bg-[#3D4D55]",
   }));
 
