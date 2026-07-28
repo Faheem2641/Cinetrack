@@ -256,7 +256,6 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                   <div className="absolute -top-1.5 right-3.5 w-3 h-3 rotate-45 bg-[#0e1a1c] border-t border-l border-white/[0.08]" />
                   <div className="relative z-10 px-4 py-2 border-b border-white/[0.07] mb-1.5">
                     <p className="text-xs font-bold text-white truncate">{session.user.name}</p>
-                    <p className="text-[9px] font-mono text-slate-400 truncate">@{session.user.username}</p>
                   </div>
                   <Link
                     href="/profile"
@@ -361,8 +360,8 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
           </div>
         </div>
 
-        {/* Right Segment: Links, Search, REC dot & Auth (Desktop - Nested in Hero Cutout Shelf) */}
-        <div className="hidden md:flex items-center gap-2.5 lg:gap-3.5 z-10 translate-y-11 lg:translate-y-12 transition-all duration-300">
+        {/* Right Segment: Links, Search & Auth (Desktop) */}
+        <div className="hidden md:flex items-center gap-2.5 lg:gap-3.5 z-10 transition-all duration-300">
 
           {/* Premium Capsule Navigation Controls (Desktop) */}
           <div className="flex items-center gap-2">
@@ -482,7 +481,6 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                 <div className="absolute -top-1.5 right-3.5 w-3 h-3 rotate-45 bg-[#0e1a1c] border-t border-l border-white/[0.08]" />
                 <div className="relative z-10 px-4 py-2 border-b border-white/[0.07] mb-1.5">
                   <p className="text-xs font-bold text-white truncate">{session.user.name}</p>
-                  <p className="text-[9px] font-mono text-slate-400 truncate">@{session.user.username}</p>
                 </div>
                 <Link
                   href="/profile"
@@ -655,7 +653,6 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                     </div>
                     <div className="leading-tight">
                       <p className="text-xs font-bold text-slate-800">{session.user.name}</p>
-                      <p className="text-[10px] font-mono text-slate-500">@{session.user.username}</p>
                     </div>
                   </div>
 

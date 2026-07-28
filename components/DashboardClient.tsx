@@ -61,7 +61,15 @@ export default function DashboardClient({
 
   const watchedMoviesCount = watched.filter((w) => w.mediaType === "movie").length;
   const watchedTVCount = watched.filter((w) => w.mediaType === "tv").length;
-  const totalHours = Math.round(totalRuntimeMinutes / 60);
+  
+  const runtimeHours = Math.floor(totalRuntimeMinutes / 60);
+  const runtimeMins = totalRuntimeMinutes % 60;
+  const formattedRuntime =
+    runtimeHours > 0
+      ? runtimeMins > 0
+        ? `${runtimeHours}h ${runtimeMins}m`
+        : `${runtimeHours}h`
+      : `${runtimeMins}m`;
 
   const mapToMediaItem = (w: WatchEntryData): MediaItem => ({
     id: w.tmdbId,
@@ -180,15 +188,15 @@ export default function DashboardClient({
               </div>
 
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#B58863]/10 border border-[#B58863]/30 text-[8.5px] font-mono uppercase tracking-widest text-[#B58863] mb-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#B58863]/10 border border-[#B58863]/30 text-xs font-mono uppercase tracking-widest text-[#B58863] mb-2.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   <span>STUDIO ARCHIVE • DIRECTOR ID #{user.id.slice(0, 8)}</span>
                 </div>
-                <h1 className="text-2xl sm:text-4xl font-black uppercase tracking-wider text-[#FAF6E8]">
+                <h1 className="text-3xl sm:text-5xl font-black uppercase tracking-wider text-[#FAF6E8]">
                   {user.name}
                 </h1>
-                <p className="text-xs font-mono text-[#B58863]/80 tracking-widest mt-1">
-                  @{user.username} • CINEMA CONTROL CONSOLE
+                <p className="text-sm sm:text-base font-mono text-[#B58863]/80 tracking-widest mt-1">
+                  CINEMA CONTROL CONSOLE
                 </p>
               </div>
             </div>
@@ -197,7 +205,7 @@ export default function DashboardClient({
             <div className="flex flex-wrap items-center gap-3">
               <button
                 onClick={() => setActiveTab("LOGGER")}
-                className="px-4 py-2.5 rounded-xl text-[10px] font-mono font-black uppercase tracking-widest text-[#0f1a1b] bg-gradient-to-r from-[#B58863] to-[#d4a87c] hover:brightness-110 active:scale-[0.98] transition-all flex items-center gap-2 font-bold shadow-lg shadow-[#B58863]/20 cursor-pointer"
+                className="px-5 py-3 rounded-xl text-xs sm:text-sm font-mono font-black uppercase tracking-widest text-[#0f1a1b] bg-gradient-to-r from-[#B58863] to-[#d4a87c] hover:brightness-110 active:scale-[0.98] transition-all flex items-center gap-2 font-bold shadow-lg shadow-[#B58863]/20 cursor-pointer"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -207,7 +215,7 @@ export default function DashboardClient({
 
               <Link
                 href={`/user/${user.username}`}
-                className="px-4 py-2.5 rounded-xl text-[10px] font-mono font-black uppercase tracking-widest text-[#FAF6E8] bg-[#103334]/60 border border-[#3D4D55]/60 hover:border-[#B58863]/60 hover:bg-[#1e2e30] transition-all flex items-center gap-2 cursor-pointer shadow-md"
+                className="px-5 py-3 rounded-xl text-xs sm:text-sm font-mono font-black uppercase tracking-widest text-[#FAF6E8] bg-[#103334]/60 border border-[#3D4D55]/60 hover:border-[#B58863]/60 hover:bg-[#1e2e30] transition-all flex items-center gap-2 cursor-pointer shadow-md"
               >
                 <span>View Public Pass</span>
               </Link>
@@ -217,29 +225,29 @@ export default function DashboardClient({
           {/* Telemetry Stats Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-6 border-t border-[#3D4D55]/30">
             <div className="bg-[#103334]/30 border border-[#3D4D55]/40 rounded-2xl p-4 text-center">
-              <span className="block text-[7.5px] font-mono text-slate-400 uppercase tracking-widest">LOGGED REELS</span>
-              <span className="text-2xl font-black font-mono text-[#FAF6E8] mt-1 block">{watched.length}</span>
-              <span className="text-[8px] font-mono text-[#B58863] mt-0.5 block">{watchedMoviesCount} Movies • {watchedTVCount} TV</span>
+              <span className="block text-xs font-mono text-slate-300 uppercase tracking-widest font-bold">LOGGED REELS</span>
+              <span className="text-3xl sm:text-4xl font-black font-mono text-[#FAF6E8] mt-1 block">{watched.length}</span>
+              <span className="text-xs font-mono text-[#B58863] mt-1 block">{watchedMoviesCount} Movies • {watchedTVCount} TV</span>
             </div>
 
             <div className="bg-[#103334]/30 border border-[#3D4D55]/40 rounded-2xl p-4 text-center">
-              <span className="block text-[7.5px] font-mono text-slate-400 uppercase tracking-widest">AVG STAR RATING</span>
-              <span className="text-2xl font-black font-mono text-[#B58863] mt-1 block">
-                {averageRating > 0 ? averageRating.toFixed(1) : "0.0"} <span className="text-xs text-[#A79E9C]">★</span>
+              <span className="block text-xs font-mono text-slate-300 uppercase tracking-widest font-bold">AVG STAR RATING</span>
+              <span className="text-3xl sm:text-4xl font-black font-mono text-[#B58863] mt-1 block">
+                {averageRating > 0 ? averageRating.toFixed(1) : "0.0"} <span className="text-sm text-[#A79E9C]">★</span>
               </span>
-              <span className="text-[8px] font-mono text-slate-400 mt-0.5 block">OUT OF 5.0 STARS</span>
+              <span className="text-xs font-mono text-slate-400 mt-1 block">OUT OF 5.0 STARS</span>
             </div>
 
             <div className="bg-[#103334]/30 border border-[#3D4D55]/40 rounded-2xl p-4 text-center">
-              <span className="block text-[7.5px] font-mono text-slate-400 uppercase tracking-widest">TIME IN CINEMA</span>
-              <span className="text-2xl font-black font-mono text-[#FAF6E8] mt-1 block">{totalHours}h</span>
-              <span className="text-[8px] font-mono text-[#B58863] mt-0.5 block">TOTAL RUNTIME</span>
+              <span className="block text-xs font-mono text-slate-300 uppercase tracking-widest font-bold">TIME IN CINEMA</span>
+              <span className="text-3xl sm:text-4xl font-black font-mono text-[#FAF6E8] mt-1 block">{formattedRuntime}</span>
+              <span className="text-xs font-mono text-[#B58863] mt-1 block">{totalRuntimeMinutes.toLocaleString()} TOTAL MINS</span>
             </div>
 
             <div className="bg-[#103334]/30 border border-[#3D4D55]/40 rounded-2xl p-4 text-center">
-              <span className="block text-[7.5px] font-mono text-slate-400 uppercase tracking-widest">WATCHLIST QUEUE</span>
-              <span className="text-2xl font-black font-mono text-[#FAF6E8] mt-1 block">{wishlist.length}</span>
-              <span className="text-[8px] font-mono text-slate-400 mt-0.5 block">FUTURE REELS</span>
+              <span className="block text-xs font-mono text-slate-300 uppercase tracking-widest font-bold">WATCHLIST QUEUE</span>
+              <span className="text-3xl sm:text-4xl font-black font-mono text-[#FAF6E8] mt-1 block">{wishlist.length}</span>
+              <span className="text-xs font-mono text-slate-400 mt-1 block">FUTURE REELS</span>
             </div>
           </div>
 
@@ -261,7 +269,7 @@ export default function DashboardClient({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`px-4 py-2 rounded-xl text-[10px] font-mono font-black uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+                className={`px-4.5 py-2.5 rounded-xl text-xs sm:text-sm font-mono font-black uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
                   activeTab === tab.id
                     ? "bg-[#B58863] text-[#0f1a1b] font-bold shadow-lg shadow-[#B58863]/20"
                     : "bg-[#103334]/40 border border-[#3D4D55]/40 text-[#A79E9C] hover:text-white hover:bg-[#1e2e30]"
@@ -273,7 +281,7 @@ export default function DashboardClient({
             ))}
           </div>
 
-          <span className="text-[8px] font-mono text-slate-500 tracking-widest uppercase hidden lg:block select-none">
+          <span className="text-xs font-mono text-slate-400 tracking-widest uppercase hidden lg:block select-none">
             STUDIO CONTROL // TELEMETRY_ACTIVE
           </span>
         </div>

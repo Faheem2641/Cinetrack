@@ -186,10 +186,17 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
     { name: "Stanley Kubrick", username: "kubrick2001", bio: "1928–1999. Still relevant." },
   ];
 
-  // Rating buckets
-  const ratings = user.reviews.map(r => r.rating).filter((r): r is number => r !== null);
-  const rBuckets = { 5: 142, 4: 78, 3: 20, 2: 5, 1: 2 };
-  if (ratings.length > 0) { Object.keys(rBuckets).forEach(k => { (rBuckets as any)[k] = 0; }); ratings.forEach(r => { const s = Math.round(r) as 1|2|3|4|5; rBuckets[s] = (rBuckets[s]||0)+1; }); }
+  // Dynamic rating buckets from user watched items and reviews
+  const rBuckets = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+  const allRatings: number[] = [
+    ...user.watched.map((w) => (w.voteAverage > 0 ? (w.voteAverage > 5 ? w.voteAverage / 2.0 : w.voteAverage) : null)),
+    ...user.reviews.map((r) => r.rating),
+  ].filter((r): r is number => r !== null && r > 0);
+
+  allRatings.forEach((r) => {
+    const s = Math.min(5, Math.max(1, Math.round(r))) as 1 | 2 | 3 | 4 | 5;
+    rBuckets[s] = (rBuckets[s] || 0) + 1;
+  });
   const maxR = Math.max(...Object.values(rBuckets), 1);
 
   // Favorites
@@ -225,9 +232,9 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
                 ))}
               </div>
               {/* Card header */}
-              <div className="bg-[#B58863] px-4 py-1.5 flex items-center justify-between">
-                <span className="text-[7.5px] font-mono font-black uppercase tracking-[0.3em] text-[#0f1a1b]">CINETRACK // DIRECTOR I.D.</span>
-                <span className="text-[7px] font-mono text-[#0f1a1b]/60">SCENE 01-A</span>
+              <div className="bg-[#B58863] px-4 py-2 flex items-center justify-between">
+                <span className="text-xs font-mono font-black uppercase tracking-[0.3em] text-[#0f1a1b]">CINETRACK // DIRECTOR I.D.</span>
+                <span className="text-xs font-mono text-[#0f1a1b]/80 font-bold">SCENE 01-A</span>
               </div>
 
               {/* Content */}
@@ -250,21 +257,18 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
 
                 {/* Name & username */}
                 <div>
-                  <h1 className="text-base font-black uppercase tracking-wider text-[#FAF6E8] leading-tight">
+                  <h1 className="text-2xl font-black uppercase tracking-wider text-[#FAF6E8] leading-tight">
                     {user.name}
                   </h1>
-                  <p className="text-[9px] font-mono text-[#B58863]/70 mt-0.5 tracking-widest">
-                    @{user.username}
-                  </p>
                 </div>
 
                 {/* Bio in screenplay style */}
                 {user.bio && (
                   <div className="w-full border-t border-b border-[#3D4D55]/30 py-3.5 text-left">
-                    <span className="block text-[6.5px] font-mono text-slate-600 uppercase tracking-widest mb-1.5 select-none">
+                    <span className="block text-xs font-mono text-slate-400 uppercase tracking-widest mb-1.5 select-none font-bold">
                       [INT. CHARACTER INTRO]
                     </span>
-                    <p className="text-[10.5px] text-[#A79E9C] leading-relaxed italic font-serif">
+                    <p className="text-xs sm:text-sm text-[#D3C3B9] leading-relaxed italic font-serif">
                       &ldquo;{user.bio}&rdquo;
                     </p>
                   </div>
@@ -273,22 +277,22 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
                 {/* Stats row — mini odometers */}
                 <div className="w-full grid grid-cols-3 text-center">
                   <div>
-                    <div className="text-base font-black font-mono text-[#FAF6E8] overflow-hidden">
+                    <div className="text-xl sm:text-2xl font-black font-mono text-[#FAF6E8] overflow-hidden">
                       {mounted ? <AnimatedCount to={user.stats.filmsCount} /> : user.stats.filmsCount}
                     </div>
-                    <div className="text-[6.5px] font-mono text-slate-500 uppercase tracking-wider mt-0.5">Films</div>
+                    <div className="text-xs font-mono text-slate-400 uppercase tracking-wider mt-1 font-bold">Films</div>
                   </div>
                   <div>
-                    <div className="text-base font-black font-mono text-[#FAF6E8]">
+                    <div className="text-xl sm:text-2xl font-black font-mono text-[#FAF6E8]">
                       {mounted ? <AnimatedCount to={user.reviews.length} duration={900} /> : user.reviews.length}
                     </div>
-                    <div className="text-[6.5px] font-mono text-slate-500 uppercase tracking-wider mt-0.5">Reviews</div>
+                    <div className="text-xs font-mono text-slate-400 uppercase tracking-wider mt-1 font-bold">Reviews</div>
                   </div>
                   <div>
-                    <div className="text-base font-black font-mono text-[#FAF6E8]">
+                    <div className="text-xl sm:text-2xl font-black font-mono text-[#FAF6E8]">
                       {mounted ? <AnimatedCount to={user.watchlist.length} duration={1000} /> : user.watchlist.length}
                     </div>
-                    <div className="text-[6.5px] font-mono text-slate-500 uppercase tracking-wider mt-0.5">Watchlist</div>
+                    <div className="text-xs font-mono text-slate-400 uppercase tracking-wider mt-1 font-bold">Watchlist</div>
                   </div>
                 </div>
 
@@ -296,18 +300,18 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
                 <div className="w-full flex gap-2.5">
                   <button
                     onClick={handleShare}
-                    className="flex-1 py-2.5 px-2.5 rounded-xl text-[9px] font-mono font-black uppercase tracking-widest text-center text-[#B58863] bg-[#B58863]/10 border border-[#B58863]/40 hover:bg-[#B58863]/20 hover:border-[#B58863]/60 transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-[0.98]"
+                    className="flex-1 py-3 px-3 rounded-xl text-xs font-mono font-black uppercase tracking-widest text-center text-[#B58863] bg-[#B58863]/10 border border-[#B58863]/40 hover:bg-[#B58863]/20 hover:border-[#B58863]/60 transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-[0.98]"
                   >
                     {copied ? (
                       <>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5 text-emerald-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4 text-emerald-400">
                           <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                         </svg>
                         <span className="text-emerald-400 font-bold">Copied!</span>
                       </>
                     ) : (
                       <>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5" />
                         </svg>
                         <span>Copy Link</span>
@@ -317,9 +321,9 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
                   {isOwnProfile && (
                     <Link
                       href="/dashboard"
-                      className="flex-1 py-2.5 px-2.5 rounded-xl text-[9px] font-mono font-black uppercase tracking-widest text-center text-[#A79E9C] bg-[#103334]/40 border border-[#3D4D55]/50 hover:border-[#B58863]/40 hover:text-[#FAF6E8] hover:bg-[#1e2e30] transition-all flex items-center justify-center gap-1.5"
+                      className="flex-1 py-3 px-3 rounded-xl text-xs font-mono font-black uppercase tracking-widest text-center text-[#A79E9C] bg-[#103334]/40 border border-[#3D4D55]/50 hover:border-[#B58863]/40 hover:text-[#FAF6E8] hover:bg-[#1e2e30] transition-all flex items-center justify-center gap-1.5"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
                       </svg>
                       <span>Dashboard</span>
@@ -351,16 +355,16 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
               <div className="absolute top-3 left-3 w-2.5 h-2.5 border-t border-l border-[#B58863]/30 pointer-events-none" />
               <div className="absolute top-3 right-3 w-2.5 h-2.5 border-t border-r border-[#B58863]/30 pointer-events-none" />
 
-              <h2 className="text-[7.5px] font-mono font-black uppercase tracking-[0.25em] text-[#B58863] mb-5 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#B58863] animate-pulse" />
+              <h2 className="text-xs font-mono font-black uppercase tracking-[0.25em] text-[#B58863] mb-5 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#B58863] animate-pulse" />
                 GENRE AFFINITY // SIGNAL MATRIX
               </h2>
 
               <div className="space-y-5">
                 {user.tasteProfile.length === 0 ? (
                   <div className="py-6 text-center border border-dashed border-[#3D4D55]/30 rounded-2xl bg-[#0a1315]/40">
-                    <p className="text-[10px] font-mono font-black uppercase tracking-wider text-[#A79E9C]/60">NO GENRE SIGNAL LOGGED</p>
-                    <p className="text-[8px] font-mono text-slate-600 mt-1">Start marking movies or TV shows as watched to generate your affinity matrix.</p>
+                    <p className="text-xs font-mono font-black uppercase tracking-wider text-[#A79E9C]/60">NO GENRE SIGNAL LOGGED</p>
+                    <p className="text-xs font-mono text-slate-500 mt-1">Start marking movies or TV shows as watched to generate your affinity matrix.</p>
                   </div>
                 ) : (
                   user.tasteProfile.map((g, idx) => {
@@ -368,10 +372,10 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
                     return (
                       <div key={g.name}>
                         <div className="flex justify-between items-center mb-1.5">
-                          <span className="text-[10px] font-mono font-black uppercase tracking-wider text-[#D3C3B9] flex items-center gap-1.5">
+                          <span className="text-xs font-mono font-black uppercase tracking-wider text-[#D3C3B9] flex items-center gap-1.5">
                             <span>{g.icon}</span><span>{g.name}</span>
                           </span>
-                          <span className="text-[9px] font-mono text-[#FAF6E8] font-black">{g.percentage}%</span>
+                          <span className="text-xs font-mono text-[#FAF6E8] font-black">{g.percentage}%</span>
                         </div>
                         {/* VU meter segments */}
                         <div className="flex gap-[2px] h-3">
@@ -393,7 +397,7 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
 
               {/* Rating Histogram inline */}
               <div className="mt-6 pt-5 border-t border-[#3D4D55]/25">
-                <h3 className="text-[7.5px] font-mono font-black uppercase tracking-[0.25em] text-[#B58863] mb-3">
+                <h3 className="text-xs font-mono font-black uppercase tracking-[0.25em] text-[#B58863] mb-3">
                   GRADING HISTOGRAM // FREQ_DIST
                 </h3>
                 <div className="space-y-2">
@@ -402,11 +406,11 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
                     const pct = (count / maxR) * 100;
                     return (
                       <div key={s} className="flex items-center gap-3">
-                        <span className="text-[8px] font-mono w-8 text-right text-[#B58863] font-black shrink-0">{"★".repeat(s)}</span>
-                        <div className="flex-grow bg-[#0a1315] h-1.5 rounded-full overflow-hidden border border-white/[0.04]">
+                        <span className="text-xs font-mono w-10 text-right text-[#B58863] font-black shrink-0">{"★".repeat(s)}</span>
+                        <div className="flex-grow bg-[#0a1315] h-2 rounded-full overflow-hidden border border-white/[0.04]">
                           <div className="h-full bg-gradient-to-r from-[#B58863]/60 to-[#d4a87c] rounded-full transition-all duration-1000" style={{ width: `${pct}%` }} />
                         </div>
-                        <span className="w-6 text-[8px] font-mono text-right text-[#FAF6E8] font-black shrink-0">{count}</span>
+                        <span className="w-8 text-xs font-mono text-right text-[#FAF6E8] font-black shrink-0">{count}</span>
                       </div>
                     );
                   })}
@@ -421,8 +425,8 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
               <div className="absolute bottom-3 left-3 w-2.5 h-2.5 border-b border-l border-[#B58863]/30 pointer-events-none" />
               <div className="absolute bottom-3 right-3 w-2.5 h-2.5 border-b border-r border-[#B58863]/30 pointer-events-none" />
 
-              <h2 className="text-[7.5px] font-mono font-black uppercase tracking-[0.25em] text-[#B58863] mb-5 flex items-center gap-2 select-none">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+              <h2 className="text-xs font-mono font-black uppercase tracking-[0.25em] text-[#B58863] mb-5 flex items-center gap-2 select-none">
+                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                 SPOTLIGHT REEL // FAVORITE CINEMA
               </h2>
 

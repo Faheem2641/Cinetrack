@@ -107,18 +107,6 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
 
   return (
     <div className="w-full relative overflow-hidden px-2 sm:px-4 lg:px-6 pb-6 pt-2 select-none">
-      
-      {/* Dynamic Clip Path Def for card cutout */}
-      <svg className="absolute w-0 h-0 pointer-events-none">
-        <defs>
-          <clipPath id="hero-cutout-clip">
-            <path
-              d={`M 0 0 L ${dimensions.width - 600} 0 C ${dimensions.width - 560} 0, ${dimensions.width - 560} 64, ${dimensions.width - 520} 64 L ${dimensions.width - 40} 64 A 40 40 0 0 1 ${dimensions.width} 104 L ${dimensions.width} ${dimensions.height} L 0 ${dimensions.height} Z`}
-            />
-          </clipPath>
-        </defs>
-      </svg>
-
       {/* Ambient Backdrop Bleed - Cinematic Depth */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         {featured.map((item, idx) => {
@@ -145,12 +133,9 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
         <div className="absolute inset-0 bg-gradient-to-b from-[#080e0f]/90 via-[#080e0f]/20 to-[#0f1a1b] z-1 pointer-events-none" />
       </div>
 
-      <div className="mx-auto w-full max-w-[98%] relative pt-12 sm:pt-14 z-10">
-
+      <div className="mx-auto w-full max-w-[98%] relative pt-16 sm:pt-20 z-10">
         <section
-          ref={containerRef}
-          style={{ clipPath: mounted && !isMobile ? "url(#hero-cutout-clip)" : "none" }}
-          className="relative w-full aspect-[21/10] min-h-[500px] sm:min-h-[600px] md:min-h-[650px] lg:min-h-[720px] overflow-hidden bg-black rounded-3xl md:rounded-[40px] shadow-2xl transition-shadow duration-300"
+          className="relative w-full aspect-[21/10] min-h-[500px] sm:min-h-[600px] md:min-h-[650px] lg:min-h-[720px] overflow-hidden bg-black rounded-3xl md:rounded-[40px] shadow-2xl transition-shadow duration-300 border border-white/10"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >

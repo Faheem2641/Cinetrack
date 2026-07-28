@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma, dbQuery } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
@@ -25,51 +25,59 @@ export async function createReview(
 
   try {
     // 1. Create the review
-    await prisma.review.create({
-      data: {
-        userId,
-        tmdbId,
-        mediaType,
-        title,
-        posterPath,
-        content: content.trim(),
-        rating,
-      },
-    });
-
-    // 2. Implicitly mark as watched
-    const existingEntry = await prisma.watchEntry.findUnique({
-      where: {
-        userId_tmdbId_mediaType: {
-          userId,
-          tmdbId,
-          mediaType,
-        },
-      },
-    });
-
-    if (existingEntry) {
-      await prisma.watchEntry.update({
-        where: { id: existingEntry.id },
-        data: {
-          isWatched: true,
-          isWishlist: false,
-          isCurrentlyWatching: false,
-          rating: rating !== null ? rating : existingEntry.rating,
-        },
-      });
-    } else {
-      await prisma.watchEntry.create({
+    await dbQuery(() =>
+      prisma.review.create({
         data: {
           userId,
           tmdbId,
           mediaType,
           title,
           posterPath,
-          isWatched: true,
+          content: content.trim(),
           rating,
         },
-      });
+      })
+    );
+
+    // 2. Implicitly mark as watched
+    const existingEntry = await dbQuery(() =>
+      prisma.watchEntry.findUnique({
+        where: {
+          userId_tmdbId_mediaType: {
+            userId,
+            tmdbId,
+            mediaType,
+          },
+        },
+      })
+    );
+
+    if (existingEntry) {
+      await dbQuery(() =>
+        prisma.watchEntry.update({
+          where: { id: existingEntry.id },
+          data: {
+            isWatched: true,
+            isWishlist: false,
+            isCurrentlyWatching: false,
+            rating: rating !== null ? rating : existingEntry.rating,
+          },
+        })
+      );
+    } else {
+      await dbQuery(() =>
+        prisma.watchEntry.create({
+          data: {
+            userId,
+            tmdbId,
+            mediaType,
+            title,
+            posterPath,
+            isWatched: true,
+            rating,
+          },
+        })
+      );
     }
 
     revalidatePath(`/${mediaType === "movie" ? "movies" : "tv"}/${tmdbId}`);

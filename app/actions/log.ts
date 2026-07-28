@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma, dbQuery } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
@@ -19,15 +19,17 @@ export async function toggleWatchStatus(
 
   const userId = session.user.id;
 
-  const existing = await prisma.watchEntry.findUnique({
-    where: {
-      userId_tmdbId_mediaType: {
-        userId,
-        tmdbId,
-        mediaType,
+  const existing = await dbQuery(() =>
+    prisma.watchEntry.findUnique({
+      where: {
+        userId_tmdbId_mediaType: {
+          userId,
+          tmdbId,
+          mediaType,
+        },
       },
-    },
-  });
+    })
+  );
 
   if (existing) {
     const currentValue = existing[field];
@@ -45,10 +47,12 @@ export async function toggleWatchStatus(
       updateData.isWatched = false;
     }
 
-    await prisma.watchEntry.update({
-      where: { id: existing.id },
-      data: updateData,
-    });
+    await dbQuery(() =>
+      prisma.watchEntry.update({
+        where: { id: existing.id },
+        data: updateData,
+      })
+    );
   } else {
     const createData: any = {
       userId,
@@ -62,9 +66,11 @@ export async function toggleWatchStatus(
       isCurrentlyWatching: field === "isCurrentlyWatching",
       isFavorite: field === "isFavorite",
     };
-    await prisma.watchEntry.create({
-      data: createData,
-    });
+    await dbQuery(() =>
+      prisma.watchEntry.create({
+        data: createData,
+      })
+    );
   }
 
   revalidatePath(`/${mediaType === "movie" ? "movies" : "tv"}/${tmdbId}`);
@@ -87,40 +93,46 @@ export async function updateMediaRating(
 
   const userId = session.user.id;
 
-  const existing = await prisma.watchEntry.findUnique({
-    where: {
-      userId_tmdbId_mediaType: {
-        userId,
-        tmdbId,
-        mediaType,
+  const existing = await dbQuery(() =>
+    prisma.watchEntry.findUnique({
+      where: {
+        userId_tmdbId_mediaType: {
+          userId,
+          tmdbId,
+          mediaType,
+        },
       },
-    },
-  });
+    })
+  );
 
   if (existing) {
-    await prisma.watchEntry.update({
-      where: { id: existing.id },
-      data: {
-        rating,
-        // Rating implicitly marks it as watched, removes from wishlist
-        isWatched: rating !== null ? true : existing.isWatched,
-        isWishlist: rating !== null ? false : existing.isWishlist,
-        isCurrentlyWatching: rating !== null ? false : existing.isCurrentlyWatching,
-      },
-    });
+    await dbQuery(() =>
+      prisma.watchEntry.update({
+        where: { id: existing.id },
+        data: {
+          rating,
+          // Rating implicitly marks it as watched, removes from wishlist
+          isWatched: rating !== null ? true : existing.isWatched,
+          isWishlist: rating !== null ? false : existing.isWishlist,
+          isCurrentlyWatching: rating !== null ? false : existing.isCurrentlyWatching,
+        },
+      })
+    );
   } else {
-    await prisma.watchEntry.create({
-      data: {
-        userId,
-        tmdbId,
-        mediaType,
-        title,
-        posterPath,
-        releaseDate,
-        rating,
-        isWatched: rating !== null,
-      },
-    });
+    await dbQuery(() =>
+      prisma.watchEntry.create({
+        data: {
+          userId,
+          tmdbId,
+          mediaType,
+          title,
+          posterPath,
+          releaseDate,
+          rating,
+          isWatched: rating !== null,
+        },
+      })
+    );
   }
 
   revalidatePath(`/${mediaType === "movie" ? "movies" : "tv"}/${tmdbId}`);
