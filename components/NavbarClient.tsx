@@ -360,14 +360,33 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
           </div>
         </div>
 
-        {/* Right Segment: Links, Search & Auth (Desktop) */}
-        <div className="hidden md:flex items-center gap-2.5 lg:gap-3.5 z-10 transition-all duration-300">
+        {/* Right Segment: Links, Search & Auth (Desktop - Nested in Hero Cutout Shelf) */}
+        <div className="hidden md:flex items-center gap-2 lg:gap-2.5 z-10 translate-y-10 lg:translate-y-11 transition-all duration-300">
 
           {/* Premium Capsule Navigation Controls (Desktop) */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 lg:gap-2">
+            <Link
+              href="/movies"
+              className="relative group px-3 py-1 rounded-full text-[9px] font-mono font-black uppercase tracking-wider text-[#D3C3B9] bg-white/5 border border-white/10 hover:border-[#B58863]/40 hover:text-white transition-all h-7.5 flex items-center justify-center"
+            >
+              Movies
+            </Link>
+            <Link
+              href="/tv"
+              className="relative group px-3 py-1 rounded-full text-[9px] font-mono font-black uppercase tracking-wider text-[#D3C3B9] bg-white/5 border border-white/10 hover:border-[#B58863]/40 hover:text-white transition-all h-7.5 flex items-center justify-center"
+            >
+              TV
+            </Link>
+            <Link
+              href="/recommend"
+              className="relative group px-3 py-1 rounded-full text-[9px] font-mono font-black uppercase tracking-wider text-[#B58863] bg-[#B58863]/10 border border-[#B58863]/30 hover:bg-[#B58863]/20 transition-all h-7.5 flex items-center justify-center gap-1"
+            >
+              <span>✦</span>
+              <span>Match</span>
+            </Link>
             <Link
               href="/dashboard"
-              className="relative group px-3.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest text-[#D3C3B9] bg-white/5 border border-white/10 hover:border-[#B58863]/40 hover:text-white hover:shadow-[0_0_15px_rgba(255,255,255,0.05)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 h-8.5 flex items-center justify-center"
+              className="relative group px-3 py-1 rounded-full text-[9px] font-mono font-black uppercase tracking-wider text-[#D3C3B9] bg-white/5 border border-white/10 hover:border-[#B58863]/40 hover:text-white transition-all h-7.5 flex items-center justify-center"
             >
               Dashboard
             </Link>
@@ -376,7 +395,7 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
           <form
             action="/search"
             method="GET"
-            className={`relative flex items-center rounded-full px-3 py-1 transition-all duration-300 h-8.5 ${searchFormClass}`}
+            className={`relative flex items-center rounded-full px-2.5 py-0.5 transition-all duration-300 h-7.5 ${searchFormClass}`}
             onFocus={() => setShowSuggestions(searchQuery.trim().length >= 2)}
             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
           >
@@ -385,13 +404,13 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
               name="q"
               value={searchQuery}
               onChange={handleSearchChange}
-              placeholder="Search catalog..."
-              className={`w-32 sm:w-40 md:w-48 lg:w-54 bg-transparent text-[10px] focus:outline-none transition-all duration-300 font-mono ${searchInputClass}`}
+              placeholder="Search..."
+              className={`w-24 sm:w-28 md:w-32 lg:w-36 bg-transparent text-[9.5px] focus:outline-none transition-all duration-300 font-mono ${searchInputClass}`}
               required
               autoComplete="off"
             />
             <button type="submit" className={`cursor-pointer pl-1 transition-colors ${searchBtnClass}`}>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3 h-3">
                 <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.604 10.604Z" />
               </svg>
             </button>

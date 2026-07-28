@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getPopularMedia, getTopRatedMedia, getPersonMovies, getPersonDetails } from "@/lib/tmdb";
 import MediaCard from "@/components/MediaCard";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { prisma, dbQuery } from "@/lib/prisma";
 import HeroSpotlight from "@/components/HeroSpotlight";
 import MediaCarousel from "@/components/MediaCarousel";
 import FilmstripDivider from "@/components/FilmstripDivider";
@@ -138,29 +138,33 @@ export default async function Home() {
   let dbLists: any[] = [];
 
   try {
-    dbReviews = await prisma.review.findMany({
-      take: 2,
-      orderBy: { createdAt: "desc" },
-      include: {
-        user: {
-          select: { name: true, username: true, avatarUrl: true }
+    dbReviews = await dbQuery(() =>
+      prisma.review.findMany({
+        take: 2,
+        orderBy: { createdAt: "desc" },
+        include: {
+          user: {
+            select: { name: true, username: true, avatarUrl: true }
+          }
         }
-      }
-    });
+      })
+    );
 
-    dbLists = await prisma.customList.findMany({
-      take: 2,
-      where: { isPublic: true },
-      orderBy: { createdAt: "desc" },
-      include: {
-        user: {
-          select: { name: true, username: true }
-        },
-        items: {
-          take: 3
+    dbLists = await dbQuery(() =>
+      prisma.customList.findMany({
+        take: 2,
+        where: { isPublic: true },
+        orderBy: { createdAt: "desc" },
+        include: {
+          user: {
+            select: { name: true, username: true }
+          },
+          items: {
+            take: 3
+          }
         }
-      }
-    });
+      })
+    );
   } catch (error) {
     // Quietly fallback to static reviews/lists if connection is transiently unreachable
   }
