@@ -73,13 +73,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
     color: colors[index] || "bg-[#3D4D55]",
   }));
 
-  // Default fallback for taste profile if user has no watches logged
-  const defaultTasteProfile = [
-    { icon: "🚀", name: "Sci-Fi", percentage: 82, color: "bg-gradient-to-r from-[#B58863] to-[#d4a87c]" },
-    { icon: "🎭", name: "Drama", percentage: 31, color: "bg-[#3D4D55]" },
-    { icon: "🍿", name: "Comedy", percentage: 12, color: "bg-[#A79E9C]/60" },
-  ];
-  const finalTasteProfile = tasteProfile.length > 0 ? tasteProfile : defaultTasteProfile;
+  const finalTasteProfile = tasteProfile;
 
   // Map database elements to Client component structure
   const mappedWatched = watched.map((w) => ({
@@ -111,42 +105,13 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
     createdAt: r.createdAt.toISOString(),
   }));
 
-  // Create default posts for active user based on their reviews or fallbacks
   const mappedPosts = reviews.slice(0, 3).map((r, index) => ({
     id: `db-post-${r.id}`,
     content: `Just reviewed ${r.title}: "${r.content.slice(0, 100)}${r.content.length > 100 ? "..." : ""}"`,
     createdAt: `${index + 1} day${index > 0 ? "s" : ""} ago`,
-    likesCount: Math.floor(Math.random() * 20),
-    commentsCount: Math.floor(Math.random() * 5),
+    likesCount: 0,
+    commentsCount: 0,
   }));
-
-  // Mock watched items in case they have not logged anything yet
-  const mockWatched = [
-    {
-      id: "76600",
-      title: "Avatar: The Way of Water",
-      posterPath: "/628Dep61rQbi2tXJHQ65q3g6TA5.jpg",
-      releaseDate: "2022-12-14",
-      mediaType: "movie" as const,
-      voteAverage: 9.2,
-    },
-    {
-      id: "27205",
-      title: "Inception",
-      posterPath: "/o062xtYJm5AdzfsEs4tFa47TuRL.jpg",
-      releaseDate: "2010-07-15",
-      mediaType: "movie" as const,
-      voteAverage: 8.4,
-    },
-    {
-      id: "4607",
-      title: "Lost",
-      posterPath: "/wOS5fRSpX5zVd287n95G0tL3ZkZ.jpg",
-      releaseDate: "2004-09-22",
-      mediaType: "tv" as const,
-      voteAverage: 7.9,
-    },
-  ];
 
   const finalUser = {
     username: profileUser.username,
@@ -159,7 +124,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
       followersCount,
     },
     tasteProfile: finalTasteProfile,
-    watched: mappedWatched.length > 0 ? mappedWatched : mockWatched,
+    watched: mappedWatched,
     watchlist: mappedWatchlist,
     reviews: mappedReviews,
     posts: mappedPosts,

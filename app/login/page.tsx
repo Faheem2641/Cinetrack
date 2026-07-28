@@ -117,21 +117,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Offline/Database Bypass Mock Account Access */}
-          <div className="mt-5 space-y-4">
-            <div className="relative flex py-2 items-center">
-              <div className="flex-grow border-t border-[#3D4D55]/30"></div>
-              <span className="flex-shrink mx-4 text-[9px] font-mono text-[#A79E9C]/60 uppercase tracking-widest">or bypass</span>
-              <div className="flex-grow border-t border-[#3D4D55]/30"></div>
-            </div>
 
-            <Link
-              href="/profile?mockOwner=true"
-              className="w-full py-3 px-4 rounded-xl border border-[#B58863]/40 hover:bg-[#B58863]/10 text-center block text-xs font-bold font-mono uppercase tracking-wider text-[#B58863] active:scale-[0.98] transition-all duration-200 shadow-md"
-            >
-              ✦ Access Mock Owner Profile
-            </Link>
-          </div>
 
           <div className="mt-8 pt-6 border-t border-[#3D4D55]/40 text-center">
             <p className="text-sm text-[#A79E9C]">

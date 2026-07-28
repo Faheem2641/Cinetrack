@@ -193,13 +193,7 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
   const maxR = Math.max(...Object.values(rBuckets), 1);
 
   // Favorites
-  const defaultFavs = [
-    { id: "27205", title: "Inception", posterPath: "/o062xtYJm5AdzfsEs4tFa47TuRL.jpg", releaseDate: "2010-07-15", mediaType: "movie" as const, voteAverage: 8.4 },
-    { id: "157336", title: "Interstellar", posterPath: "/gEU2QvHOm52Yv0tprYhp3v2v1gY.jpg", releaseDate: "2014-11-05", mediaType: "movie" as const, voteAverage: 8.5 },
-    { id: "155", title: "The Dark Knight", posterPath: "/qJ2tWGB2XclmAEc97aIsG24GEtY.jpg", releaseDate: "2008-07-16", mediaType: "movie" as const, voteAverage: 9.0 },
-    { id: "603", title: "The Matrix", posterPath: "/f89U3wzqrjVnHwb9Y9OMhk0e2jC.jpg", releaseDate: "1999-03-30", mediaType: "movie" as const, voteAverage: 8.2 },
-  ];
-  const favs: MediaItem[] = user.watched.length >= 4 ? user.watched.slice(0, 4) : defaultFavs;
+  const favs: MediaItem[] = user.watched.slice(0, 4);
 
   const handleFollow = () => {
     setIsFollowing(p => !p);
@@ -418,31 +412,38 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
               </h2>
 
               <div className="space-y-5">
-                {user.tasteProfile.map((g, idx) => {
-                  const lit = Math.max(1, Math.round(g.percentage / 8.5));
-                  return (
-                    <div key={g.name}>
-                      <div className="flex justify-between items-center mb-1.5">
-                        <span className="text-[10px] font-mono font-black uppercase tracking-wider text-[#D3C3B9] flex items-center gap-1.5">
-                          <span>{g.icon}</span><span>{g.name}</span>
-                        </span>
-                        <span className="text-[9px] font-mono text-[#FAF6E8] font-black">{g.percentage}%</span>
+                {user.tasteProfile.length === 0 ? (
+                  <div className="py-6 text-center border border-dashed border-[#3D4D55]/30 rounded-2xl bg-[#0a1315]/40">
+                    <p className="text-[10px] font-mono font-black uppercase tracking-wider text-[#A79E9C]/60">NO GENRE SIGNAL LOGGED</p>
+                    <p className="text-[8px] font-mono text-slate-600 mt-1">Start marking movies or TV shows as watched to generate your affinity matrix.</p>
+                  </div>
+                ) : (
+                  user.tasteProfile.map((g, idx) => {
+                    const lit = Math.max(1, Math.round(g.percentage / 8.5));
+                    return (
+                      <div key={g.name}>
+                        <div className="flex justify-between items-center mb-1.5">
+                          <span className="text-[10px] font-mono font-black uppercase tracking-wider text-[#D3C3B9] flex items-center gap-1.5">
+                            <span>{g.icon}</span><span>{g.name}</span>
+                          </span>
+                          <span className="text-[9px] font-mono text-[#FAF6E8] font-black">{g.percentage}%</span>
+                        </div>
+                        {/* VU meter segments */}
+                        <div className="flex gap-[2px] h-3">
+                          {Array.from({ length: 12 }).map((_, si) => {
+                            const isLit = si < lit;
+                            const color = isLit
+                              ? si < 6 ? "bg-teal-500/80 shadow-[0_0_4px_rgba(20,184,166,0.5)]"
+                                : si < 9 ? "bg-[#B58863] shadow-[0_0_5px_rgba(181,136,99,0.5)]"
+                                : "bg-[#d4a87c] shadow-[0_0_8px_rgba(212,168,124,0.7)]"
+                              : "bg-[#1e2e30]/60 border border-white/[0.04]";
+                            return <div key={si} className={`flex-grow rounded-[1px] transition-all duration-700 ${color}`} style={{ transitionDelay: `${idx * 60 + si * 20}ms` }} />;
+                          })}
+                        </div>
                       </div>
-                      {/* VU meter segments */}
-                      <div className="flex gap-[2px] h-3">
-                        {Array.from({ length: 12 }).map((_, si) => {
-                          const isLit = si < lit;
-                          const color = isLit
-                            ? si < 6 ? "bg-teal-500/80 shadow-[0_0_4px_rgba(20,184,166,0.5)]"
-                              : si < 9 ? "bg-[#B58863] shadow-[0_0_5px_rgba(181,136,99,0.5)]"
-                              : "bg-[#d4a87c] shadow-[0_0_8px_rgba(212,168,124,0.7)]"
-                            : "bg-[#1e2e30]/60 border border-white/[0.04]";
-                          return <div key={si} className={`flex-grow rounded-[1px] transition-all duration-700 ${color}`} style={{ transitionDelay: `${idx * 60 + si * 20}ms` }} />;
-                        })}
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                )}
               </div>
 
               {/* Rating Histogram inline */}
@@ -480,11 +481,18 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
                 SPOTLIGHT REEL // FAVORITE CINEMA
               </h2>
 
-              <div className="grid grid-cols-4 gap-3">
-                {favs.map((item, i) => (
-                  <FilmCard key={item.id} item={item} index={i} />
-                ))}
-              </div>
+              {favs.length === 0 ? (
+                <div className="py-6 text-center border border-dashed border-[#3D4D55]/30 rounded-2xl bg-[#0a1315]/40">
+                  <p className="text-[10px] font-mono font-black uppercase tracking-wider text-[#A79E9C]/60">NO SPOTLIGHT TITLES</p>
+                  <p className="text-[8px] font-mono text-slate-600 mt-1">Mark movies as watched to feature your top titles here.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {favs.map((item, i) => (
+                    <FilmCard key={item.id} item={item} index={i} />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

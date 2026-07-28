@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { Pool } from "pg";
 
 const globalForPrisma = globalThis as unknown as {
@@ -8,7 +9,15 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 const createPrismaClient = () => {
-  const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL;
+  const connectionString = process.env.DATABASE_URL || process.env.DIRECT_URL || "file:./dev.db";
+
+  if (connectionString.startsWith("file:") || !connectionString.includes("postgres")) {
+    const adapter = new PrismaBetterSqlite3({ url: connectionString });
+    return new PrismaClient({
+      adapter,
+      log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+    });
+  }
 
   const pool =
     globalForPrisma.pgPool ??
