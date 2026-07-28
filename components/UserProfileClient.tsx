@@ -332,79 +332,52 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
                     </div>
                     <div className="text-[6.5px] font-mono text-slate-500 uppercase tracking-wider mt-0.5">Films</div>
                   </div>
-                  <button onClick={() => setActiveModal("following")} className="hover:opacity-75 transition-opacity cursor-pointer">
+                  <div>
                     <div className="text-base font-black font-mono text-[#FAF6E8]">
-                      {mounted ? <AnimatedCount to={user.stats.followingCount} duration={900} /> : user.stats.followingCount}
+                      {mounted ? <AnimatedCount to={user.reviews.length} duration={900} /> : user.reviews.length}
                     </div>
-                    <div className="text-[6.5px] font-mono text-slate-500 uppercase tracking-wider mt-0.5">Following</div>
-                  </button>
-                  <button onClick={() => setActiveModal("followers")} className="hover:opacity-75 transition-opacity cursor-pointer">
+                    <div className="text-[6.5px] font-mono text-slate-500 uppercase tracking-wider mt-0.5">Reviews</div>
+                  </div>
+                  <div>
                     <div className="text-base font-black font-mono text-[#FAF6E8]">
-                      {mounted ? <AnimatedCount to={followerCount} duration={1000} /> : followerCount}
+                      {mounted ? <AnimatedCount to={user.watchlist.length} duration={1000} /> : user.watchlist.length}
                     </div>
-                    <div className="text-[6.5px] font-mono text-slate-500 uppercase tracking-wider mt-0.5">Followers</div>
-                  </button>
+                    <div className="text-[6.5px] font-mono text-slate-500 uppercase tracking-wider mt-0.5">Watchlist</div>
+                  </div>
                 </div>
 
                 {/* Action buttons */}
                 <div className="w-full flex gap-2.5">
-                  {!isOwnProfile ? (
-                    <>
-                      <button
-                        onClick={handleFollow}
-                        className={`flex-grow py-2.5 rounded-xl text-[9px] font-mono font-black uppercase tracking-widest transition-all cursor-pointer shadow ${
-                          isFollowing
-                            ? "bg-[#3D4D55]/40 border border-[#3D4D55]/60 text-[#A79E9C] hover:bg-[#3D4D55]/60"
-                            : "bg-gradient-to-r from-[#B58863] to-[#d4a87c] text-[#0f1a1b] hover:brightness-110 hover:scale-[1.02] active:scale-[0.98]"
-                        }`}
-                      >
-                        {isFollowing ? "✓ Following" : "✦ Follow"}
-                      </button>
-                      <button
-                        onClick={handleShare}
-                        title="Copy profile link"
-                        className="relative px-3.5 py-2.5 bg-[#103334]/40 border border-[#3D4D55]/50 text-[#A79E9C] rounded-xl hover:text-[#FAF6E8] hover:bg-[#1e2e30] transition-all cursor-pointer group"
-                      >
-                        {copied ? (
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5 text-emerald-400"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
-                        ) : (
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5" /></svg>
-                        )}
-                        {copied && <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 text-[7px] font-mono font-black bg-emerald-900/80 border border-emerald-600/40 text-emerald-300 rounded whitespace-nowrap z-30">Link copied!</span>}
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={handleShare}
-                        className="flex-1 py-2.5 px-2.5 rounded-xl text-[9px] font-mono font-black uppercase tracking-widest text-center text-[#B58863] bg-[#B58863]/10 border border-[#B58863]/40 hover:bg-[#B58863]/20 hover:border-[#B58863]/60 transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-[0.98]"
-                      >
-                        {copied ? (
-                          <>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5 text-emerald-400">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                            </svg>
-                            <span className="text-emerald-400 font-bold">Copied!</span>
-                          </>
-                        ) : (
-                          <>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5" />
-                            </svg>
-                            <span>Copy Link</span>
-                          </>
-                        )}
-                      </button>
-                      <Link
-                        href="/dashboard"
-                        className="flex-1 py-2.5 px-2.5 rounded-xl text-[9px] font-mono font-black uppercase tracking-widest text-center text-[#A79E9C] bg-[#103334]/40 border border-[#3D4D55]/50 hover:border-[#B58863]/40 hover:text-[#FAF6E8] hover:bg-[#1e2e30] transition-all flex items-center justify-center gap-1.5"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+                  <button
+                    onClick={handleShare}
+                    className="flex-1 py-2.5 px-2.5 rounded-xl text-[9px] font-mono font-black uppercase tracking-widest text-center text-[#B58863] bg-[#B58863]/10 border border-[#B58863]/40 hover:bg-[#B58863]/20 hover:border-[#B58863]/60 transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-[0.98]"
+                  >
+                    {copied ? (
+                      <>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5 text-emerald-400">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                         </svg>
-                        <span>Dashboard</span>
-                      </Link>
-                    </>
+                        <span className="text-emerald-400 font-bold">Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5" />
+                        </svg>
+                        <span>Copy Link</span>
+                      </>
+                    )}
+                  </button>
+                  {isOwnProfile && (
+                    <Link
+                      href="/dashboard"
+                      className="flex-1 py-2.5 px-2.5 rounded-xl text-[9px] font-mono font-black uppercase tracking-widest text-center text-[#A79E9C] bg-[#103334]/40 border border-[#3D4D55]/50 hover:border-[#B58863]/40 hover:text-[#FAF6E8] hover:bg-[#1e2e30] transition-all flex items-center justify-center gap-1.5"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+                      </svg>
+                      <span>Dashboard</span>
+                    </Link>
                   )}
                 </div>
 
@@ -609,39 +582,6 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
                   <span className="text-[10px] font-mono font-black uppercase tracking-wider">{t.label}</span>
                   {coverTheme === t.id && <span className="ml-auto text-[#B58863] text-[8px] font-mono">ACTIVE</span>}
                 </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ════════ FOLLOWER / FOLLOWING MODAL ════════ */}
-      {activeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md" onClick={() => setActiveModal(null)}>
-          <div className="bg-[#0d1f20] border border-[#3D4D55]/60 rounded-3xl p-6 w-full max-w-sm mx-4 shadow-2xl relative max-h-[70vh] flex flex-col" onClick={e => e.stopPropagation()}>
-            <button onClick={() => setActiveModal(null)} className="absolute top-4 right-4 text-[#A79E9C] hover:text-white cursor-pointer transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
-            </button>
-            <h3 className="text-[8px] font-mono font-black uppercase tracking-[0.25em] text-[#B58863] mb-4">
-              {activeModal === "followers" ? "AUDIENCE // ROLL CALL" : "TRACKED // TARGET LIST"}
-            </h3>
-            <div className="overflow-y-auto space-y-4 scrollbar-none pr-1">
-              {modalList.map(u => (
-                <div key={u.username} className="flex items-center gap-3 group">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#3D4D55]/60 to-[#103334] border border-[#3D4D55]/40 flex items-center justify-center text-[#B58863] font-mono font-black text-xs uppercase flex-shrink-0 select-none">
-                    {u.name.slice(0, 2)}
-                  </div>
-                  <div className="flex-grow min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[11px] font-black text-[#D3C3B9] group-hover:text-white transition-colors truncate">{u.name}</span>
-                      <span className="w-3 h-3 rounded-full bg-[#B58863] flex items-center justify-center text-[#0f1a1b] text-[6px] font-black flex-shrink-0">✓</span>
-                    </div>
-                    <span className="text-[8px] font-mono text-slate-500">@{u.username}</span>
-                  </div>
-                  <button className="text-[7.5px] font-mono font-black px-2.5 py-1 bg-[#B58863]/10 border border-[#B58863]/20 text-[#B58863] rounded-lg hover:bg-[#B58863]/20 transition-all cursor-pointer flex-shrink-0">
-                    VIEW
-                  </button>
-                </div>
               ))}
             </div>
           </div>
