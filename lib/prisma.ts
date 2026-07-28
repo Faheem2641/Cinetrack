@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { Pool } from "pg";
 
 const globalForPrisma = globalThis as unknown as {
@@ -9,27 +8,19 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 const createPrismaClient = () => {
-  const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL || "file:./dev.db";
-
-  if (connectionString.startsWith("file:") || !connectionString.includes("postgres")) {
-    const adapter = new PrismaBetterSqlite3({ url: connectionString });
-    return new PrismaClient({
-      adapter,
-      log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
-    });
-  }
+  const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL;
 
   let pool = globalForPrisma.pgPool;
   if (!pool) {
     pool = new Pool({
       connectionString,
-      max: 10,
+      max: 5,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 10000,
       ssl: { rejectUnauthorized: false },
     });
     pool.on("error", (err) => {
-      console.warn("PostgreSQL idle client connection dropped, auto-reconnecting...", err.message);
+      console.warn("PostgreSQL idle client connection dropped", err.message);
     });
   }
 
@@ -50,5 +41,3 @@ export const prisma = globalForPrisma.prisma ?? (globalForPrisma.prisma = create
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
 }
-
-
