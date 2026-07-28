@@ -15,13 +15,9 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
   const username = resolvedParams.username.toLowerCase();
   const session = await auth();
 
-  // Find user by username with follower relationships
+  // Find user by username
   const profileUser = await prisma.user.findUnique({
     where: { username },
-    include: {
-      followers: true,
-      following: true,
-    },
   });
 
   if (!profileUser) {
@@ -32,19 +28,13 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
   const isOwnProfile = session?.user?.id === userId;
 
   // Fetch user entries
-  const [watched, wishlist, reviews] = await Promise.all([
+  const [watched, wishlist] = await Promise.all([
     prisma.watchEntry.findMany({ where: { userId, isWatched: true } }),
     prisma.watchEntry.findMany({ where: { userId, isWishlist: true } }),
-    prisma.review.findMany({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-    }),
   ]);
 
   // Compute metrics
   const filmsCount = watched.length;
-  const followersCount = profileUser.followers.length;
-  const followingCount = profileUser.following.length;
 
   // Compute dynamic taste profile (genres) across ALL watched entries
   const detailRequests = watched.map((w) => getMediaDetails(w.tmdbId, w.mediaType as "movie" | "tv"));
@@ -116,25 +106,6 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
     voteAverage: w.rating ? w.rating * 2.0 : 0.0,
   }));
 
-  const mappedReviews = reviews.map((r) => ({
-    id: r.id,
-    tmdbId: r.tmdbId,
-    mediaType: r.mediaType as "movie" | "tv",
-    title: r.title,
-    posterPath: r.posterPath,
-    content: r.content,
-    rating: r.rating,
-    createdAt: r.createdAt.toISOString(),
-  }));
-
-  const mappedPosts = reviews.slice(0, 3).map((r, index) => ({
-    id: `db-post-${r.id}`,
-    content: `Just reviewed ${r.title}: "${r.content.slice(0, 100)}${r.content.length > 100 ? "..." : ""}"`,
-    createdAt: `${index + 1} day${index > 0 ? "s" : ""} ago`,
-    likesCount: 0,
-    commentsCount: 0,
-  }));
-
   const finalUser = {
     username: profileUser.username,
     name: profileUser.name || profileUser.username,
@@ -142,18 +113,18 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
     bio: profileUser.bio,
     stats: {
       filmsCount,
-      followingCount,
-      followersCount,
+      followingCount: 0,
+      followersCount: 0,
     },
     tasteProfile: finalTasteProfile,
     watched: mappedWatched,
     watchlist: mappedWatchlist,
-    reviews: mappedReviews,
-    posts: mappedPosts,
+    reviews: [],
+    posts: [],
   };
 
   return (
-    <main className="pt-16 cinema-bg-mesh min-h-screen">
+    <main className="pt-20 bg-[#0f1a1b] min-h-screen">
       <UserProfileClient isOwnProfile={isOwnProfile} user={finalUser} />
     </main>
   );

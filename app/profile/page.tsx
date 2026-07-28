@@ -19,29 +19,19 @@ export default async function ProfilePage() {
   // 2. Fetch authenticated user data from database
   const dbUser = await prisma.user.findUnique({
     where: { id: userId },
-    include: {
-      followers: true,
-      following: true,
-    },
   });
 
   if (!dbUser) {
     redirect("/login");
   }
 
-  const [watchedEntries, wishlistEntries, reviews] = await Promise.all([
+  const [watchedEntries, wishlistEntries] = await Promise.all([
     prisma.watchEntry.findMany({ where: { userId, isWatched: true } }),
     prisma.watchEntry.findMany({ where: { userId, isWishlist: true } }),
-    prisma.review.findMany({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-    }),
   ]);
 
   // Compute metrics
   const filmsCount = watchedEntries.length;
-  const followersCount = dbUser.followers.length;
-  const followingCount = dbUser.following.length;
 
   // Compute dynamic taste profile (genres) across ALL watched entries
   const detailRequests = watchedEntries.map((w) => getMediaDetails(w.tmdbId, w.mediaType as "movie" | "tv"));
@@ -113,26 +103,6 @@ export default async function ProfilePage() {
     voteAverage: w.rating ? w.rating * 2.0 : 0.0,
   }));
 
-  const mappedReviews = reviews.map((r) => ({
-    id: r.id,
-    tmdbId: r.tmdbId,
-    mediaType: r.mediaType as "movie" | "tv",
-    title: r.title,
-    posterPath: r.posterPath,
-    content: r.content,
-    rating: r.rating,
-    createdAt: r.createdAt.toISOString(),
-  }));
-
-  // Create default posts for active user based on their reviews or fallbacks
-  const mappedPosts = reviews.slice(0, 3).map((r, index) => ({
-    id: `db-post-${r.id}`,
-    content: `Just reviewed ${r.title}: "${r.content.slice(0, 100)}${r.content.length > 100 ? "..." : ""}"`,
-    createdAt: `${index + 1} day${index > 0 ? "s" : ""} ago`,
-    likesCount: Math.floor(Math.random() * 20),
-    commentsCount: Math.floor(Math.random() * 5),
-  }));
-
   const finalUser = {
     username: dbUser.username,
     name: dbUser.name || dbUser.username,
@@ -140,18 +110,18 @@ export default async function ProfilePage() {
     bio: dbUser.bio,
     stats: {
       filmsCount,
-      followingCount,
-      followersCount,
+      followingCount: 0,
+      followersCount: 0,
     },
     tasteProfile: finalTasteProfile,
     watched: mappedWatched,
     watchlist: mappedWatchlist,
-    reviews: mappedReviews,
-    posts: mappedPosts,
+    reviews: [],
+    posts: [],
   };
 
   return (
-    <main className="pt-16 cinema-bg-mesh min-h-screen">
+    <main className="pt-20 bg-[#0f1a1b] min-h-screen">
       <UserProfileClient isOwnProfile={true} user={finalUser} />
     </main>
   );

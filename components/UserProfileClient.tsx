@@ -12,7 +12,7 @@ interface UserProfileClientProps {
   isOwnProfile: boolean;
   user: {
     username: string; name: string; avatarUrl: string | null; bio: string | null;
-    stats: { filmsCount: number; followingCount: number; followersCount: number; };
+    stats: { filmsCount: number; followingCount?: number; followersCount?: number; };
     tasteProfile: TasteProfileItem[];
     watched: MediaItem[]; watchlist: MediaItem[]; reviews: ReviewItem[];
   };
@@ -197,7 +197,7 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
 
   const handleFollow = () => {
     setIsFollowing(p => !p);
-    setFollowerCount(p => isFollowing ? p - 1 : p + 1);
+    setFollowerCount(p => isFollowing ? (p ?? 0) - 1 : (p ?? 0) + 1);
   };
   const handleShare = () => {
     if (typeof window !== "undefined" && navigator.clipboard) {
