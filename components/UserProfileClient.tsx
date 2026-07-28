@@ -210,68 +210,9 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
   const modalList = activeModal === "followers" ? mockFollowers : mockFollowing;
 
   return (
-    <div className="w-full min-h-screen cinema-bg-mesh text-[#D3C3B9] selection:bg-[#B58863]/30 selection:text-[#FAF6E8] overflow-x-hidden relative">
-      
-      {/* Ambient Background Plasma Light Orbs */}
-      <div className="absolute top-10 right-10 w-[500px] h-[500px] bg-[#B58863]/15 rounded-full blur-[140px] pointer-events-none z-0" />
-      <div className="absolute top-1/2 left-10 w-[600px] h-[600px] bg-[#103334]/50 rounded-full blur-[160px] pointer-events-none z-0" />
-      <div className="absolute bottom-20 right-1/4 w-[550px] h-[550px] bg-[#d4a87c]/10 rounded-full blur-[150px] pointer-events-none z-0" />
-
-      {/* ════════════════ COVER BANNER ════════════════ */}
-      <div className={`relative h-64 md:h-80 w-full bg-gradient-to-br ${activeCover.gradient} overflow-hidden`}>
-        {/* Animated scan line */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="animate-scan-sweep absolute left-0 right-0 h-24 bg-gradient-to-b from-transparent via-white/[0.025] to-transparent" />
-        </div>
-
-        {/* Horizontal film-frame lines top & bottom */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-[#B58863]/25 z-20" />
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-[#B58863]/25 z-20" />
-
-        {/* Film sprocket row — top */}
-        <div className="absolute top-2.5 left-0 right-0 flex justify-between px-4 z-20 pointer-events-none select-none">
-          {Array.from({ length: 20 }).map((_, i) => (
-            <div key={i} className="w-3 h-2 rounded-[1px] bg-[#0f1a1b]/60 border border-white/[0.04]" />
-          ))}
-        </div>
-        {/* Film sprocket row — bottom */}
-        <div className="absolute bottom-2.5 left-0 right-0 flex justify-between px-4 z-20 pointer-events-none select-none">
-          {Array.from({ length: 20 }).map((_, i) => (
-            <div key={i} className="w-3 h-2 rounded-[1px] bg-[#0f1a1b]/60 border border-white/[0.04]" />
-          ))}
-        </div>
-
-        {/* Subtle radial ambient */}
-        <div className="absolute inset-0 bg-radial-[ellipse_at_center] from-white/[0.03] to-transparent pointer-events-none" />
-
-        {/* TOP-LEFT METADATA STRIP */}
-        <div className="absolute top-9 left-6 z-20 flex items-center gap-3 font-mono text-[7.5px] text-white/20 tracking-[0.2em] uppercase select-none">
-          <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-          <span>REC • PORTFOLIO_SCAN • EXT_1.85:1 • @{user.username}</span>
-        </div>
-
-        {/* TOP-RIGHT: Cover picker (owner only) */}
-        {isOwnProfile && (
-          <button
-            onClick={() => setShowCoverPicker(true)}
-            className="absolute top-8 right-5 z-30 flex items-center gap-1.5 px-3 py-1.5 bg-black/50 hover:bg-black/70 text-white/40 hover:text-white/70 rounded-full border border-white/10 text-[8px] font-mono uppercase tracking-widest transition-all cursor-pointer backdrop-blur"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3 h-3">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
-            </svg>
-            <span>Filter</span>
-          </button>
-        )}
-
-        {/* BOTTOM GRADIENT: bleeds into profile content */}
-        <div className="absolute bottom-0 left-0 right-0 h-3/4 bg-gradient-to-t from-[#0f1a1b] to-transparent z-10" />
-      </div>
-
-      {/* ════════════════ MAIN CONTENT ════════════════ */}
-      <div className="relative z-20 -mt-28 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto pb-32">
-
-        {/* ─── HERO IDENTITY ROW ─── */}
-        <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 items-start mb-10">
+    <div className="w-full min-h-screen bg-[#0f1a1b] text-[#D3C3B9] pt-8 pb-32 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto selection:bg-[#B58863]/30 overflow-x-hidden font-sans">
+      {/* ─── HERO IDENTITY ROW ─── */}
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 items-start mb-10 pt-4">
 
           {/* LEFT: Avatar + ID Card */}
           <div className={`flex-shrink-0 w-full lg:w-72 animate-panel-enter`}>
@@ -566,7 +507,6 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
             )
           )}
         </div>
-      </div>
 
       {/* ════════ COVER PICKER MODAL ════════ */}
       {showCoverPicker && (

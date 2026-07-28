@@ -130,53 +130,10 @@ export default function DashboardClient({
   };
 
   return (
-    <div className="w-full min-h-screen cinema-bg-mesh text-[#D3C3B9] selection:bg-[#B58863]/30 overflow-x-hidden font-sans relative">
+    <div className="w-full min-h-screen bg-[#0f1a1b] text-[#D3C3B9] pt-8 pb-32 px-4 sm:px-6 lg:px-12 font-sans selection:bg-[#B58863]/30 overflow-x-hidden">
       
-      {/* Ambient Background Plasma Light Orbs */}
-      <div className="absolute top-10 left-10 w-[500px] h-[500px] bg-[#B58863]/15 rounded-full blur-[140px] pointer-events-none z-0" />
-      <div className="absolute top-1/3 right-10 w-[600px] h-[600px] bg-[#103334]/50 rounded-full blur-[160px] pointer-events-none z-0" />
-      <div className="absolute bottom-20 left-1/4 w-[550px] h-[550px] bg-[#d4a87c]/10 rounded-full blur-[150px] pointer-events-none z-0" />
-
-      {/* ════════════════ CINEMATIC HERO BACKDROP BANNER ════════════════ */}
-      <div className="relative h-72 sm:h-88 md:h-96 w-full bg-gradient-to-br from-[#103334] via-[#0d1f20] to-[#080e0f] overflow-hidden border-b border-[#3D4D55]/40">
-        
-        {/* Ambient Film Grain & Scanline sweep */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
-          <div className="animate-scan-sweep absolute left-0 right-0 h-32 bg-gradient-to-b from-transparent via-white/[0.03] to-transparent" />
-          <div className="absolute inset-0 bg-radial-[ellipse_at_center] from-transparent via-[#0f1a1b]/60 to-[#0f1a1b]" />
-        </div>
-
-        {/* Sprocket Hole Bands (Top & Bottom) */}
-        <div className="absolute top-3 left-0 right-0 flex justify-between px-6 z-20 pointer-events-none select-none">
-          {Array.from({ length: 24 }).map((_, i) => (
-            <div key={i} className="w-3 h-2 rounded-[1px] bg-[#0f1a1b]/80 border border-white/[0.05]" />
-          ))}
-        </div>
-        <div className="absolute bottom-3 left-0 right-0 flex justify-between px-6 z-20 pointer-events-none select-none">
-          {Array.from({ length: 24 }).map((_, i) => (
-            <div key={i} className="w-3 h-2 rounded-[1px] bg-[#0f1a1b]/80 border border-white/[0.05]" />
-          ))}
-        </div>
-
-        {/* Top HUD Spec Bar */}
-        <div className="absolute top-10 left-6 right-6 z-20 flex justify-between items-center font-mono text-[8px] sm:text-[9px] text-[#B58863]/80 tracking-[0.25em] uppercase select-none">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-            <span className="font-bold text-[#FAF6E8]">REC // DIRECTOR_STUDIO_CONTROL</span>
-          </div>
-          <div className="hidden sm:flex gap-4 text-slate-400">
-            <span>LENS: 35MM ANAMORPHIC</span>
-            <span>24FPS SAFETY FILM</span>
-            <span>STEREO CH-A/B</span>
-          </div>
-        </div>
-
-        {/* Hero Vignette Fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#0f1a1b] to-transparent z-10" />
-      </div>
-
-      {/* ════════════════ FLOATING CONTROL DECK CARD ════════════════ */}
-      <div className="relative z-20 -mt-36 sm:-mt-44 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto mb-12">
+      {/* ════════════════ CONTROL DECK HEADER ════════════════ */}
+      <div className="mx-auto max-w-7xl mb-10">
         <div className="bg-[#0d1f20]/95 backdrop-blur-2xl border border-[#3D4D55]/60 rounded-3xl p-6 sm:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.8)] relative overflow-hidden animate-glow-breathe">
           
           {/* Top Film Slate Bar */}
