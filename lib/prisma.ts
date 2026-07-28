@@ -19,15 +19,19 @@ const createPrismaClient = () => {
     });
   }
 
-  const pool =
-    globalForPrisma.pgPool ??
-    new Pool({
+  let pool = globalForPrisma.pgPool;
+  if (!pool) {
+    pool = new Pool({
       connectionString,
       max: 10,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 10000,
       ssl: { rejectUnauthorized: false },
     });
+    pool.on("error", (err) => {
+      console.warn("PostgreSQL idle client connection dropped, auto-reconnecting...", err.message);
+    });
+  }
 
   if (process.env.NODE_ENV !== "production") {
     globalForPrisma.pgPool = pool;

@@ -16,10 +16,14 @@ export default async function ProfilePage() {
 
   const userId = session.user.id;
 
-  // 2. Fetch authenticated user data from database
-  const dbUser = await prisma.user.findUnique({
-    where: { id: userId },
-  });
+  // 2. Fetch authenticated user data from database with retry protection
+  let dbUser = null;
+  try {
+    dbUser = await prisma.user.findUnique({ where: { id: userId } });
+  } catch (err) {
+    console.warn("Retrying profile fetch after pooler reconnect...", err);
+    dbUser = await prisma.user.findUnique({ where: { id: userId } });
+  }
 
   if (!dbUser) {
     redirect("/login");
