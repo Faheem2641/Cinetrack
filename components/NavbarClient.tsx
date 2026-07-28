@@ -89,9 +89,9 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
 
   if (!isHome) {
     return (
-      <header className="sticky top-0 z-50 w-full px-3 sm:px-6 pt-3 pb-1 select-none pointer-events-none">
-        <div className="mx-auto max-w-7xl w-full bg-[#0d1f20]/90 backdrop-blur-2xl border border-[#3D4D55]/60 rounded-2xl px-4 py-2.5 shadow-[0_12px_40px_rgba(0,0,0,0.65)] relative flex items-center justify-between transition-all duration-300 pointer-events-auto">
-          
+      <header className="sticky top-3 z-50 w-full px-3 sm:px-6 py-1 select-none">
+        <div className="mx-auto max-w-7xl w-full bg-[#0b1618]/90 backdrop-blur-2xl border border-[#3D4D55]/60 rounded-2xl px-4 py-2.5 shadow-[0_12px_40px_rgba(0,0,0,0.65)] relative flex items-center justify-between transition-all duration-300">
+
           {/* Golden Viewfinder Corner Marks */}
           <div className="absolute top-1.5 left-1.5 w-2 h-2 border-t-2 border-l-2 border-[#B58863]/60 pointer-events-none" />
           <div className="absolute top-1.5 right-1.5 w-2 h-2 border-t-2 border-r-2 border-[#B58863]/60 pointer-events-none" />
@@ -115,33 +115,30 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
           <div className="hidden md:flex items-center gap-2 lg:gap-3 z-10">
             <Link
               href="/movies"
-              className={`px-3 py-1.5 rounded-xl text-[10px] font-mono font-black uppercase tracking-wider transition-all ${
-                pathname === "/movies"
+              className={`px-3 py-1.5 rounded-xl text-[10px] font-mono font-black uppercase tracking-wider transition-all ${pathname === "/movies"
                   ? "bg-[#B58863]/20 border border-[#B58863]/60 text-[#FAF6E8]"
                   : "text-[#D3C3B9]/80 hover:text-white hover:bg-white/5"
-              }`}
+                }`}
             >
               Movies
             </Link>
 
             <Link
               href="/tv"
-              className={`px-3 py-1.5 rounded-xl text-[10px] font-mono font-black uppercase tracking-wider transition-all ${
-                pathname === "/tv"
+              className={`px-3 py-1.5 rounded-xl text-[10px] font-mono font-black uppercase tracking-wider transition-all ${pathname === "/tv"
                   ? "bg-[#B58863]/20 border border-[#B58863]/60 text-[#FAF6E8]"
                   : "text-[#D3C3B9]/80 hover:text-white hover:bg-white/5"
-              }`}
+                }`}
             >
               TV Shows
             </Link>
 
             <Link
               href="/recommend"
-              className={`px-3 py-1.5 rounded-xl text-[10px] font-mono font-black uppercase tracking-wider transition-all flex items-center gap-1 ${
-                pathname === "/recommend"
+              className={`px-3 py-1.5 rounded-xl text-[10px] font-mono font-black uppercase tracking-wider transition-all flex items-center gap-1 ${pathname === "/recommend"
                   ? "bg-gradient-to-r from-[#B58863] to-[#d4a87c] text-[#0f1a1b] font-bold"
                   : "text-[#B58863] hover:text-[#d4a87c] bg-[#B58863]/10 border border-[#B58863]/30 hover:bg-[#B58863]/20"
-              }`}
+                }`}
             >
               <span>✦</span>
               <span>Match Finder</span>
@@ -149,11 +146,10 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
 
             <Link
               href="/dashboard"
-              className={`px-3 py-1.5 rounded-xl text-[10px] font-mono font-black uppercase tracking-wider transition-all ${
-                pathname === "/dashboard"
+              className={`px-3 py-1.5 rounded-xl text-[10px] font-mono font-black uppercase tracking-wider transition-all ${pathname === "/dashboard"
                   ? "bg-[#B58863]/20 border border-[#B58863]/60 text-[#FAF6E8]"
                   : "text-[#D3C3B9]/80 hover:text-white hover:bg-white/5"
-              }`}
+                }`}
             >
               Dashboard
             </Link>
@@ -255,7 +251,7 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                     <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border border-white rounded-full" />
                   </div>
                 </button>
-                
+
                 <div className="absolute right-0 top-full mt-3.5 w-52 rounded-xl bg-[#0e1a1c]/95 backdrop-blur-xl border border-white/[0.08] py-2.5 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 transform origin-top-right translate-y-1 group-hover:translate-y-0">
                   <div className="absolute -top-1.5 right-3.5 w-3 h-3 rotate-45 bg-[#0e1a1c] border-t border-l border-white/[0.08]" />
                   <div className="relative z-10 px-4 py-2 border-b border-white/[0.07] mb-1.5">
@@ -300,7 +296,7 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
               </svg>
             </label>
-            
+
             <div className="fixed top-0 right-0 bottom-0 w-72 bg-[#0c1618]/97 backdrop-blur-2xl border-l border-white/[0.07] shadow-2xl translate-x-full peer-checked:translate-x-0 transition-transform duration-300 ease-in-out z-50 p-6 flex flex-col justify-between pointer-events-auto">
               <div className="space-y-6">
                 <div className="flex justify-between items-center border-b border-white/[0.07] pb-4">
@@ -311,7 +307,7 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                     </svg>
                   </label>
                 </div>
-                
+
                 <nav className="flex flex-col gap-2">
                   <Link href="/movies" className="text-xs font-mono font-bold uppercase tracking-wider py-2 text-slate-300 border-b border-white/5 hover:text-white">Movies</Link>
                   <Link href="/tv" className="text-xs font-mono font-bold uppercase tracking-wider py-2 text-slate-300 border-b border-white/5 hover:text-white">TV Shows</Link>
@@ -343,7 +339,7 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
       className="absolute top-0 left-0 right-0 z-40 w-full flex h-20 items-center justify-between px-4 sm:px-8 lg:px-12 select-none bg-gradient-to-b from-[#080e0f]/85 via-[#080e0f]/30 to-transparent border-none shadow-none transition-all duration-500 ease-in-out"
     >
       <div className="mx-auto flex w-full max-w-[98%] items-center justify-between relative">
-        
+
         {/* Left Segment: Skeuomorphic Viewfinder Brand Logo & Info */}
         <div className="flex items-center gap-4 z-10">
           <Link href="/" className="relative px-3.5 py-1.5 group flex-shrink-0">
@@ -352,22 +348,22 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
             <div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-[#B58863]/60 group-hover:border-[#d4a87c] transition-colors" />
             <div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-[#B58863]/60 group-hover:border-[#d4a87c] transition-colors" />
             <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-[#B58863]/60 group-hover:border-[#d4a87c] transition-colors" />
-            
+
             <span className={`text-xs sm:text-sm font-black tracking-[0.25em] ${brandTextClass} group-hover:brightness-110 transition-all font-mono`}>
               CINETRACK
             </span>
           </Link>
-          
+
           {/* Tech Spec Overlay Tags */}
           <div className={`hidden lg:flex flex-col text-[7px] font-mono text-slate-400 border-l ${dividerClass} pl-3.5 leading-none select-none tracking-wider`}>
             <span>LENS: 35MM</span>
             <span className="text-[#B58863]/80 mt-0.5 font-bold">24FPS • 1.85:1</span>
           </div>
         </div>
-        
+
         {/* Right Segment: Links, Search, REC dot & Auth (Desktop - Nested in Hero Cutout Shelf) */}
         <div className="hidden md:flex items-center gap-2.5 lg:gap-3.5 z-10 translate-y-11 lg:translate-y-12 transition-all duration-300">
-          
+
           {/* Premium Capsule Navigation Controls (Desktop) */}
           <div className="flex items-center gap-2">
             <Link
@@ -377,10 +373,10 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
               Dashboard
             </Link>
           </div>
-          
-          <form 
-            action="/search" 
-            method="GET" 
+
+          <form
+            action="/search"
+            method="GET"
             className={`relative flex items-center rounded-full px-3 py-1 transition-all duration-300 h-8.5 ${searchFormClass}`}
             onFocus={() => setShowSuggestions(searchQuery.trim().length >= 2)}
             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
@@ -481,7 +477,7 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                   <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border border-white rounded-full" />
                 </div>
               </button>
-              
+
               <div className="absolute right-0 top-full mt-3.5 w-52 rounded-xl bg-[#0e1a1c]/95 backdrop-blur-xl border border-white/[0.08] py-2.5 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 transform origin-top-right translate-y-1 group-hover:translate-y-0">
                 <div className="absolute -top-1.5 right-3.5 w-3 h-3 rotate-45 bg-[#0e1a1c] border-t border-l border-white/[0.08]" />
                 <div className="relative z-10 px-4 py-2 border-b border-white/[0.07] mb-1.5">
@@ -520,10 +516,10 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
         <div className="flex md:hidden items-center gap-3 z-10">
           {/* Mobile Drawer Checkbox Toggle */}
           <input type="checkbox" id="mobile-menu-toggle" className="peer hidden" />
-          
+
           {/* Dark blurred background overlay */}
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none peer-checked:opacity-100 peer-checked:pointer-events-auto transition-opacity duration-300 z-40 md:hidden" />
-          
+
           {/* Hamburger trigger */}
           <label
             htmlFor="mobile-menu-toggle"
@@ -533,11 +529,11 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
           </label>
-          
+
           {/* Drawer Sidebar Menu */}
           <div className="fixed top-0 right-0 bottom-0 w-72 bg-[#0c1618]/97 backdrop-blur-2xl border-l border-white/[0.07] shadow-2xl translate-x-full peer-checked:translate-x-0 transition-transform duration-300 ease-in-out z-50 p-6 flex flex-col justify-between pointer-events-auto">
             <div className="space-y-8">
-              
+
               {/* Close button header */}
               <div className="flex justify-between items-center border-b border-white/[0.07] pb-4">
                 <span className="font-mono text-[9px] text-[#B58863] tracking-widest uppercase">NAV CONSOLE</span>
@@ -547,10 +543,10 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                   </svg>
                 </label>
               </div>
-              
+
               {/* Navigation lists */}
               <nav className="flex flex-col gap-3">
-                
+
                 <Link
                   href="/recommend"
                   className="flex items-center justify-between text-xs font-black uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-[#B58863] to-[#d4a87c] py-2 border-b border-white/[0.07] transition-all hover:brightness-110"
@@ -558,7 +554,7 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                   <span>✦ Match Finder</span>
                   <span className="text-[9px] text-[#B58863] font-mono">[MATCH]</span>
                 </Link>
-                
+
                 <Link
                   href="/profile"
                   className="flex items-center justify-between text-xs font-black uppercase tracking-widest text-slate-300 hover:text-white py-2 border-b border-white/[0.07] transition-colors"
@@ -567,12 +563,12 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                   <span className="text-[9px] text-[#B58863]/80 font-mono">[USER]</span>
                 </Link>
               </nav>
-              
+
               {/* Mobile Search Tool */}
               <div className="pt-2">
-                <form 
-                  action="/search" 
-                  method="GET" 
+                <form
+                  action="/search"
+                  method="GET"
                   className="relative flex items-center bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 focus-within:border-[#B58863] transition-all duration-300"
                   onFocus={() => setShowMobileSuggestions(mobileQuery.trim().length >= 2)}
                   onBlur={() => setTimeout(() => setShowMobileSuggestions(false), 200)}
@@ -642,7 +638,7 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                 </form>
               </div>
             </div>
-            
+
             {/* Drawer User Control Panel */}
             <div className="border-t border-white/[0.07] pt-6">
               {session?.user ? (
@@ -662,7 +658,7 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                       <p className="text-[10px] font-mono text-slate-500">@{session.user.username}</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex flex-col gap-2 pt-2">
                     <Link
                       href="/profile"
@@ -690,14 +686,14 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                   </Link>
                 </div>
               )}
-              
+
               {/* Monospaced Viewfinder metadata inside Drawer */}
               <div className="mt-8 flex justify-between text-[7px] font-mono text-slate-400 select-none">
                 <span>SYS LOG: ONLINE</span>
                 <span>24FPS SAFETY FILM</span>
               </div>
             </div>
-            
+
           </div>
         </div>
 

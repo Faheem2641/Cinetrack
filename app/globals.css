@@ -450,14 +450,3 @@ body::-webkit-scrollbar-thumb:hover {
 .animate-halo {
   animation: halo-spin 18s linear infinite;
 }
-
-/* ─── Cinema Multi-Layered Background Mesh ────────────────────────────── */
-.cinema-bg-mesh {
-  background-color: #0c1618;
-  background-image: 
-    radial-gradient(circle at 15% 15%, rgba(181, 136, 99, 0.14) 0%, transparent 45%),
-    radial-gradient(circle at 85% 65%, rgba(16, 51, 52, 0.55) 0%, transparent 55%),
-    radial-gradient(circle at 50% 90%, rgba(212, 168, 124, 0.08) 0%, transparent 40%),
-    radial-gradient(rgba(61, 77, 85, 0.22) 1.2px, transparent 1.2px);
-  background-size: 100% 100%, 100% 100%, 100% 100%, 28px 28px;
-}

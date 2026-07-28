@@ -13,13 +13,11 @@ export default async function DashboardPage() {
   const userId = session.user.id;
 
   // Fetch user data from DB with retry handling
-  const [watched, wishlist, favorites] = await dbQuery(() =>
-    Promise.all([
-      prisma.watchEntry.findMany({ where: { userId, isWatched: true } }),
-      prisma.watchEntry.findMany({ where: { userId, isWishlist: true } }),
-      prisma.watchEntry.findMany({ where: { userId, isFavorite: true } }),
-    ])
-  );
+  const [watched, wishlist, favorites] = await Promise.all([
+    dbQuery(() => prisma.watchEntry.findMany({ where: { userId, isWatched: true } })),
+    dbQuery(() => prisma.watchEntry.findMany({ where: { userId, isWishlist: true } })),
+    dbQuery(() => prisma.watchEntry.findMany({ where: { userId, isFavorite: true } })),
+  ]);
 
   // Compute rating distribution
   const ratings = watched.map((w) => w.rating).filter((r): r is number => r !== null);

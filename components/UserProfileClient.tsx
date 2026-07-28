@@ -12,7 +12,7 @@ interface UserProfileClientProps {
   isOwnProfile: boolean;
   user: {
     username: string; name: string; avatarUrl: string | null; bio: string | null;
-    stats: { filmsCount: number; followingCount?: number; followersCount?: number; };
+    stats: { filmsCount: number; followingCount: number; followersCount: number; };
     tasteProfile: TasteProfileItem[];
     watched: MediaItem[]; watchlist: MediaItem[]; reviews: ReviewItem[];
   };
@@ -197,7 +197,7 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
 
   const handleFollow = () => {
     setIsFollowing(p => !p);
-    setFollowerCount(p => isFollowing ? (p ?? 0) - 1 : (p ?? 0) + 1);
+    setFollowerCount(p => isFollowing ? p - 1 : p + 1);
   };
   const handleShare = () => {
     if (typeof window !== "undefined" && navigator.clipboard) {
@@ -212,12 +212,12 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
   return (
     <div className="w-full min-h-screen bg-[#0f1a1b] text-[#D3C3B9] pt-8 pb-32 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto selection:bg-[#B58863]/30 overflow-x-hidden font-sans">
       {/* ─── HERO IDENTITY ROW ─── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start mb-12 pt-2">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch mb-12 pt-2">
 
           {/* LEFT: Avatar + ID Card */}
           <div className="lg:col-span-4 sm:col-span-12 flex flex-col animate-panel-enter">
             {/* Director's Clapper ID Card */}
-            <div className="relative bg-[#0d1f20]/95 backdrop-blur-2xl border border-[#3D4D55]/50 rounded-3xl overflow-hidden animate-glow-breathe shadow-2xl">
+            <div className="relative bg-[#0d1f20]/95 backdrop-blur-2xl border border-[#3D4D55]/50 rounded-3xl overflow-hidden animate-glow-breathe shadow-2xl h-full flex flex-col justify-between">
               {/* Top clapper bar (black & white stripes) */}
               <div className="h-5 flex overflow-hidden">
                 {Array.from({ length: 30 }).map((_, i) => (
@@ -248,11 +248,14 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
                   </div>
                 </div>
 
-                {/* Name */}
+                {/* Name & username */}
                 <div>
                   <h1 className="text-base font-black uppercase tracking-wider text-[#FAF6E8] leading-tight">
                     {user.name}
                   </h1>
+                  <p className="text-[9px] font-mono text-[#B58863]/70 mt-0.5 tracking-widest">
+                    @{user.username}
+                  </p>
                 </div>
 
                 {/* Bio in screenplay style */}
@@ -268,12 +271,18 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
                 )}
 
                 {/* Stats row — mini odometers */}
-                <div className="w-full grid grid-cols-2 text-center gap-2">
+                <div className="w-full grid grid-cols-3 text-center">
                   <div>
                     <div className="text-base font-black font-mono text-[#FAF6E8] overflow-hidden">
                       {mounted ? <AnimatedCount to={user.stats.filmsCount} /> : user.stats.filmsCount}
                     </div>
                     <div className="text-[6.5px] font-mono text-slate-500 uppercase tracking-wider mt-0.5">Films</div>
+                  </div>
+                  <div>
+                    <div className="text-base font-black font-mono text-[#FAF6E8]">
+                      {mounted ? <AnimatedCount to={user.reviews.length} duration={900} /> : user.reviews.length}
+                    </div>
+                    <div className="text-[6.5px] font-mono text-slate-500 uppercase tracking-wider mt-0.5">Reviews</div>
                   </div>
                   <div>
                     <div className="text-base font-black font-mono text-[#FAF6E8]">
@@ -437,9 +446,9 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
         <div className="animate-panel-enter-delay-3 mb-8">
           {/* Mixing board style tab strip */}
           <div className="flex items-end gap-0 border-b border-[#3D4D55]/35 overflow-x-auto scrollbar-none">
-            {(["FILMS", "QUEUE"] as const).map((tab, i) => {
-              const labels: Record<string, string> = { FILMS: "FILM LOG", QUEUE: "WATCHLIST" };
-              const counts: Record<string, number> = { FILMS: user.watched.length, QUEUE: user.watchlist.length };
+            {(["FILMS", "QUEUE", "DISPATCH"] as const).map((tab, i) => {
+              const labels: Record<string, string> = { FILMS: "FILM LOG", QUEUE: "WATCHLIST", DISPATCH: "CRITIC DISPATCH" };
+              const counts: Record<string, number> = { FILMS: user.watched.length, QUEUE: user.watchlist.length, DISPATCH: user.reviews.length };
               const isActive = activeTab === tab;
               return (
                 <button
@@ -484,6 +493,17 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
               </div>
             ) : (
               <EmptyState text="WATCHLIST IS EMPTY" />
+            )
+          )}
+
+          {/* REVIEWS */}
+          {activeTab === "DISPATCH" && (
+            user.reviews.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {user.reviews.map(rev => <ReviewTicket key={rev.id} rev={rev} />)}
+              </div>
+            ) : (
+              <EmptyState text="NO REVIEWS DISPATCHED" />
             )
           )}
         </div>

@@ -26,12 +26,10 @@ export default async function ProfilePage() {
     redirect("/login");
   }
 
-  const [watchedEntries, wishlistEntries] = await dbQuery(() =>
-    Promise.all([
-      prisma.watchEntry.findMany({ where: { userId, isWatched: true } }),
-      prisma.watchEntry.findMany({ where: { userId, isWishlist: true } }),
-    ])
-  );
+  const [watchedEntries, wishlistEntries] = await Promise.all([
+    dbQuery(() => prisma.watchEntry.findMany({ where: { userId, isWatched: true } })),
+    dbQuery(() => prisma.watchEntry.findMany({ where: { userId, isWishlist: true } })),
+  ]);
 
   // Compute metrics
   const filmsCount = watchedEntries.length;

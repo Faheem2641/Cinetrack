@@ -30,12 +30,10 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
   const isOwnProfile = session?.user?.id === userId;
 
   // Fetch user entries
-  const [watched, wishlist] = await dbQuery(() =>
-    Promise.all([
-      prisma.watchEntry.findMany({ where: { userId, isWatched: true } }),
-      prisma.watchEntry.findMany({ where: { userId, isWishlist: true } }),
-    ])
-  );
+  const [watched, wishlist] = await Promise.all([
+    dbQuery(() => prisma.watchEntry.findMany({ where: { userId, isWatched: true } })),
+    dbQuery(() => prisma.watchEntry.findMany({ where: { userId, isWishlist: true } })),
+  ]);
 
   // Compute metrics
   const filmsCount = watched.length;
