@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { prisma, dbQuery } from "@/lib/prisma";
 import { getMediaDetails } from "@/lib/tmdb";
 import UserProfileClient from "@/components/UserProfileClient";
 import { redirect } from "next/navigation";
@@ -9,30 +9,29 @@ export const revalidate = 0;
 export default async function ProfilePage() {
   const session = await auth();
 
-
   if (!session?.user?.id) {
     redirect("/login");
   }
 
   const userId = session.user.id;
 
-  // 2. Fetch authenticated user data from database with retry protection
-  let dbUser = null;
-  try {
-    dbUser = await prisma.user.findUnique({ where: { id: userId } });
-  } catch (err) {
-    console.warn("Retrying profile fetch after pooler reconnect...", err);
-    dbUser = await prisma.user.findUnique({ where: { id: userId } });
-  }
+  // Fetch authenticated user data from database with retry handling
+  const dbUser = await dbQuery(() =>
+    prisma.user.findUnique({
+      where: { id: userId },
+    })
+  );
 
   if (!dbUser) {
     redirect("/login");
   }
 
-  const [watchedEntries, wishlistEntries] = await Promise.all([
-    prisma.watchEntry.findMany({ where: { userId, isWatched: true } }),
-    prisma.watchEntry.findMany({ where: { userId, isWishlist: true } }),
-  ]);
+  const [watchedEntries, wishlistEntries] = await dbQuery(() =>
+    Promise.all([
+      prisma.watchEntry.findMany({ where: { userId, isWatched: true } }),
+      prisma.watchEntry.findMany({ where: { userId, isWishlist: true } }),
+    ])
+  );
 
   // Compute metrics
   const filmsCount = watchedEntries.length;

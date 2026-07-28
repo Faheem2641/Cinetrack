@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { prisma, dbQuery } from "@/lib/prisma";
 import { getMediaDetails } from "@/lib/tmdb";
 import DashboardClient from "@/components/DashboardClient";
 import { redirect } from "next/navigation";
@@ -12,12 +12,14 @@ export default async function DashboardPage() {
 
   const userId = session.user.id;
 
-  // Fetch user data from DB
-  const [watched, wishlist, favorites] = await Promise.all([
-    prisma.watchEntry.findMany({ where: { userId, isWatched: true } }),
-    prisma.watchEntry.findMany({ where: { userId, isWishlist: true } }),
-    prisma.watchEntry.findMany({ where: { userId, isFavorite: true } }),
-  ]);
+  // Fetch user data from DB with retry handling
+  const [watched, wishlist, favorites] = await dbQuery(() =>
+    Promise.all([
+      prisma.watchEntry.findMany({ where: { userId, isWatched: true } }),
+      prisma.watchEntry.findMany({ where: { userId, isWishlist: true } }),
+      prisma.watchEntry.findMany({ where: { userId, isFavorite: true } }),
+    ])
+  );
 
   // Compute rating distribution
   const ratings = watched.map((w) => w.rating).filter((r): r is number => r !== null);

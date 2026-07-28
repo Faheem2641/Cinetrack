@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { prisma, dbQuery } from "@/lib/prisma";
 import { getMediaDetails } from "@/lib/tmdb";
 import { auth } from "@/lib/auth";
 import UserProfileClient from "@/components/UserProfileClient";
@@ -15,10 +15,12 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
   const username = resolvedParams.username.toLowerCase();
   const session = await auth();
 
-  // Find user by username
-  const profileUser = await prisma.user.findUnique({
-    where: { username },
-  });
+  // Find user by username with retry handling
+  const profileUser = await dbQuery(() =>
+    prisma.user.findUnique({
+      where: { username },
+    })
+  );
 
   if (!profileUser) {
     notFound();
@@ -28,10 +30,12 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
   const isOwnProfile = session?.user?.id === userId;
 
   // Fetch user entries
-  const [watched, wishlist] = await Promise.all([
-    prisma.watchEntry.findMany({ where: { userId, isWatched: true } }),
-    prisma.watchEntry.findMany({ where: { userId, isWishlist: true } }),
-  ]);
+  const [watched, wishlist] = await dbQuery(() =>
+    Promise.all([
+      prisma.watchEntry.findMany({ where: { userId, isWatched: true } }),
+      prisma.watchEntry.findMany({ where: { userId, isWishlist: true } }),
+    ])
+  );
 
   // Compute metrics
   const filmsCount = watched.length;
