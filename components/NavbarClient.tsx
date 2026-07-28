@@ -120,10 +120,10 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
           {/* Premium Capsule Navigation Controls (Desktop) */}
           <div className="flex items-center gap-2">
             <Link
-              href="/profile"
+              href="/dashboard"
               className="relative group px-3.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest text-[#D3C3B9] bg-white/5 border border-white/10 hover:border-[#B58863]/40 hover:text-white hover:shadow-[0_0_15px_rgba(255,255,255,0.05)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 h-8.5 flex items-center justify-center"
             >
-              Profile
+              Dashboard
             </Link>
           </div>
           
