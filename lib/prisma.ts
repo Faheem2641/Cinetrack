@@ -9,7 +9,7 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 const createPrismaClient = () => {
-  const connectionString = process.env.DATABASE_URL || process.env.DIRECT_URL || "file:./dev.db";
+  const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL || "file:./dev.db";
 
   if (connectionString.startsWith("file:") || !connectionString.includes("postgres")) {
     const adapter = new PrismaBetterSqlite3({ url: connectionString });
