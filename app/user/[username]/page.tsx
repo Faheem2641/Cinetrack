@@ -153,7 +153,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
   };
 
   return (
-    <main className="pt-20 bg-[#0f1a1b] min-h-screen">
+    <main className="pt-16 cinema-bg-mesh min-h-screen">
       <UserProfileClient isOwnProfile={isOwnProfile} user={finalUser} />
     </main>
   );
