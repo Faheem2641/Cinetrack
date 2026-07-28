@@ -248,14 +248,11 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
                   </div>
                 </div>
 
-                {/* Name & username */}
+                {/* Name */}
                 <div>
                   <h1 className="text-base font-black uppercase tracking-wider text-[#FAF6E8] leading-tight">
                     {user.name}
                   </h1>
-                  <p className="text-[9px] font-mono text-[#B58863]/70 mt-0.5 tracking-widest">
-                    @{user.username}
-                  </p>
                 </div>
 
                 {/* Bio in screenplay style */}
@@ -271,18 +268,12 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
                 )}
 
                 {/* Stats row — mini odometers */}
-                <div className="w-full grid grid-cols-3 text-center">
+                <div className="w-full grid grid-cols-2 text-center gap-2">
                   <div>
                     <div className="text-base font-black font-mono text-[#FAF6E8] overflow-hidden">
                       {mounted ? <AnimatedCount to={user.stats.filmsCount} /> : user.stats.filmsCount}
                     </div>
                     <div className="text-[6.5px] font-mono text-slate-500 uppercase tracking-wider mt-0.5">Films</div>
-                  </div>
-                  <div>
-                    <div className="text-base font-black font-mono text-[#FAF6E8]">
-                      {mounted ? <AnimatedCount to={user.reviews.length} duration={900} /> : user.reviews.length}
-                    </div>
-                    <div className="text-[6.5px] font-mono text-slate-500 uppercase tracking-wider mt-0.5">Reviews</div>
                   </div>
                   <div>
                     <div className="text-base font-black font-mono text-[#FAF6E8]">
@@ -446,9 +437,9 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
         <div className="animate-panel-enter-delay-3 mb-8">
           {/* Mixing board style tab strip */}
           <div className="flex items-end gap-0 border-b border-[#3D4D55]/35 overflow-x-auto scrollbar-none">
-            {(["FILMS", "QUEUE", "DISPATCH"] as const).map((tab, i) => {
-              const labels: Record<string, string> = { FILMS: "FILM LOG", QUEUE: "WATCHLIST", DISPATCH: "CRITIC DISPATCH" };
-              const counts: Record<string, number> = { FILMS: user.watched.length, QUEUE: user.watchlist.length, DISPATCH: user.reviews.length };
+            {(["FILMS", "QUEUE"] as const).map((tab, i) => {
+              const labels: Record<string, string> = { FILMS: "FILM LOG", QUEUE: "WATCHLIST" };
+              const counts: Record<string, number> = { FILMS: user.watched.length, QUEUE: user.watchlist.length };
               const isActive = activeTab === tab;
               return (
                 <button
@@ -493,17 +484,6 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
               </div>
             ) : (
               <EmptyState text="WATCHLIST IS EMPTY" />
-            )
-          )}
-
-          {/* REVIEWS */}
-          {activeTab === "DISPATCH" && (
-            user.reviews.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {user.reviews.map(rev => <ReviewTicket key={rev.id} rev={rev} />)}
-              </div>
-            ) : (
-              <EmptyState text="NO REVIEWS DISPATCHED" />
             )
           )}
         </div>

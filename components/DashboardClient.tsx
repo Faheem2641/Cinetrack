@@ -190,7 +190,7 @@ export default function DashboardClient({
                   {user.name}
                 </h1>
                 <p className="text-xs font-mono text-[#B58863]/80 tracking-widest mt-1">
-                  @{user.username} • CINEMA CONTROL CONSOLE
+                  CINEMA CONTROL CONSOLE
                 </p>
               </div>
             </div>
