@@ -7,50 +7,61 @@ const globalForPrisma = globalThis as unknown as {
   pgPool?: Pool;
 };
 
-const createPrismaClient = () => {
+export const getPrismaClient = (): PrismaClient => {
+  if (globalForPrisma.prisma) {
+    return globalForPrisma.prisma;
+  }
+
   const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL;
 
-  let pool = globalForPrisma.pgPool;
-  if (!pool) {
-    pool = new Pool({
-      connectionString,
-      max: 10,
-      idleTimeoutMillis: 60000,
-      connectionTimeoutMillis: 20000,
-      keepAlive: true,
-      keepAliveInitialDelayMillis: 10000,
-      ssl: { rejectUnauthorized: false },
-    });
-    pool.on("error", (err) => {
-      console.warn("PostgreSQL client connection error (auto-reconnecting):", err.message);
-    });
-  }
+  const pool = new Pool({
+    connectionString,
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000,
+    ssl: { rejectUnauthorized: false },
+  });
 
-  if (process.env.NODE_ENV !== "production") {
-    globalForPrisma.pgPool = pool;
-  }
+  pool.on("error", (err) => {
+    console.warn("PostgreSQL pool connection error (auto-handled):", err.message);
+  });
 
   const adapter = new PrismaPg(pool);
-
-  return new PrismaClient({
+  const client = new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
   });
+
+  if (process.env.NODE_ENV !== "production") {
+    globalForPrisma.pgPool = pool;
+    globalForPrisma.prisma = client;
+  }
+
+  return client;
 };
 
-export const prisma = globalForPrisma.prisma ?? (globalForPrisma.prisma = createPrismaClient());
+export const prisma = getPrismaClient();
 
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
-}
-
-// Utility helper to safely execute database operations with auto-retry on closed connections
-export async function dbQuery<T>(fn: () => Promise<T>, retries = 2): Promise<T> {
+// Resilient query execution helper with auto-reconnect on closed sockets
+export async function dbQuery<T>(fn: () => Promise<T>, retries = 3): Promise<T> {
   try {
     return await fn();
   } catch (err: any) {
-    if (retries > 0 && err?.message?.includes("closed the connection")) {
-      console.warn("Retrying database query after connection drop...");
+    const isConnErr =
+      err?.message?.includes("closed the connection") ||
+      err?.message?.includes("Connection terminated") ||
+      err?.message?.includes("Kind: Command failed") ||
+      err?.code === "P1001" ||
+      err?.code === "P1017";
+
+    if (retries > 0 && isConnErr) {
+      console.warn("Database connection dropped, resetting pool & retrying...", err.message);
+      if (globalForPrisma.pgPool) {
+        try { globalForPrisma.pgPool.end(); } catch (e) { /* ignore cleanup error */ }
+        globalForPrisma.pgPool = undefined;
+      }
+      globalForPrisma.prisma = undefined;
+
       await new Promise((resolve) => setTimeout(resolve, 300));
       return dbQuery(fn, retries - 1);
     }
