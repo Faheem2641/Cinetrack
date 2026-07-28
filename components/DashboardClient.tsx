@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import MediaCard from "./MediaCard";
 import { MediaItem } from "@/lib/tmdb";
@@ -77,26 +77,39 @@ export default function DashboardClient({
 
   const maxRatingCount = Math.max(...Object.values(ratingCounts), 1);
 
-  // Search API handler for Quick Logger
-  const handleLoggerSearch = async (val: string) => {
-    setLoggerQuery(val);
-    if (val.trim().length >= 2) {
-      setIsSearching(true);
+  // Debounced search for Quick Logger
+  useEffect(() => {
+    if (loggerQuery.trim().length < 2) {
+      setLoggerResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(val)}`);
+        const res = await fetch(`/api/search?q=${encodeURIComponent(loggerQuery)}`, {
+          signal: controller.signal,
+        });
         if (res.ok) {
           const data = await res.json();
           setLoggerResults(data);
         }
-      } catch (e) {
-        console.error("Quick logger search failed", e);
+      } catch (e: any) {
+        if (e.name !== "AbortError") {
+          console.error("Quick logger search error", e);
+        }
       } finally {
         setIsSearching(false);
       }
-    } else {
-      setLoggerResults([]);
-    }
-  };
+    }, 150);
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [loggerQuery]);
 
   // Quick Reel Log submit handler
   const handleLogSubmit = async () => {
@@ -285,36 +298,53 @@ export default function DashboardClient({
               <input
                 type="text"
                 value={loggerQuery}
-                onChange={(e) => handleLoggerSearch(e.target.value)}
+                onChange={(e) => setLoggerQuery(e.target.value)}
                 placeholder="Type movie or TV show title..."
-                className="w-full bg-[#0f1a1b] border border-[#3D4D55]/60 rounded-2xl px-5 py-3.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#B58863] font-mono transition-colors"
+                className="w-full bg-[#0f1a1b] border border-[#3D4D55]/60 rounded-2xl px-5 py-3.5 pl-11 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#B58863] focus:ring-1 focus:ring-[#B58863]/50 font-mono transition-all duration-200 shadow-inner"
               />
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 text-[#B58863] absolute left-4 top-4 pointer-events-none">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+              </svg>
+              
+              {loggerQuery && (
+                <button
+                  onClick={() => { setLoggerQuery(""); setLoggerResults([]); }}
+                  className="absolute right-12 top-3.5 text-xs font-mono text-slate-400 hover:text-white transition-colors cursor-pointer px-1.5 py-0.5 rounded-md hover:bg-white/10"
+                >
+                  ✕ CLEAR
+                </button>
+              )}
+
               {isSearching && (
-                <span className="absolute right-4 top-4 text-xs font-mono text-[#B58863] animate-pulse">SEARCHING...</span>
+                <div className="absolute right-4 top-4 flex items-center gap-1.5">
+                  <span className="w-3 h-3 border-2 border-[#B58863] border-t-transparent rounded-full animate-spin" />
+                </div>
               )}
             </div>
 
             {/* Search Results Grid */}
             {loggerResults.length > 0 && !selectedMedia && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96 overflow-y-auto pr-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-[#B58863]/40">
                 {loggerResults.map((item) => (
                   <button
                     key={item.id}
                     onClick={() => setSelectedMedia(item)}
-                    className="flex items-center gap-3 p-2.5 rounded-xl bg-[#103334]/30 border border-[#3D4D55]/40 hover:border-[#B58863]/60 hover:bg-[#103334]/60 transition-all text-left group cursor-pointer"
+                    className="flex items-center gap-3 p-3 rounded-xl bg-[#103334]/30 border border-[#3D4D55]/40 hover:border-[#B58863]/70 hover:bg-[#103334]/70 active:scale-[0.98] transition-all duration-150 text-left group cursor-pointer shadow-sm hover:shadow-lg hover:shadow-[#B58863]/10"
                   >
-                    <div className="w-10 h-14 bg-black rounded-lg overflow-hidden flex-shrink-0 border border-white/5">
+                    <div className="w-11 h-15 bg-black rounded-lg overflow-hidden flex-shrink-0 border border-white/10 group-hover:border-[#B58863]/40 transition-colors">
                       {item.posterPath ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={`https://image.tmdb.org/t/p/w92${item.posterPath}`} alt="" className="w-full h-full object-cover" />
+                        <img src={`https://image.tmdb.org/t/p/w92${item.posterPath}`} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-[6px] text-white/20 font-mono">NO IMG</div>
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
                       <h4 className="text-xs font-bold text-[#D3C3B9] group-hover:text-white truncate">{item.title}</h4>
-                      <p className="text-[9px] font-mono text-slate-500 mt-1">
-                        <span className="text-[#B58863]">{item.mediaType === "movie" ? "MOVIE" : "SERIES"}</span> • {item.releaseDate ? item.releaseDate.split("-")[0] : "N/A"}
+                      <p className="text-[9px] font-mono text-slate-400 mt-1 flex items-center gap-2">
+                        <span className="text-[#B58863] font-bold">{item.mediaType === "movie" ? "MOVIE" : "SERIES"}</span>
+                        <span>•</span>
+                        <span>{item.releaseDate ? item.releaseDate.split("-")[0] : "N/A"}</span>
                       </p>
                     </div>
                   </button>
