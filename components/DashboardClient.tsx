@@ -61,7 +61,9 @@ export default function DashboardClient({
 
   const watchedMoviesCount = watched.filter((w) => w.mediaType === "movie").length;
   const watchedTVCount = watched.filter((w) => w.mediaType === "tv").length;
-  const totalHours = Math.round(totalRuntimeMinutes / 60);
+  const hours = Math.floor(totalRuntimeMinutes / 60);
+  const mins = totalRuntimeMinutes % 60;
+  const formattedRuntime = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
 
   const mapToMediaItem = (w: WatchEntryData): MediaItem => ({
     id: w.tmdbId,
@@ -232,8 +234,8 @@ export default function DashboardClient({
 
             <div className="bg-[#103334]/30 border border-[#3D4D55]/40 rounded-2xl p-4 text-center">
               <span className="block text-[7.5px] font-mono text-slate-400 uppercase tracking-widest">TIME IN CINEMA</span>
-              <span className="text-2xl font-black font-mono text-[#FAF6E8] mt-1 block">{totalHours}h</span>
-              <span className="text-[8px] font-mono text-[#B58863] mt-0.5 block">TOTAL RUNTIME</span>
+              <span className="text-2xl font-black font-mono text-[#FAF6E8] mt-1 block">{formattedRuntime}</span>
+              <span className="text-[8px] font-mono text-[#B58863] mt-0.5 block">{totalRuntimeMinutes.toLocaleString()} TOTAL MINS</span>
             </div>
 
             <div className="bg-[#103334]/30 border border-[#3D4D55]/40 rounded-2xl p-4 text-center">
