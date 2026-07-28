@@ -130,8 +130,13 @@ export default function DashboardClient({
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#0f1a1b] text-[#D3C3B9] selection:bg-[#B58863]/30 overflow-x-hidden font-sans">
+    <div className="w-full min-h-screen cinema-bg-mesh text-[#D3C3B9] selection:bg-[#B58863]/30 overflow-x-hidden font-sans relative">
       
+      {/* Ambient Background Plasma Light Orbs */}
+      <div className="absolute top-10 left-10 w-[500px] h-[500px] bg-[#B58863]/15 rounded-full blur-[140px] pointer-events-none z-0" />
+      <div className="absolute top-1/3 right-10 w-[600px] h-[600px] bg-[#103334]/50 rounded-full blur-[160px] pointer-events-none z-0" />
+      <div className="absolute bottom-20 left-1/4 w-[550px] h-[550px] bg-[#d4a87c]/10 rounded-full blur-[150px] pointer-events-none z-0" />
+
       {/* ════════════════ CINEMATIC HERO BACKDROP BANNER ════════════════ */}
       <div className="relative h-72 sm:h-88 md:h-96 w-full bg-gradient-to-br from-[#103334] via-[#0d1f20] to-[#080e0f] overflow-hidden border-b border-[#3D4D55]/40">
         

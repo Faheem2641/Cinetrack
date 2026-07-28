@@ -210,7 +210,12 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
   const modalList = activeModal === "followers" ? mockFollowers : mockFollowing;
 
   return (
-    <div className="w-full min-h-screen bg-[#0f1a1b] text-[#D3C3B9] selection:bg-[#B58863]/30 selection:text-[#FAF6E8] overflow-x-hidden">
+    <div className="w-full min-h-screen cinema-bg-mesh text-[#D3C3B9] selection:bg-[#B58863]/30 selection:text-[#FAF6E8] overflow-x-hidden relative">
+      
+      {/* Ambient Background Plasma Light Orbs */}
+      <div className="absolute top-10 right-10 w-[500px] h-[500px] bg-[#B58863]/15 rounded-full blur-[140px] pointer-events-none z-0" />
+      <div className="absolute top-1/2 left-10 w-[600px] h-[600px] bg-[#103334]/50 rounded-full blur-[160px] pointer-events-none z-0" />
+      <div className="absolute bottom-20 right-1/4 w-[550px] h-[550px] bg-[#d4a87c]/10 rounded-full blur-[150px] pointer-events-none z-0" />
 
       {/* ════════════════ COVER BANNER ════════════════ */}
       <div className={`relative h-64 md:h-80 w-full bg-gradient-to-br ${activeCover.gradient} overflow-hidden`}>
