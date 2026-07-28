@@ -212,12 +212,12 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
   return (
     <div className="w-full min-h-screen bg-[#0f1a1b] text-[#D3C3B9] pt-8 pb-32 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto selection:bg-[#B58863]/30 overflow-x-hidden font-sans">
       {/* ─── HERO IDENTITY ROW ─── */}
-      <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 items-start mb-10 pt-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch mb-12 pt-2">
 
           {/* LEFT: Avatar + ID Card */}
-          <div className={`flex-shrink-0 w-full lg:w-72 animate-panel-enter`}>
+          <div className="lg:col-span-4 sm:col-span-12 flex flex-col animate-panel-enter">
             {/* Director's Clapper ID Card */}
-            <div className="relative bg-[#0d1f20]/95 backdrop-blur-2xl border border-[#3D4D55]/50 rounded-3xl overflow-hidden animate-glow-breathe shadow-2xl">
+            <div className="relative bg-[#0d1f20]/95 backdrop-blur-2xl border border-[#3D4D55]/50 rounded-3xl overflow-hidden animate-glow-breathe shadow-2xl h-full flex flex-col justify-between">
               {/* Top clapper bar (black & white stripes) */}
               <div className="h-5 flex overflow-hidden">
                 {Array.from({ length: 30 }).map((_, i) => (
@@ -343,7 +343,7 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
           </div>
 
           {/* RIGHT: Analytics + Favorite Cinema */}
-          <div className="flex-grow space-y-6 min-w-0">
+          <div className="lg:col-span-8 sm:col-span-12 flex flex-col gap-6 justify-between min-w-0">
 
             {/* Genre VU Meters */}
             <div className="animate-panel-enter-delay-1 bg-[#0d1f20]/80 backdrop-blur-xl border border-[#3D4D55]/40 rounded-3xl p-6 relative overflow-hidden">
