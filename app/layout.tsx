@@ -40,7 +40,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${caveat.variable} ${playfair.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col bg-[#0f1a1b] text-[#D3C3B9] font-sans">
+      <body className="min-h-full flex flex-col cinema-bg-mesh bg-[#070d0e] text-[#E8DDD5] font-sans relative selection:bg-[#B58863]/30">
         <Navbar />
         <main className="flex-grow flex flex-col">{children}</main>
         <FilmstripDivider

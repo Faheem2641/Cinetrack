@@ -89,8 +89,8 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
 
   if (!isHome) {
     return (
-      <header className="sticky top-3 z-50 w-full px-3 sm:px-6 py-1 select-none">
-        <div className="mx-auto max-w-7xl w-full bg-[#0b1618]/90 backdrop-blur-2xl border border-[#3D4D55]/60 rounded-2xl px-4 py-2.5 shadow-[0_12px_40px_rgba(0,0,0,0.65)] relative flex items-center justify-between transition-all duration-300">
+      <header className="sticky top-0 z-50 w-full px-3 sm:px-6 pt-3 pb-1 select-none backdrop-blur-md bg-[#070d0e]/40">
+        <div className="mx-auto max-w-7xl w-full bg-[#0d1f20]/90 backdrop-blur-2xl border border-[#3D4D55]/60 rounded-2xl px-4 py-2.5 shadow-[0_12px_40px_rgba(0,0,0,0.65)] relative flex items-center justify-between transition-all duration-300">
           
           {/* Golden Viewfinder Corner Marks */}
           <div className="absolute top-1.5 left-1.5 w-2 h-2 border-t-2 border-l-2 border-[#B58863]/60 pointer-events-none" />
