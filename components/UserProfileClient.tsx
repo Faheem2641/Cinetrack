@@ -360,26 +360,41 @@ export default function UserProfileClient({ isOwnProfile, user }: UserProfileCli
                       >
                         {isFollowing ? "✓ Following" : "✦ Follow"}
                       </button>
-                      <button className="px-3.5 py-2.5 bg-[#103334]/60 border border-[#3D4D55]/50 text-[#A79E9C] rounded-xl text-[9px] font-mono font-black uppercase hover:text-white hover:bg-[#1e2e30] transition-all cursor-pointer">
-                        MSG
+                      <button
+                        onClick={handleShare}
+                        title="Copy profile link"
+                        className="relative px-3.5 py-2.5 bg-[#103334]/40 border border-[#3D4D55]/50 text-[#A79E9C] rounded-xl hover:text-[#FAF6E8] hover:bg-[#1e2e30] transition-all cursor-pointer group"
+                      >
+                        {copied ? (
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5 text-emerald-400"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                        ) : (
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5" /></svg>
+                        )}
+                        {copied && <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 text-[7px] font-mono font-black bg-emerald-900/80 border border-emerald-600/40 text-emerald-300 rounded whitespace-nowrap z-30">Link copied!</span>}
                       </button>
                     </>
                   ) : (
-                    <Link href="/dashboard" className="flex-grow py-2.5 rounded-xl text-[9px] font-mono font-black uppercase tracking-widest text-center text-[#A79E9C] bg-[#103334]/40 border border-[#3D4D55]/50 hover:border-[#B58863]/40 hover:text-[#FAF6E8] hover:bg-[#1e2e30] transition-all">
-                      Edit Portfolio
-                    </Link>
+                    <button
+                      onClick={handleShare}
+                      className="flex-grow py-2.5 px-4 rounded-xl text-[9px] font-mono font-black uppercase tracking-widest text-center text-[#B58863] bg-[#B58863]/10 border border-[#B58863]/40 hover:bg-[#B58863]/20 hover:border-[#B58863]/60 transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-[0.98]"
+                    >
+                      {copied ? (
+                        <>
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5 text-emerald-400">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                          </svg>
+                          <span className="text-emerald-400 font-bold">Link Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5" />
+                          </svg>
+                          <span>Copy Profile Link</span>
+                        </>
+                      )}
+                    </button>
                   )}
-                  <button
-                    onClick={handleShare}
-                    title="Share profile"
-                    className="relative px-3.5 py-2.5 bg-[#103334]/40 border border-[#3D4D55]/50 text-[#A79E9C] rounded-xl hover:text-[#FAF6E8] hover:bg-[#1e2e30] transition-all cursor-pointer group"
-                  >
-                    {copied
-                      ? <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5 text-emerald-400"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
-                      : <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186 2.504-1.253m-2.504 3.439 2.504 1.253m0-4.692a2.25 2.25 0 1 1 0-3.328m0 3.328a2.25 2.25 0 0 1-2.504 1.253m2.504 2.186a2.25 2.25 0 1 0 0 3.328m0-3.328a2.25 2.25 0 0 0-2.504-1.253" /></svg>
-                    }
-                    {copied && <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 text-[7px] font-mono font-black bg-emerald-900/80 border border-emerald-600/40 text-emerald-300 rounded whitespace-nowrap z-30">Link copied!</span>}
-                  </button>
                 </div>
 
                 {/* Bottom barcode */}
