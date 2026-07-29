@@ -31,7 +31,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             name="q"
             defaultValue={query}
             placeholder="Search by title, series, or keywords..."
-            className="w-full bg-[#103334]/60 border border-[#3D4D55]/50 rounded-2xl py-3.5 pl-5 pr-12 text-sm text-[#D3C3B9] placeholder-[#A79E9C]/60 focus:outline-none focus:border-[#B58863]/60 focus:ring-1 focus:ring-[#B58863]/20 shadow-xl transition-all"
+            className="w-full bg-[#103334]/60 border border-[#3D4D55]/50 rounded-2xl py-3.5 pl-5 pr-12 text-base sm:text-sm text-[#D3C3B9] placeholder-[#A79E9C]/60 focus:outline-none focus:border-[#B58863]/60 focus:ring-1 focus:ring-[#B58863]/20 shadow-xl transition-all"
             required
           />
           <button

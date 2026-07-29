@@ -39,6 +39,34 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
   const [dimensions, setDimensions] = useState({ width: 1600, height: 720 });
   const [mounted, setMounted] = useState(false);
 
+  // Swipe gesture states
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isLeftSwipe) {
+      setActiveIndex((prev) => (prev + 1) % featured.length);
+    } else if (isRightSwipe) {
+      setActiveIndex((prev) => (prev - 1 + featured.length) % featured.length);
+    }
+  };
+
   useEffect(() => {
     setMounted(true);
     if (!containerRef.current) return;
@@ -153,9 +181,12 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
           style={{
             clipPath: mounted && !isMobile ? "url(#hero-cutout-clip)" : "none",
           }}
-          className="relative w-full aspect-[21/10] min-h-[500px] sm:min-h-[600px] md:min-h-[650px] lg:min-h-[720px] overflow-hidden bg-black rounded-3xl md:rounded-[40px] shadow-2xl transition-shadow duration-300 border border-white/10"
+          className="relative w-full aspect-[21/10] min-h-[500px] sm:min-h-[600px] md:min-h-[650px] lg:min-h-[720px] overflow-hidden bg-black rounded-3xl md:rounded-[40px] shadow-2xl transition-shadow duration-300 border border-white/10 touch-pan-y"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
         >
           {/* Background Backdrops Container */}
           <div className="absolute inset-0">
@@ -288,7 +319,7 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
 
                   <Link
                     href="/search"
-                    className="px-6 py-3 rounded-full bg-white/5 border border-white/10 text-slate-200 font-bold text-xs sm:text-sm hover:bg-white/10 hover:text-white transition-colors"
+                    className="px-6 py-3 rounded-full bg-white/5 border border-white/10 text-slate-200 font-bold text-xs sm:text-sm hover:bg-white/10 hover:text-white transition-all active:scale-95"
                   >
                     Browse Catalog
                   </Link>
@@ -339,11 +370,10 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
                 <button
                   key={idx}
                   onClick={() => setActiveIndex(idx)}
-                  className={`relative h-1.5 rounded-full transition-all duration-300 cursor-pointer overflow-hidden bg-[#3D4D55]/60 ${
-                    isActive ? "w-10" : "w-1.5"
-                  }`}
+                  className="relative py-2 px-0 group/pill cursor-pointer outline-none"
                   aria-label={`Go to slide ${idx + 1}`}
                 >
+                  <div className={`relative h-1.5 rounded-full transition-all duration-300 overflow-hidden bg-[#3D4D55]/60 group-hover/pill:bg-[#3D4D55] ${isActive ? "w-10" : "w-1.5"}`}>
                   {isActive && (
                     <div
                       key={activeIndex}
@@ -354,6 +384,7 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
                       }}
                     />
                   )}
+                  </div>
                 </button>
               );
             })}

@@ -89,6 +89,7 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
 
   if (!isHome) {
     return (
+      <>
       <header className="sticky top-3 z-50 w-full px-3 sm:px-6 py-1 select-none">
         <div className="mx-auto max-w-7xl w-full bg-[#0b1618]/90 backdrop-blur-2xl border border-[#3D4D55]/60 rounded-2xl px-4 py-2.5 shadow-[0_12px_40px_rgba(0,0,0,0.65)] relative flex items-center justify-between transition-all duration-300">
 
@@ -114,39 +115,8 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
           {/* Desktop Navigation Links & Controls */}
           <div className="hidden md:flex items-center gap-2 lg:gap-3 z-10">
             <Link
-              href="/movies"
-              className={`px-3 py-1.5 rounded-xl text-[10px] font-mono font-black uppercase tracking-wider transition-all ${pathname === "/movies"
-                  ? "bg-[#B58863]/20 border border-[#B58863]/60 text-[#FAF6E8]"
-                  : "text-[#D3C3B9]/80 hover:text-white hover:bg-white/5"
-                }`}
-            >
-              Movies
-            </Link>
-
-            <Link
-              href="/tv"
-              className={`px-3 py-1.5 rounded-xl text-[10px] font-mono font-black uppercase tracking-wider transition-all ${pathname === "/tv"
-                  ? "bg-[#B58863]/20 border border-[#B58863]/60 text-[#FAF6E8]"
-                  : "text-[#D3C3B9]/80 hover:text-white hover:bg-white/5"
-                }`}
-            >
-              TV Shows
-            </Link>
-
-            <Link
-              href="/recommend"
-              className={`px-3 py-1.5 rounded-xl text-[10px] font-mono font-black uppercase tracking-wider transition-all flex items-center gap-1 ${pathname === "/recommend"
-                  ? "bg-gradient-to-r from-[#B58863] to-[#d4a87c] text-[#0f1a1b] font-bold"
-                  : "text-[#B58863] hover:text-[#d4a87c] bg-[#B58863]/10 border border-[#B58863]/30 hover:bg-[#B58863]/20"
-                }`}
-            >
-              <span>✦</span>
-              <span>Match Finder</span>
-            </Link>
-
-            <Link
               href="/dashboard"
-              className={`px-3 py-1.5 rounded-xl text-[10px] font-mono font-black uppercase tracking-wider transition-all ${pathname === "/dashboard"
+              className={`px-4 py-2 rounded-xl text-sm font-mono font-black uppercase tracking-wider transition-all ${pathname === "/dashboard"
                   ? "bg-[#B58863]/20 border border-[#B58863]/60 text-[#FAF6E8]"
                   : "text-[#D3C3B9]/80 hover:text-white hover:bg-white/5"
                 }`}
@@ -158,7 +128,7 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
             <form
               action="/search"
               method="GET"
-              className="relative flex items-center bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 focus-within:border-[#B58863] transition-all ml-1"
+              className="relative flex items-center bg-white/5 border border-white/10 rounded-xl px-4 py-2 focus-within:border-[#B58863] transition-all ml-1"
               onFocus={() => setShowSuggestions(searchQuery.trim().length >= 2)}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
             >
@@ -168,7 +138,7 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                 value={searchQuery}
                 onChange={handleSearchChange}
                 placeholder="Search catalog..."
-                className="w-28 sm:w-36 lg:w-44 bg-transparent text-[10px] text-white placeholder-white/40 focus:outline-none font-mono"
+                className="w-28 sm:w-36 lg:w-44 bg-transparent text-sm text-white placeholder-white/40 focus:outline-none font-mono"
                 required
                 autoComplete="off"
               />
@@ -246,7 +216,7 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                     <img
                       src={session.user.image || "/avatar-placeholder.png"}
                       alt={session.user.name || "User Avatar"}
-                      className="w-7.5 h-7.5 rounded-full object-cover bg-slate-100"
+                      className="w-9 h-9 rounded-full object-cover bg-slate-100"
                     />
                     <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border border-white rounded-full" />
                   </div>
@@ -276,64 +246,22 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
             ) : (
               <Link
                 href="/login"
-                className="text-[10px] font-bold bg-gradient-to-r from-[#B58863] to-[#d4a87c] text-[#0f1a1b] px-4 py-1.5 rounded-xl transition-all shadow-md shadow-[#B58863]/20 hover:opacity-90 font-mono tracking-wider"
+                className="text-sm font-bold bg-gradient-to-r from-[#B58863] to-[#d4a87c] text-[#0f1a1b] px-5 py-2 rounded-xl transition-all shadow-md shadow-[#B58863]/20 hover:opacity-90 font-mono tracking-wider"
               >
                 Sign In
               </Link>
             )}
           </div>
 
-          {/* Mobile Drawer Trigger for Inner Pages */}
-          <div className="flex md:hidden items-center gap-3 z-10">
-            <input type="checkbox" id="mobile-menu-toggle-inner" className="peer hidden" />
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none peer-checked:opacity-100 peer-checked:pointer-events-auto transition-opacity duration-300 z-40" />
-            <label
-              htmlFor="mobile-menu-toggle-inner"
-              className="flex items-center justify-center p-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 cursor-pointer"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4.5 h-4.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-              </svg>
-            </label>
-
-            <div className="fixed top-0 right-0 bottom-0 w-72 bg-[#0c1618]/97 backdrop-blur-2xl border-l border-white/[0.07] shadow-2xl translate-x-full peer-checked:translate-x-0 transition-transform duration-300 ease-in-out z-50 p-6 flex flex-col justify-between pointer-events-auto">
-              <div className="space-y-6">
-                <div className="flex justify-between items-center border-b border-white/[0.07] pb-4">
-                  <span className="font-mono text-[9px] text-[#B58863] tracking-widest uppercase">NAV CONSOLE</span>
-                  <label htmlFor="mobile-menu-toggle-inner" className="cursor-pointer text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-white/10">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                    </svg>
-                  </label>
-                </div>
-
-                <nav className="flex flex-col gap-2">
-                  <Link href="/movies" className="text-xs font-mono font-bold uppercase tracking-wider py-2 text-slate-300 border-b border-white/5 hover:text-white">Movies</Link>
-                  <Link href="/tv" className="text-xs font-mono font-bold uppercase tracking-wider py-2 text-slate-300 border-b border-white/5 hover:text-white">TV Shows</Link>
-                  <Link href="/recommend" className="text-xs font-mono font-bold uppercase tracking-wider py-2 text-[#B58863] border-b border-white/5">✦ Match Finder</Link>
-                  <Link href="/dashboard" className="text-xs font-mono font-bold uppercase tracking-wider py-2 text-slate-300 border-b border-white/5 hover:text-white">Dashboard</Link>
-                  <Link href="/profile" className="text-xs font-mono font-bold uppercase tracking-wider py-2 text-slate-300 border-b border-white/5 hover:text-white">Profile</Link>
-                </nav>
-              </div>
-
-              <div className="border-t border-white/[0.07] pt-4">
-                {session?.user ? (
-                  <form action={logoutAction}>
-                    <button type="submit" className="w-full py-2 text-xs bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl font-bold">Sign Out</button>
-                  </form>
-                ) : (
-                  <Link href="/login" className="block text-center py-2 text-xs bg-[#B58863] text-[#0f1a1b] rounded-xl font-bold font-mono">Sign In</Link>
-                )}
-              </div>
-            </div>
-          </div>
-
         </div>
       </header>
+      <MobileBottomNav pathname={pathname} session={session} />
+      </>
     );
   }
 
   return (
+    <>
     <header
       className="absolute top-0 left-0 right-0 z-40 w-full flex h-20 items-center justify-between px-4 sm:px-8 lg:px-12 select-none bg-gradient-to-b from-[#080e0f]/85 via-[#080e0f]/30 to-transparent border-none shadow-none transition-all duration-500 ease-in-out"
     >
@@ -366,27 +294,8 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
           {/* Premium Capsule Navigation Controls (Desktop) */}
           <div className="flex items-center gap-1.5 lg:gap-2">
             <Link
-              href="/movies"
-              className="relative group px-3 py-1 rounded-full text-[9px] font-mono font-black uppercase tracking-wider text-[#D3C3B9] bg-white/5 border border-white/10 hover:border-[#B58863]/40 hover:text-white transition-all h-7.5 flex items-center justify-center"
-            >
-              Movies
-            </Link>
-            <Link
-              href="/tv"
-              className="relative group px-3 py-1 rounded-full text-[9px] font-mono font-black uppercase tracking-wider text-[#D3C3B9] bg-white/5 border border-white/10 hover:border-[#B58863]/40 hover:text-white transition-all h-7.5 flex items-center justify-center"
-            >
-              TV
-            </Link>
-            <Link
-              href="/recommend"
-              className="relative group px-3 py-1 rounded-full text-[9px] font-mono font-black uppercase tracking-wider text-[#B58863] bg-[#B58863]/10 border border-[#B58863]/30 hover:bg-[#B58863]/20 transition-all h-7.5 flex items-center justify-center gap-1"
-            >
-              <span>✦</span>
-              <span>Match</span>
-            </Link>
-            <Link
               href="/dashboard"
-              className="relative group px-3 py-1 rounded-full text-[9px] font-mono font-black uppercase tracking-wider text-[#D3C3B9] bg-white/5 border border-white/10 hover:border-[#B58863]/40 hover:text-white transition-all h-7.5 flex items-center justify-center"
+              className="relative group px-4 py-1.5 rounded-full text-xs font-mono font-black uppercase tracking-wider text-[#D3C3B9] bg-white/5 border border-white/10 hover:border-[#B58863]/40 hover:text-white transition-all h-9 flex items-center justify-center"
             >
               Dashboard
             </Link>
@@ -395,7 +304,7 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
           <form
             action="/search"
             method="GET"
-            className={`relative flex items-center rounded-full px-2.5 py-0.5 transition-all duration-300 h-7.5 ${searchFormClass}`}
+            className={`relative flex items-center rounded-full px-3 py-1 transition-all duration-300 h-9 ${searchFormClass}`}
             onFocus={() => setShowSuggestions(searchQuery.trim().length >= 2)}
             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
           >
@@ -405,7 +314,7 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
               value={searchQuery}
               onChange={handleSearchChange}
               placeholder="Search..."
-              className={`w-24 sm:w-28 md:w-32 lg:w-36 bg-transparent text-[9.5px] focus:outline-none transition-all duration-300 font-mono ${searchInputClass}`}
+              className={`w-24 sm:w-28 md:w-32 lg:w-36 bg-transparent text-xs focus:outline-none transition-all duration-300 font-mono ${searchInputClass}`}
               required
               autoComplete="off"
             />
@@ -476,8 +385,8 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
           </form>
 
           {/* Director Shutter REC Marker */}
-          <div className="hidden xl:flex items-center gap-1.5 font-mono text-[7.5px] tracking-widest text-red-500/80 bg-red-550/5 border border-red-500/30 px-2.5 py-0.5 rounded-full select-none h-7.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 pulse-red" />
+          <div className="hidden xl:flex items-center gap-1.5 font-mono text-[10px] tracking-widest text-red-500/80 bg-red-550/5 border border-red-500/30 px-3 py-1 rounded-full select-none h-9">
+            <span className="w-2 h-2 rounded-full bg-red-500 pulse-red" />
             <span className="text-red-500 font-bold">REC</span>
           </div>
 
@@ -490,7 +399,7 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
                   <img
                     src={session.user.image || "/avatar-placeholder.png"}
                     alt={session.user.name || "User Avatar"}
-                    className="w-7 h-7 rounded-full object-cover bg-slate-100"
+                    className="w-8 h-8 rounded-full object-cover bg-slate-100"
                   />
                   <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border border-white rounded-full" />
                 </div>
@@ -521,199 +430,49 @@ export default function NavbarClient({ session, logoutAction }: NavbarClientProp
             <div className="flex items-center">
               <Link
                 href="/login"
-                className="text-[10px] font-bold bg-gradient-to-r from-[#B58863] to-[#d4a87c] text-[#0f1a1b] px-4.5 py-1 rounded-full transition-all shadow-md shadow-[#B58863]/20 hover:shadow-[#B58863]/40 hover:opacity-90 font-mono tracking-wider h-8.5 flex items-center justify-center"
+                className="text-sm font-bold bg-gradient-to-r from-[#B58863] to-[#d4a87c] text-[#0f1a1b] px-5 py-1.5 rounded-full transition-all shadow-md shadow-[#B58863]/20 hover:shadow-[#B58863]/40 hover:opacity-90 font-mono tracking-wider h-10 flex items-center justify-center"
               >
                 Sign In
               </Link>
             </div>
           )}
         </div>
-
-        {/* Mobile Layout: Responsive Drawer Interface */}
-        <div className="flex md:hidden items-center gap-3 z-10">
-          {/* Mobile Drawer Checkbox Toggle */}
-          <input type="checkbox" id="mobile-menu-toggle" className="peer hidden" />
-
-          {/* Dark blurred background overlay */}
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none peer-checked:opacity-100 peer-checked:pointer-events-auto transition-opacity duration-300 z-40 md:hidden" />
-
-          {/* Hamburger trigger */}
-          <label
-            htmlFor="mobile-menu-toggle"
-            className="flex items-center justify-center p-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-all cursor-pointer"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4.5 h-4.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-            </svg>
-          </label>
-
-          {/* Drawer Sidebar Menu */}
-          <div className="fixed top-0 right-0 bottom-0 w-72 bg-[#0c1618]/97 backdrop-blur-2xl border-l border-white/[0.07] shadow-2xl translate-x-full peer-checked:translate-x-0 transition-transform duration-300 ease-in-out z-50 p-6 flex flex-col justify-between pointer-events-auto">
-            <div className="space-y-8">
-
-              {/* Close button header */}
-              <div className="flex justify-between items-center border-b border-white/[0.07] pb-4">
-                <span className="font-mono text-[9px] text-[#B58863] tracking-widest uppercase">NAV CONSOLE</span>
-                <label htmlFor="mobile-menu-toggle" className="cursor-pointer text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-white/10">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                  </svg>
-                </label>
-              </div>
-
-              {/* Navigation lists */}
-              <nav className="flex flex-col gap-3">
-
-                <Link
-                  href="/recommend"
-                  className="flex items-center justify-between text-xs font-black uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-[#B58863] to-[#d4a87c] py-2 border-b border-white/[0.07] transition-all hover:brightness-110"
-                >
-                  <span>✦ Match Finder</span>
-                  <span className="text-[9px] text-[#B58863] font-mono">[MATCH]</span>
-                </Link>
-
-                <Link
-                  href="/profile"
-                  className="flex items-center justify-between text-xs font-black uppercase tracking-widest text-slate-300 hover:text-white py-2 border-b border-white/[0.07] transition-colors"
-                >
-                  <span>Profile</span>
-                  <span className="text-[9px] text-[#B58863]/80 font-mono">[USER]</span>
-                </Link>
-              </nav>
-
-              {/* Mobile Search Tool */}
-              <div className="pt-2">
-                <form
-                  action="/search"
-                  method="GET"
-                  className="relative flex items-center bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 focus-within:border-[#B58863] transition-all duration-300"
-                  onFocus={() => setShowMobileSuggestions(mobileQuery.trim().length >= 2)}
-                  onBlur={() => setTimeout(() => setShowMobileSuggestions(false), 200)}
-                >
-                  <input
-                    type="text"
-                    name="q"
-                    value={mobileQuery}
-                    onChange={handleMobileChange}
-                    placeholder="Search catalog..."
-                    className="w-full bg-transparent text-xs text-white placeholder-white/40 focus:outline-none font-mono"
-                    required
-                    autoComplete="off"
-                  />
-                  <button type="submit" className="text-white/40 hover:text-[#B58863] cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.604 10.604Z" />
-                    </svg>
-                  </button>
-
-                  {/* Autocomplete suggestions for Mobile */}
-                  {showMobileSuggestions && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-[#0c1618] border border-white/[0.08] rounded-xl p-2 shadow-2xl z-50 animate-search-dropdown flex flex-col gap-1 w-full max-h-60 overflow-y-auto">
-                      {mobileSuggestions.length > 0 ? (
-                        mobileSuggestions.map((item) => (
-                          <Link
-                            key={item.id}
-                            href={`/${item.mediaType === "movie" ? "movies" : "tv"}/${item.id}`}
-                            onClick={() => {
-                              setMobileQuery("");
-                              setShowMobileSuggestions(false);
-                            }}
-                            className="flex items-center gap-3.5 p-1.5 rounded-lg hover:bg-white/5 transition-colors text-left"
-                          >
-                            <div className="relative w-7 h-10 bg-black rounded overflow-hidden flex-shrink-0 border border-white/5">
-                              {item.posterPath ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
-                                  src={`https://image.tmdb.org/t/p/w92${item.posterPath}`}
-                                  alt=""
-                                  className="w-full h-full object-cover"
-                                  loading="lazy"
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center text-[5px] text-white/20 font-mono">NO IMG</div>
-                              )}
-                            </div>
-                            <div className="flex-grow min-w-0">
-                              <h4 className="text-[10px] font-black text-slate-300 truncate leading-tight">
-                                {item.title}
-                              </h4>
-                              <p className="text-[8px] font-mono text-slate-500 mt-0.5 flex items-center gap-1">
-                                <span className="text-[#B58863]">{item.mediaType === "movie" ? "MOVIE" : "SERIES"}</span>
-                                <span>•</span>
-                                <span>{item.releaseDate ? item.releaseDate.split("-")[0] : "N/A"}</span>
-                              </p>
-                            </div>
-                          </Link>
-                        ))
-                      ) : (
-                        <div className="py-3 text-center text-[9px] font-mono text-slate-500 select-none">
-                          NO COMPATIBLE REELS FOUND
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </form>
-              </div>
-            </div>
-
-            {/* Drawer User Control Panel */}
-            <div className="border-t border-white/[0.07] pt-6">
-              {session?.user ? (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="relative p-0.5 rounded-full bg-gradient-to-tr from-[#B58863] to-[#d4a87c] shadow-md">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={session.user.image || "/avatar-placeholder.png"}
-                        alt={session.user.name || "User Avatar"}
-                        className="w-10 h-10 rounded-full object-cover bg-slate-100"
-                      />
-                      <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
-                    </div>
-                    <div className="leading-tight">
-                      <p className="text-xs font-bold text-slate-800">{session.user.name}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-2 pt-2">
-                    <Link
-                      href="/profile"
-                      className="block w-full text-center px-4 py-2.5 text-xs bg-white/5 border border-white/10 text-slate-300 rounded-xl hover:bg-white/10 transition-all font-bold"
-                    >
-                      Profile
-                    </Link>
-                    <form action={logoutAction}>
-                      <button
-                        type="submit"
-                        className="block w-full text-center px-4 py-2.5 text-xs bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl hover:bg-red-500/20 transition-all font-bold cursor-pointer"
-                      >
-                        Sign Out
-                      </button>
-                    </form>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-col">
-                  <Link
-                    href="/login"
-                    className="block w-full text-center px-4 py-2.5 text-xs bg-gradient-to-r from-[#B58863] to-[#d4a87c] text-[#0f1a1b] rounded-xl hover:opacity-90 transition-all font-bold font-mono tracking-wider"
-                  >
-                    Sign In
-                  </Link>
-                </div>
-              )}
-
-              {/* Monospaced Viewfinder metadata inside Drawer */}
-              <div className="mt-8 flex justify-between text-[7px] font-mono text-slate-400 select-none">
-                <span>SYS LOG: ONLINE</span>
-                <span>24FPS SAFETY FILM</span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
       </div>
     </header>
+    <MobileBottomNav pathname={pathname} session={session} />
+    </>
   );
 }
+
+const MobileBottomNav = ({ pathname, session }: { pathname: string; session: any }) => {
+  return (
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0b1618]/95 backdrop-blur-xl border-t border-white/10 pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+      <div className="flex justify-around items-center h-16 px-2">
+        <Link href="/" className={`flex flex-col items-center justify-center w-full h-full gap-1 active:scale-95 transition-transform ${pathname === "/" ? "text-[#B58863]" : "text-slate-400 hover:text-slate-200"}`}>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+          </svg>
+          <span className="text-[10px] font-bold">Home</span>
+        </Link>
+        <Link href="/search" className={`flex flex-col items-center justify-center w-full h-full gap-1 active:scale-95 transition-transform ${pathname === "/search" ? "text-[#B58863]" : "text-slate-400 hover:text-slate-200"}`}>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.604 10.604Z" />
+          </svg>
+          <span className="text-[10px] font-bold">Search</span>
+        </Link>
+        <Link href="/dashboard" className={`flex flex-col items-center justify-center w-full h-full gap-1 active:scale-95 transition-transform ${pathname === "/dashboard" ? "text-[#B58863]" : "text-slate-400 hover:text-slate-200"}`}>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+          </svg>
+          <span className="text-[10px] font-bold">List</span>
+        </Link>
+        <Link href={session?.user ? "/profile" : "/login"} className={`flex flex-col items-center justify-center w-full h-full gap-1 active:scale-95 transition-transform ${pathname === "/profile" || pathname === "/login" ? "text-[#B58863]" : "text-slate-400 hover:text-slate-200"}`}>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+          </svg>
+          <span className="text-[10px] font-bold">Profile</span>
+        </Link>
+      </div>
+    </nav>
+  );
+};

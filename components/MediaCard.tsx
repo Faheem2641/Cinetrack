@@ -16,7 +16,7 @@ export default function MediaCard({ item }: MediaCardProps) {
   const linkHref = mediaType === "movie" ? `/movies/${id}` : `/tv/${id}`;
 
   return (
-    <div className="group relative aspect-[2/3] w-full overflow-hidden rounded-2xl bg-[#080d0e] border border-white/10 hover:border-[#B58863]/60 transition-[transform,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] hover:-translate-y-2 hover:scale-[1.03] shadow-lg hover:shadow-[0_22px_45px_rgba(0,0,0,0.85),0_0_30px_rgba(181,136,99,0.25)] z-10 hover:z-30 select-none">
+    <div className="group relative aspect-[2/3] w-full overflow-hidden rounded-2xl bg-[#080d0e] border border-white/10 hover:border-[#B58863]/60 transition-[transform,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] hover:-translate-y-2 hover:scale-[1.03] active:scale-[0.98] shadow-lg hover:shadow-[0_22px_45px_rgba(0,0,0,0.85),0_0_30px_rgba(181,136,99,0.25)] z-10 hover:z-30 select-none">
       <Link href={linkHref} className="absolute inset-0 z-10">
         {/* Poster Image - Pure Edge-to-Edge Canvas */}
         {/* eslint-disable-next-line @next/next/no-img-element */}

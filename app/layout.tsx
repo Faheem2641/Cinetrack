@@ -41,7 +41,7 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} ${caveat.variable} ${playfair.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col bg-[#0f1a1b] text-[#D3C3B9] font-sans">
+      <body className="min-h-full flex flex-col bg-[#0f1a1b] text-[#D3C3B9] font-sans pb-20 md:pb-0">
         <Navbar />
         <main className="flex-grow flex flex-col">{children}</main>
         <FilmstripDivider
