@@ -207,115 +207,103 @@ export default async function Home() {
             </span>
           </div>
 
-          {/* 2-column editorial grid with gaps and rounded cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+          {/* Majestic Portrait Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {iconsData.map((icon, idx) => {
               if (!icon.profile) return null;
               const profileImg = icon.profile.profilePath
-                ? `https://image.tmdb.org/t/p/h632${icon.profile.profilePath}`
+                ? `https://image.tmdb.org/t/p/w780${icon.profile.profilePath}`
                 : null;
-              const top5 = icon.films.slice(0, 5);
+              const today = new Date();
+              const start = new Date(today.getFullYear(), 0, 0);
+              const diff = today.getTime() - start.getTime();
+              const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+              
+              const offset = (dayOfYear + icon.id) % icon.films.length;
+              const shuffledFilms = [...icon.films.slice(offset), ...icon.films.slice(0, offset)];
+              const top5 = shuffledFilms.slice(0, 5); // show 5 masterpieces
 
               return (
                 <div
                   key={icon.id}
-                  className="group/icon relative bg-[#0a1214]/80 border border-white/10 rounded-3xl hover:border-[#B58863]/40 transition-all duration-300 p-0 overflow-hidden shadow-2xl hover:shadow-[0_0_40px_rgba(181,136,99,0.15)]"
+                  className="group/icon relative w-full aspect-[3/4] sm:aspect-[2/3] bg-[#0a1214] border border-white/5 rounded-[32px] overflow-hidden shadow-2xl hover:shadow-[0_0_50px_rgba(181,136,99,0.15)] transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
                 >
-                  <div className="flex h-full min-h-[240px]">
+                  {/* Full Background Portrait */}
+                  {profileImg ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={profileImg}
+                      alt={icon.profile.name}
+                      className="absolute inset-0 w-full h-full object-cover object-center grayscale group-hover/icon:grayscale-0 group-hover/icon:scale-105 transition-all duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)] opacity-70 group-hover/icon:opacity-100"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-[#080d0e]">
+                      <span className="font-mono text-[10px] text-white/20 uppercase tracking-widest">No photo</span>
+                    </div>
+                  )}
 
-                    {/* Left — tall portrait */}
-                    <div className="relative w-[140px] sm:w-[180px] flex-shrink-0 overflow-hidden bg-[#080e0f]">
-                      {profileImg ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={profileImg}
-                          alt={icon.profile.name}
-                          className="absolute inset-0 w-full h-full object-cover object-top grayscale group-hover/icon:grayscale-0 transition-all duration-500 opacity-80 group-hover/icon:opacity-100"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="absolute inset-0 flex items-end p-3">
-                          <span className="font-mono text-[8px] text-white/20 uppercase tracking-widest">No photo</span>
-                        </div>
-                      )}
-                      {/* Bottom gradient over portrait */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#0a1214] group-hover/icon:to-[#0d1618] transition-colors duration-300" />
-                      {/* Index watermark on portrait */}
-                      <span className="absolute top-3 left-3 font-mono text-[9px] font-black text-white/20 select-none">
-                        {String(idx + 1).padStart(2, "0")}
+                  {/* Base Gradient - Always visible for name legibility */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#040809] via-[#040809]/40 to-transparent opacity-90 group-hover/icon:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+                  {/* Top Badges */}
+                  <div className="absolute top-6 left-6 right-6 flex justify-between items-start z-20 pointer-events-none">
+                    <span className="font-mono text-[11px] font-black text-white/30 drop-shadow-md">
+                      {String(idx + 1).padStart(2, "0")}
+                    </span>
+                    <span className="font-mono text-[8px] tracking-[0.25em] text-[#B58863]/90 uppercase px-3 py-1.5 border border-[#B58863]/30 rounded-full bg-[#040809]/50 backdrop-blur-md shadow-lg">
+                      {icon.label}
+                    </span>
+                  </div>
+
+                  {/* Content Container (Slides up on hover) */}
+                  <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8 flex flex-col justify-end z-20 translate-y-[140px] group-hover/icon:translate-y-0 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]">
+                    
+                    {/* Name Block */}
+                    <div className="mb-6">
+                      <h3 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white leading-none drop-shadow-2xl group-hover/icon:text-[#d4a87c] transition-colors duration-300">
+                        {icon.profile.name}
+                      </h3>
+                      {/* Minimal gold rule */}
+                      <div className="mt-4 w-12 h-px bg-[#B58863]/40 group-hover/icon:w-full group-hover/icon:bg-[#B58863] transition-all duration-700 ease-in-out" />
+                    </div>
+
+                    {/* Masterpieces Reveal Panel */}
+                    <div className="w-full flex flex-col gap-3 opacity-0 group-hover/icon:opacity-100 transition-opacity duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] delay-100">
+                      <span className="font-mono text-[9px] tracking-[0.15em] text-[#B58863] uppercase select-none flex items-center gap-2">
+                        ✦ Iconic Works
                       </span>
-                    </div>
-
-                    {/* Right — name + horizontal film slides */}
-                    <div className="flex-grow flex flex-col justify-between p-3.5 sm:p-5">
-
-                      {/* Name block */}
-                      <div>
-                        <span className="font-mono text-[7px] tracking-[0.25em] text-[#B58863]/60 uppercase block mb-2">
-                          {icon.label}
-                        </span>
-                        <h3 className="text-base sm:text-lg font-black tracking-tight text-white leading-tight group-hover/icon:text-[#d4a87c] transition-colors duration-300">
-                          {icon.profile.name}
-                        </h3>
-                        {/* Minimal gold rule */}
-                        <div className="mt-3 w-8 h-px bg-[#B58863]/40 group-hover/icon:w-16 group-hover/icon:bg-[#B58863] transition-all duration-400" />
-                      </div>
-
-                      {/* Overlapping Masterpiece Posters Track */}
-                      {top5.length > 0 && (
-                        <div className="flex flex-col gap-2">
-                          <span className="font-mono text-[6px] tracking-widest text-[#B58863]/50 uppercase select-none">
-                            ✦ Masterpieces
-                          </span>
-                          
-                          {/* Flex track sits directly in the card panel (static spacing to prevent layout shifts) */}
-                          <div className="flex -space-x-6 w-full pl-2">
-                            {top5.map((film, fi) => {
-                              const href = film.mediaType === "movie" ? `/movies/${film.id}` : `/tv/${film.id}`;
-                              const poster = film.posterPath
-                                ? `https://image.tmdb.org/t/p/w185${film.posterPath}`
-                                : null;
-                              return (
-                                <Link
-                                  key={film.id}
-                                  href={href}
-                                  className="group/film relative w-[72px] sm:w-[90px] md:w-[104px] aspect-[2/3] rounded-md border border-white/10 shadow-md bg-[#0c1416] transition-[transform,opacity,border-color] duration-200 ease-out hover:z-30 hover:-translate-y-2.5 hover:scale-[1.08] hover:border-[#B58863]/60 flex-shrink-0 opacity-65 hover:opacity-100"
-                                  title={`${film.title} (${film.releaseDate?.split("-")[0] ?? ""})`}
-                                >
-                                  {poster ? (
-                                    // eslint-disable-next-line @next/next/no-img-element
-                                    <img
-                                      src={poster}
-                                      alt={film.title}
-                                      className="w-full h-full object-cover rounded-lg"
-                                      loading="lazy"
-                                    />
-                                  ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-[6px] text-white/20">NO IMG</div>
-                                  )}
-                                  
-                                  {/* Slide Title tooltip strip inside the poster itself */}
-                                  <div className="absolute inset-x-0 bottom-0 bg-black/90 py-1 px-1 text-center opacity-0 group-hover/film:opacity-100 transition-opacity duration-200 rounded-b-lg">
-                                    <span className="block text-[5px] sm:text-[6px] text-[#FAF6E8] font-black truncate leading-none">
-                                      {film.title}
-                                    </span>
-                                  </div>
-                                </Link>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
-
-
-                      {/* Bottom meta */}
-                      <div className="mt-5 flex items-center justify-between">
-                        <span className="font-mono text-[7px] tracking-widest text-white/10 uppercase select-none">
-                          {icon.films.length} credits
-                        </span>
-                        <div className="w-3 h-3 border border-[#B58863]/20 rotate-45 group-hover/icon:border-[#B58863]/60 transition-colors duration-300" />
+                      
+                      <div className="flex gap-2">
+                        {top5.map((film) => {
+                          const href = film.mediaType === "movie" ? `/movies/${film.id}` : `/tv/${film.id}`;
+                          const poster = film.posterPath
+                            ? `https://image.tmdb.org/t/p/w185${film.posterPath}`
+                            : null;
+                          return (
+                            <Link
+                              key={film.id}
+                              href={href}
+                              className="group/film relative flex-1 aspect-[2/3] rounded-md border border-white/10 shadow-lg bg-[#0c1416] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-2 hover:border-[#B58863]/60 hover:shadow-[0_10px_20px_rgba(0,0,0,0.8)] overflow-hidden"
+                              title={film.title}
+                            >
+                              {poster ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                  src={poster}
+                                  alt={film.title}
+                                  className="w-full h-full object-cover group-hover/film:scale-110 group-hover/film:brightness-110 transition-all duration-500"
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-[8px] text-white/20">NO IMG</div>
+                              )}
+                            </Link>
+                          );
+                        })}
                       </div>
                     </div>
+
                   </div>
                 </div>
               );

@@ -96,7 +96,7 @@ export default function MediaCarousel({ children }: MediaCarouselProps) {
       {/* Left Chevron Button */}
       <button
         onClick={() => handleChevronScroll("left")}
-        className={`absolute left-2 top-[42%] -translate-y-1/2 z-20 p-3 rounded-full bg-[#0f1a1b]/90 border border-white/10 text-[#D3C3B9] hover:bg-[#B58863] hover:text-[#0f1a1b] hover:border-transparent active:scale-90 shadow-2xl transition-all duration-300 cursor-pointer ${
+        className={`absolute left-2 top-[42%] -translate-y-1/2 z-40 p-3 rounded-full bg-[#0f1a1b]/90 border border-white/10 text-[#D3C3B9] hover:bg-[#B58863] hover:text-[#0f1a1b] hover:border-transparent active:scale-90 shadow-2xl transition-all duration-300 cursor-pointer ${
           showLeft ? "opacity-0 group-hover/carousel:opacity-100" : "opacity-0 pointer-events-none"
         }`}
         aria-label="Scroll Left"
@@ -109,7 +109,7 @@ export default function MediaCarousel({ children }: MediaCarouselProps) {
       {/* Right Chevron Button */}
       <button
         onClick={() => handleChevronScroll("right")}
-        className={`absolute right-2 top-[42%] -translate-y-1/2 z-20 p-3 rounded-full bg-[#0f1a1b]/90 border border-white/10 text-[#D3C3B9] hover:bg-[#B58863] hover:text-[#0f1a1b] hover:border-transparent active:scale-90 shadow-2xl transition-all duration-300 cursor-pointer ${
+        className={`absolute right-2 top-[42%] -translate-y-1/2 z-40 p-3 rounded-full bg-[#0f1a1b]/90 border border-white/10 text-[#D3C3B9] hover:bg-[#B58863] hover:text-[#0f1a1b] hover:border-transparent active:scale-90 shadow-2xl transition-all duration-300 cursor-pointer ${
           showRight ? "opacity-0 group-hover/carousel:opacity-100" : "opacity-0 pointer-events-none"
         }`}
         aria-label="Scroll Right"
